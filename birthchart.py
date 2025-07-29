@@ -6,11 +6,11 @@
 ```
 Flask==2.3.3
 pytz==2023.3
-```
+
 
 ### Optional Requirements (for advanced features)
-``` File "/mount/src/birthchart/birthchart.py", line 6
-  ```
+ File "/mount/src/birthchart/birthchart.py", line 6
+  
   ^
 SyntaxError: invalid syntax 
 # For database storage
