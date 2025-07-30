@@ -68,6 +68,50 @@ st.markdown("""
     margin: 5px 0;
     border-left: 4px solid #ffc107;
 }
+.bullish-text {
+    color: #28a745;
+    font-weight: bold;
+}
+.bearish-text {
+    color: #dc3545;
+    font-weight: bold;
+}
+.neutral-text {
+    color: #ffc107;
+    font-weight: bold;
+}
+.volatile-text {
+    color: #ff6b35;
+    font-weight: bold;
+}
+.trend-bullish {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.trend-bearish {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.trend-neutral {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.trend-volatile {
+    background-color: #ffe5d4;
+    color: #a04000;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -428,11 +472,23 @@ with main_col1:
     
     for planet, data in st.session_state.planetary_data.items():
         market_info = planetary_market.get(planet, {})
+        trend = market_info.get('trend', 'N/A')
+        
+        # Apply color based on trend
+        if trend in ['Bullish', 'Positive']:
+            trend_class = 'bullish-text'
+        elif trend in ['Bearish', 'Negative']:
+            trend_class = 'bearish-text'
+        elif trend in ['Volatile', 'Aggressive']:
+            trend_class = 'volatile-text'
+        else:
+            trend_class = 'neutral-text'
+            
         st.markdown(f"""
         <div class="planet-info">
             <strong>{data['symbol']} {planet}</strong> - {data['sign']} {data['degree']}<br>
             Nakshatra: {data['nakshatra']} | House: {data['house']}<br>
-            <strong>Market Impact:</strong> {market_info.get('sectors', 'N/A')} - {market_info.get('trend', 'N/A')}
+            <strong>Market Impact:</strong> {market_info.get('sectors', 'N/A')} - <span class="{trend_class}">{trend}</span>
         </div>
         """, unsafe_allow_html=True)
     
@@ -543,7 +599,16 @@ with main_col2:
         col1, col2 = st.columns(2)
         with col1:
             trend_color = "🟢" if "Bullish" in sector_data['trend'] else "🔴" if "Bearish" in sector_data['trend'] else "🟡"
-            st.info(f"{trend_color} **Trend:** {sector_data['trend']}")
+            
+            # Apply colored styling to trend
+            if "Bullish" in sector_data['trend']:
+                trend_html = f'<span class="trend-bullish">{sector_data["trend"]}</span>'
+            elif "Bearish" in sector_data['trend']:
+                trend_html = f'<span class="trend-bearish">{sector_data["trend"]}</span>'
+            else:
+                trend_html = f'<span class="trend-neutral">{sector_data["trend"]}</span>'
+            
+            st.markdown(f'{trend_color} **Trend:** {trend_html}', unsafe_allow_html=True)
             st.info(f"🪐 **Planetary Influence:** {sector_data['planet']}")
         with col2:
             st.info(f"⏰ **Best Trading Time:** {sector_data['timing']}")
@@ -555,8 +620,37 @@ with main_col2:
         st.write("### 📈 Intraday Stock Timings")
         timings = get_market_timing("Sector", selected_sector)
         if timings:
-            timing_df = pd.DataFrame(timings)
-            st.dataframe(timing_df, use_container_width=True, hide_index=True)
+            # Create custom display for colored trends
+            for timing in timings:
+                col1, col2, col3, col4, col5, col6 = st.columns([2, 1.5, 1, 1, 1.5, 1])
+                
+                with col1:
+                    st.write(f"**{timing['Stock']}**")
+                
+                with col2:
+                    if timing['Trend'] == 'Bullish':
+                        st.markdown('<span class="trend-bullish">Bullish</span>', unsafe_allow_html=True)
+                    elif timing['Trend'] == 'Bearish':
+                        st.markdown('<span class="trend-bearish">Bearish</span>', unsafe_allow_html=True)
+                    else:
+                        st.markdown('<span class="trend-neutral">Neutral</span>', unsafe_allow_html=True)
+                
+                with col3:
+                    st.write(timing['Start'])
+                
+                with col4:
+                    st.write(timing['End'])
+                
+                with col5:
+                    st.write(timing['Planet'])
+                
+                with col6:
+                    if timing['Trend'] == 'Bullish':
+                        st.markdown(f'<span class="bullish-text">{timing["Target"]}</span>', unsafe_allow_html=True)
+                    elif timing['Trend'] == 'Bearish':
+                        st.markdown(f'<span class="bearish-text">{timing["Target"]}</span>', unsafe_allow_html=True)
+                    else:
+                        st.write(timing['Target'])
     
     elif market_type == "Commodity":
         selected_commodity = st.selectbox(
@@ -566,7 +660,18 @@ with main_col2:
         
         if selected_commodity in st.session_state.astro_predictions['commodities']:
             comm_data = st.session_state.astro_predictions['commodities'][selected_commodity]
-            st.info(f"**{selected_commodity}:** {comm_data['trend']} | {comm_data['planet']} | Active: {comm_data['timing']}")
+            
+            # Apply colored styling to trend
+            if "Bullish" in comm_data['trend']:
+                trend_html = f'<span class="trend-bullish">{comm_data["trend"]}</span>'
+            elif "Bearish" in comm_data['trend']:
+                trend_html = f'<span class="trend-bearish">{comm_data["trend"]}</span>'
+            elif "Volatile" in comm_data['trend']:
+                trend_html = f'<span class="trend-volatile">{comm_data["trend"]}</span>'
+            else:
+                trend_html = f'<span class="trend-neutral">{comm_data["trend"]}</span>'
+            
+            st.markdown(f'**{selected_commodity}:** {trend_html} | {comm_data["planet"]} | Active: {comm_data["timing"]}', unsafe_allow_html=True)
         
         # Show commodity current price if available
         if selected_commodity in st.session_state.market_data:
