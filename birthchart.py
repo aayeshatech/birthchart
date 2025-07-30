@@ -1,217 +1,153 @@
 import streamlit as st
-import pandas as pd
 import random
 from datetime import datetime
 
-# Page configuration
-st.set_page_config(
-    page_title="Vedic Market Intelligence",
-    page_icon="🕉️",
-    layout="wide"
-)
+# Basic page config
+st.set_page_config(page_title="Vedic Market App", page_icon="🕉️", layout="wide")
 
-# Simple CSS
+# Minimal CSS
 st.markdown("""
 <style>
-.market-card {
-    background: #f1f3f4;
-    padding: 20px;
-    border-radius: 10px;
+.card {
+    background: #f0f2f6;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 5px 0;
     text-align: center;
-    margin: 10px 0;
-    border: 2px solid #e0e0e0;
 }
-.positive { color: #16a085; font-weight: bold; }
-.negative { color: #e74c3c; font-weight: bold; }
-.header {
-    background: linear-gradient(45deg, #ff6b35, #f7931e);
-    color: white;
-    padding: 20px;
-    text-align: center;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
+.green { color: #00AA00; font-weight: bold; }
+.red { color: #FF0000; font-weight: bold; }
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize simple data
-if 'markets' not in st.session_state:
-    st.session_state.markets = {
-        'NIFTY 50': {'price': 24780.50, 'change': -0.50},
-        'BANK NIFTY': {'price': 52435.75, 'change': 0.60},
-        'SENSEX': {'price': 81342.15, 'change': -0.35},
-        'NIFTY IT': {'price': 32156.40, 'change': -1.31},
-        'GOLD': {'price': 3326.50, 'change': 0.55},
-        'SILVER': {'price': 38.25, 'change': -0.83},
-        'CRUDE OIL': {'price': 82.45, 'change': -1.49},
-        'BITCOIN': {'price': 97850.50, 'change': 2.57},
-        'USD/INR': {'price': 83.45, 'change': -0.14}
+# Initialize data
+if 'data' not in st.session_state:
+    st.session_state.data = {
+        'NIFTY': 24780,
+        'BANKNIFTY': 52435,
+        'SENSEX': 81342,
+        'GOLD': 3326,
+        'BITCOIN': 97850
+    }
+    st.session_state.changes = {
+        'NIFTY': -0.5,
+        'BANKNIFTY': 0.6,
+        'SENSEX': -0.3,
+        'GOLD': 0.5,
+        'BITCOIN': 2.5
     }
 
-# Planetary positions
-planets = {
-    '☀️ Sun': 'Cancer 7°15\' (Pushya)',
-    '🌙 Moon': 'Virgo 12°30\' (Hasta)', 
-    '♂️ Mars': 'Virgo 25°45\' (Chitra)',
-    '☿️ Mercury': 'Cancer 15°20\' (Ashlesha)',
-    '♃ Jupiter': 'Gemini 22°10\' (Punarvasu)',
-    '♀ Venus': 'Gemini 8°35\' (Ardra)',
-    '♄ Saturn': 'Pisces 18°25\' (Revati)',
-    '☊ Rahu': 'Aries 5°40\' (Ashwini)',
-    '☋ Ketu': 'Libra 5°40\' (Swati)'
-}
-
 # Header
-st.markdown("""
-<div class="header">
-    <h1>🕉️ Vedic Birth Chart & Market Intelligence</h1>
-    <p>Astrological Market Analysis & Birth Chart Calculator</p>
-</div>
-""", unsafe_allow_html=True)
-
-# Simple update function
-def update_prices():
-    for name in st.session_state.markets:
-        market = st.session_state.markets[name]
-        change = (random.random() - 0.5) * 1.0  # Random change
-        market['change'] += change * 0.1
-        market['price'] *= (1 + change/1000)
+st.title("🕉️ Vedic Market Intelligence")
+st.write("Real-time market data with astrological analysis")
 
 # Sidebar
 with st.sidebar:
-    st.header("🎛️ Controls")
+    st.header("Controls")
     
-    if st.button("📈 Update Market Prices", type="primary"):
-        update_prices()
-        st.success("Prices updated!")
+    if st.button("🔄 Update Prices"):
+        for market in st.session_state.data:
+            change = (random.random() - 0.5) * 2
+            st.session_state.changes[market] += change * 0.1
+            st.session_state.data[market] *= (1 + change/1000)
+        st.success("Updated!")
         st.rerun()
     
-    st.header("📅 Birth Details")
-    birth_date = st.date_input("Birth Date", datetime(1990, 1, 1))
-    birth_time = st.time_input("Birth Time")
-    birth_place = st.text_input("Birth Place", "Mumbai, India")
-    timezone = st.selectbox("Timezone", ["IST (+05:30)", "UTC", "EST", "PST"])
+    st.header("Birth Chart")
+    birth_date = st.date_input("Date")
+    birth_time = st.time_input("Time")
+    birth_place = st.text_input("Place", "Mumbai")
     
-    if st.button("🔄 Generate Chart"):
-        st.success("Birth chart generated!")
-    
-    st.header("🪐 Planetary Positions")
-    for planet, position in planets.items():
-        st.write(f"**{planet}**: {position}")
+    if st.button("Generate Chart"):
+        st.success("Chart Generated!")
 
-# Main content area
-st.header("📊 Live Market Data")
+# Main content
+st.header("📊 Market Dashboard")
 
-# Create ticker display
-ticker_text = " | ".join([
-    f"{name}: {data['price']:.1f} ({'▲' if data['change'] >= 0 else '▼'}{abs(data['change']):.2f}%)"
-    for name, data in list(st.session_state.markets.items())[:6]
-])
-st.info(f"📡 **Live Ticker:** {ticker_text}")
+# Quick ticker
+ticker = " | ".join([f"{k}: {v:.0f}" for k, v in st.session_state.data.items()])
+st.info(f"📡 {ticker}")
 
-# Market cards in grid
+# Market cards
 col1, col2, col3 = st.columns(3)
-cols = [col1, col2, col3]
+markets = list(st.session_state.data.items())
 
-for i, (name, data) in enumerate(st.session_state.markets.items()):
-    col = cols[i % 3]
+for i, (name, price) in enumerate(markets):
+    col = [col1, col2, col3][i % 3]
+    change = st.session_state.changes[name]
+    color = "green" if change >= 0 else "red"
+    arrow = "▲" if change >= 0 else "▼"
     
     with col:
-        color_class = "positive" if data['change'] >= 0 else "negative"
-        arrow = "▲" if data['change'] >= 0 else "▼"
-        
         st.markdown(f"""
-        <div class="market-card">
+        <div class="card">
             <h4>{name}</h4>
-            <h2>{data['price']:.2f}</h2>
-            <p class="{color_class}">
-                {arrow} {abs(data['change']):.2f}%
-            </p>
+            <h3>{price:.0f}</h3>
+            <p class="{color}">{arrow} {abs(change):.1f}%</p>
         </div>
         """, unsafe_allow_html=True)
 
-# Market table
+# Data table
 st.header("📋 Market Summary")
+import pandas as pd
+
 table_data = []
-for name, data in st.session_state.markets.items():
+for name, price in st.session_state.data.items():
+    change = st.session_state.changes[name]
     table_data.append({
         'Market': name,
-        'Current Price': f"{data['price']:.2f}",
-        'Change %': f"{data['change']:+.2f}%",
-        'Status': "🟢 Bullish" if data['change'] > 0 else "🔴 Bearish"
+        'Price': f"{price:.0f}",
+        'Change %': f"{change:+.1f}%",
+        'Trend': "🟢 Up" if change > 0 else "🔴 Down"
     })
 
 df = pd.DataFrame(table_data)
 st.dataframe(df, use_container_width=True)
 
-# Tabs for analysis
-tab1, tab2, tab3 = st.tabs(["📈 Technical Analysis", "🌌 Astrological Predictions", "📊 Sector Overview"])
+# Tabs
+tab1, tab2 = st.tabs(["📈 Analysis", "🌌 Astrology"])
 
 with tab1:
     st.subheader("Market Analysis")
     
-    selected_market = st.selectbox("Choose Market for Analysis", list(st.session_state.markets.keys()))
+    selected = st.selectbox("Select Market", list(st.session_state.data.keys()))
     
-    analysis = {
-        'NIFTY 50': {'trend': 'Bearish', 'support': '24,700', 'resistance': '24,900'},
-        'BANK NIFTY': {'trend': 'Bullish', 'support': '52,200', 'resistance': '52,800'},
-        'GOLD': {'trend': 'Bullish', 'support': '$3,320', 'resistance': '$3,350'},
-        'BITCOIN': {'trend': 'Volatile', 'support': '$96,000', 'resistance': '$99,000'}
+    predictions = {
+        'NIFTY': 'Bearish trend expected',
+        'BANKNIFTY': 'Strong bullish momentum',
+        'SENSEX': 'Sideways consolidation',
+        'GOLD': 'Upward breakout likely',
+        'BITCOIN': 'High volatility ahead'
     }
     
-    if selected_market in analysis:
-        data = analysis[selected_market]
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.metric("Trend", data['trend'])
-        with col2:
-            st.metric("Support", data['support'])
-        with col3:
-            st.metric("Resistance", data['resistance'])
+    st.info(f"**{selected}**: {predictions.get(selected, 'Neutral outlook')}")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Support", "24,500" if selected == 'NIFTY' else "TBD")
+    with col2:
+        st.metric("Resistance", "25,000" if selected == 'NIFTY' else "TBD")
 
 with tab2:
-    st.subheader("Astrological Market Predictions")
+    st.subheader("Planetary Influence")
     
-    st.write("### Today's Planetary Influences:")
-    
-    predictions = [
-        "🌙 **Moon in Virgo**: Analytical energy favors IT and tech stocks",
-        "♂️ **Mars in Cancer**: Banking sector shows strong momentum", 
-        "♃ **Jupiter in Gemini**: Communication and media stocks are favorable",
-        "♀ **Venus in Gemini**: Luxury and consumer goods perform well",
-        "☿️ **Mercury in Cancer**: Real estate and property stocks active"
+    planets = [
+        "☀️ Sun in Cancer - Emotional trading decisions",
+        "🌙 Moon in Virgo - Analytical market approach", 
+        "♂️ Mars in Cancer - Banking sector strength",
+        "♃ Jupiter in Gemini - Communication stocks favorable",
+        "♀ Venus in Gemini - Consumer goods perform well"
     ]
     
-    for prediction in predictions:
-        st.write(prediction)
+    for planet in planets:
+        st.write(f"• {planet}")
     
-    st.write("### Time-based Trading Recommendations:")
-    st.write("- **09:15-10:00 AM**: High volatility, avoid major positions")
-    st.write("- **10:00-11:30 AM**: Best time for fresh entries")
-    st.write("- **02:00-03:00 PM**: Reversal zone, book profits")
-    st.write("- **03:15-03:30 PM**: Position for next day")
-
-with tab3:
-    st.subheader("Sector Performance")
-    
-    sectors = [
-        {'name': 'Banking & Finance', 'performance': 'Bullish', 'change': '+0.8%'},
-        {'name': 'Information Technology', 'performance': 'Bearish', 'change': '-1.2%'},
-        {'name': 'Pharmaceuticals', 'performance': 'Neutral', 'change': '+0.1%'},
-        {'name': 'Automobiles', 'performance': 'Bearish', 'change': '-0.9%'},
-        {'name': 'Metals & Mining', 'performance': 'Bearish', 'change': '-1.5%'},
-        {'name': 'FMCG', 'performance': 'Bullish', 'change': '+0.5%'}
-    ]
-    
-    for sector in sectors:
-        color = "🟢" if sector['performance'] == 'Bullish' else "🔴" if sector['performance'] == 'Bearish' else "🟡"
-        st.write(f"{color} **{sector['name']}**: {sector['performance']} ({sector['change']})")
+    st.subheader("Trading Times")
+    st.write("🕘 **09:15-10:00**: High volatility")
+    st.write("🕚 **10:00-11:30**: Best entry time")
+    st.write("🕐 **14:00-15:00**: Profit booking zone")
+    st.write("🕞 **15:15-15:30**: Position for tomorrow")
 
 # Footer
 st.markdown("---")
-col1, col2 = st.columns(2)
-with col1:
-    st.caption(f"🕐 Last Updated: {datetime.now().strftime('%I:%M %p')}")
-with col2:
-    st.caption("📊 Data is simulated for demonstration purposes")
+st.caption(f"Last updated: {datetime.now().strftime('%H:%M:%S')} | Data simulated for demo")
