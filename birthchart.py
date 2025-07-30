@@ -169,6 +169,21 @@ def get_planetary_influence(current_time):
     
     return "Mixed", "🌟", "Multiple planetary influences"
 
+# Helper function to check if current time is in range
+def is_time_in_range(current_time_str, time_range):
+    try:
+        start_str, end_str = time_range.split('-')
+        current = datetime.strptime(current_time_str, '%H:%M').time()
+        start = datetime.strptime(start_str, '%H:%M').time()
+        end = datetime.strptime(end_str, '%H:%M').time()
+        
+        if start <= end:
+            return start <= current <= end
+        else:
+            return current >= start or current <= end
+    except:
+        return False
+
 # Function to get market-specific timing
 def get_market_timing(market_type, selected_item):
     current_time = datetime.now()
@@ -417,7 +432,7 @@ with main_col1:
         <div class="planet-info">
             <strong>{data['symbol']} {planet}</strong> - {data['sign']} {data['degree']}<br>
             Nakshatra: {data['nakshatra']} | House: {data['house']}<br>
-            <em>Market Impact: {market_info.get('sectors', 'N/A')} - {market_info.get('trend', 'N/A')}</em>
+            <strong>Market Impact:</strong> {market_info.get('sectors', 'N/A')} - {market_info.get('trend', 'N/A')}
         </div>
         """, unsafe_allow_html=True)
     
@@ -437,19 +452,18 @@ with main_col2:
     if market_type == "Overview":
         # Display market cards
         try:
-            major_markets = ['NIFTY', 'BANKNIFTY', 'SENSEX', 'GOLD', 'SILVER', 'DOWJONES']
+            # Show indices
+            st.write("#### 📊 Indices")
+            indices = ['NIFTY', 'BANKNIFTY', 'SENSEX']
+            cols = st.columns(3)
             
-            for i in range(0, len(major_markets), 2):
-                col_x, col_y = st.columns(2)
-                
-                # First market
-                if i < len(major_markets):
-                    market = major_markets[i]
+            for idx, market in enumerate(indices):
+                if market in st.session_state.market_data:
                     data = st.session_state.market_data[market]
                     color_class = "positive" if data['change'] >= 0 else "negative"
                     arrow = "▲" if data['change'] >= 0 else "▼"
                     
-                    col_x.markdown(f"""
+                    cols[idx].markdown(f"""
                     <div class="market-card">
                         <h4>{market}</h4>
                         <h2>{data['price']:.2f}</h2>
@@ -459,15 +473,51 @@ with main_col2:
                         <small>H: {data['high']:.1f} | L: {data['low']:.1f}</small>
                     </div>
                     """, unsafe_allow_html=True)
-                
-                # Second market
-                if i + 1 < len(major_markets):
-                    market = major_markets[i + 1]
+            
+            # Show commodities
+            st.write("#### 🏭 Commodities")
+            commodities = ['GOLD', 'SILVER', 'CRUDE']
+            cols = st.columns(3)
+            
+            for idx, market in enumerate(commodities):
+                if market in st.session_state.market_data:
                     data = st.session_state.market_data[market]
                     color_class = "positive" if data['change'] >= 0 else "negative"
                     arrow = "▲" if data['change'] >= 0 else "▼"
                     
-                    col_y.markdown(f"""
+                    # Format price based on commodity
+                    if market == 'GOLD':
+                        price_str = f"₹{data['price']:,.0f}"
+                    elif market == 'SILVER':
+                        price_str = f"₹{data['price']:,.0f}"
+                    elif market == 'CRUDE':
+                        price_str = f"₹{data['price']:,.0f}"
+                    else:
+                        price_str = f"{data['price']:.2f}"
+                    
+                    cols[idx].markdown(f"""
+                    <div class="market-card">
+                        <h4>{market}</h4>
+                        <h3>{price_str}</h3>
+                        <p class="{color_class}">
+                            {arrow} {abs(data['change']):.2f}%
+                        </p>
+                        <small>H: {data['high']:,.0f} | L: {data['low']:,.0f}</small>
+                    </div>
+                    """, unsafe_allow_html=True)
+            
+            # Show global markets
+            st.write("#### 🌍 Global Markets")
+            global_markets = ['DOWJONES', 'NASDAQ', 'USDINR']
+            cols = st.columns(3)
+            
+            for idx, market in enumerate(global_markets):
+                if market in st.session_state.market_data:
+                    data = st.session_state.market_data[market]
+                    color_class = "positive" if data['change'] >= 0 else "negative"
+                    arrow = "▲" if data['change'] >= 0 else "▼"
+                    
+                    cols[idx].markdown(f"""
                     <div class="market-card">
                         <h4>{market}</h4>
                         <h2>{data['price']:.2f}</h2>
@@ -488,14 +538,25 @@ with main_col2:
         )
         
         sector_data = st.session_state.astro_predictions['sectors'][selected_sector]
-        st.info(f"**{selected_sector}:** {sector_data['trend']} | {sector_data['planet']} | Best Time: {sector_data['timing']}")
+        
+        # Enhanced sector display with timing
+        col1, col2 = st.columns(2)
+        with col1:
+            trend_color = "🟢" if "Bullish" in sector_data['trend'] else "🔴" if "Bearish" in sector_data['trend'] else "🟡"
+            st.info(f"{trend_color} **Trend:** {sector_data['trend']}")
+            st.info(f"🪐 **Planetary Influence:** {sector_data['planet']}")
+        with col2:
+            st.info(f"⏰ **Best Trading Time:** {sector_data['timing']}")
+            current_time_str = datetime.now().strftime('%H:%M')
+            if is_time_in_range(current_time_str, sector_data['timing']):
+                st.success("🔥 ACTIVE NOW - Good time to trade!")
         
         # Show sector stocks with timing
         st.write("### 📈 Intraday Stock Timings")
         timings = get_market_timing("Sector", selected_sector)
         if timings:
             timing_df = pd.DataFrame(timings)
-            st.dataframe(timing_df, use_container_width=True)
+            st.dataframe(timing_df, use_container_width=True, hide_index=True)
     
     elif market_type == "Commodity":
         selected_commodity = st.selectbox(
@@ -506,6 +567,19 @@ with main_col2:
         if selected_commodity in st.session_state.astro_predictions['commodities']:
             comm_data = st.session_state.astro_predictions['commodities'][selected_commodity]
             st.info(f"**{selected_commodity}:** {comm_data['trend']} | {comm_data['planet']} | Active: {comm_data['timing']}")
+        
+        # Show commodity current price if available
+        if selected_commodity in st.session_state.market_data:
+            price_data = st.session_state.market_data[selected_commodity]
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("Current Price", f"₹{price_data['price']:,.2f}")
+            with col2:
+                st.metric("Change", f"{price_data['change']:+.2f}%")
+            with col3:
+                st.metric("Day High", f"₹{price_data['high']:,.2f}")
+            with col4:
+                st.metric("Day Low", f"₹{price_data['low']:,.2f}")
         
         # Show commodity session timings
         st.write("### ⏰ Session-wise Analysis")
@@ -543,6 +617,64 @@ with main_col2:
 # Live Planetary Transit Section
 st.write("---")
 st.subheader("🌌 Live Planetary Transits & Market Impact")
+
+# Add current active opportunities
+st.write("### 🎯 Active Trading Opportunities Right Now")
+current_time_str = datetime.now().strftime('%H:%M')
+current_hour = datetime.now().hour
+
+active_opportunities = []
+
+# Check sectors
+sector_stocks_quick = {
+    'Banking': [
+        {'stock': 'HDFC Bank', 'trend': 'Bullish', 'time': '10:30-11:15'},
+        {'stock': 'ICICI Bank', 'trend': 'Bullish', 'time': '11:00-12:00'},
+        {'stock': 'Kotak Bank', 'trend': 'Bullish', 'time': '09:30-10:30'}
+    ],
+    'IT': [
+        {'stock': 'TCS', 'trend': 'Bearish', 'time': '14:00-15:00'},
+        {'stock': 'Infosys', 'trend': 'Bearish', 'time': '14:15-15:15'}
+    ],
+    'Pharma': [
+        {'stock': 'Sun Pharma', 'trend': 'Bullish', 'time': '09:30-10:30'},
+        {'stock': 'Dr Reddy', 'trend': 'Bullish', 'time': '10:00-11:00'}
+    ]
+}
+
+for sector, stocks in sector_stocks_quick.items():
+    for stock_info in stocks:
+        if is_time_in_range(current_time_str, stock_info['time']):
+            active_opportunities.append({
+                'Type': 'Stock',
+                'Name': stock_info['stock'],
+                'Sector': sector,
+                'Signal': '🟢 BUY' if stock_info['trend'] == 'Bullish' else '🔴 SELL',
+                'Active Till': stock_info['time'].split('-')[1]
+            })
+
+# Check commodities
+if 20 <= current_hour <= 23:
+    active_opportunities.append({
+        'Type': 'Commodity',
+        'Name': 'GOLD',
+        'Sector': 'Precious Metal',
+        'Signal': '🟢 BUY',
+        'Active Till': '23:30'
+    })
+    active_opportunities.append({
+        'Type': 'Commodity',
+        'Name': 'SILVER',
+        'Sector': 'Precious Metal',
+        'Signal': '🟢 STRONG BUY',
+        'Active Till': '23:30'
+    })
+
+if active_opportunities:
+    opp_df = pd.DataFrame(active_opportunities)
+    st.dataframe(opp_df, use_container_width=True, hide_index=True)
+else:
+    st.info("No active opportunities at current time. Check sector/commodity tabs for upcoming timings.")
 
 transit_col1, transit_col2 = st.columns(2)
 
@@ -596,35 +728,272 @@ tab1, tab2, tab3, tab4 = st.tabs(["📈 Sector Analysis", "🏭 Commodities", "�
 with tab1:
     st.subheader("📈 Detailed Sector Analysis")
     
-    # Sector performance with planetary influence
-    sector_analysis = []
-    for sector, data in st.session_state.astro_predictions['sectors'].items():
-        sector_analysis.append({
-            'Sector': sector,
-            'Trend': data['trend'],
-            'Planetary Influence': data['planet'],
-            'Best Timing': data['timing'],
-            'Signal': '🟢 BUY' if 'Bullish' in data['trend'] else '🔴 SELL' if 'Bearish' in data['trend'] else '🟡 HOLD'
-        })
+    # Show currently active sectors
+    current_time_str = datetime.now().strftime('%H:%M')
+    active_sectors = []
     
-    sector_df = pd.DataFrame(sector_analysis)
-    st.dataframe(sector_df, use_container_width=True)
+    for sector, data in st.session_state.astro_predictions['sectors'].items():
+        if is_time_in_range(current_time_str, data['timing']):
+            trend_icon = "🟢" if "Bullish" in data['trend'] else "🔴" if "Bearish" in data['trend'] else "🟡"
+            active_sectors.append(f"{trend_icon} **{sector}** ({data['trend']})")
+    
+    if active_sectors:
+        st.success(f"🔥 **Currently Active Sectors:** {', '.join(active_sectors)}")
+    else:
+        st.info("💤 No sectors in their optimal trading window currently")
+    
+    st.write("---")
+    
+    # Define sector stocks with detailed predictions
+    sector_stocks_detail = {
+        'Banking': [
+            {'stock': 'HDFC Bank', 'trend': 'Bullish', 'time': '10:30-11:15', 'target': '+1.2%'},
+            {'stock': 'ICICI Bank', 'trend': 'Bullish', 'time': '11:00-12:00', 'target': '+0.8%'},
+            {'stock': 'SBI', 'trend': 'Neutral', 'time': '13:00-14:00', 'target': '±0.3%'},
+            {'stock': 'Axis Bank', 'trend': 'Bearish', 'time': '14:30-15:15', 'target': '-0.6%'},
+            {'stock': 'Kotak Bank', 'trend': 'Bullish', 'time': '09:30-10:30', 'target': '+0.9%'}
+        ],
+        'IT': [
+            {'stock': 'TCS', 'trend': 'Bearish', 'time': '14:00-15:00', 'target': '-0.8%'},
+            {'stock': 'Infosys', 'trend': 'Bearish', 'time': '14:15-15:15', 'target': '-1.1%'},
+            {'stock': 'Wipro', 'trend': 'Neutral', 'time': '11:30-12:30', 'target': '±0.4%'},
+            {'stock': 'HCL Tech', 'trend': 'Bearish', 'time': '13:45-14:45', 'target': '-0.9%'},
+            {'stock': 'Tech Mahindra', 'trend': 'Bearish', 'time': '14:00-15:00', 'target': '-1.3%'}
+        ],
+        'Pharma': [
+            {'stock': 'Sun Pharma', 'trend': 'Bullish', 'time': '09:30-10:30', 'target': '+1.5%'},
+            {'stock': 'Dr Reddy', 'trend': 'Bullish', 'time': '10:00-11:00', 'target': '+1.2%'},
+            {'stock': 'Cipla', 'trend': 'Neutral', 'time': '11:30-12:30', 'target': '±0.5%'},
+            {'stock': 'Divis Lab', 'trend': 'Bullish', 'time': '09:45-10:45', 'target': '+0.9%'},
+            {'stock': 'Biocon', 'trend': 'Bearish', 'time': '14:00-15:00', 'target': '-0.7%'}
+        ],
+        'Auto': [
+            {'stock': 'Maruti', 'trend': 'Neutral', 'time': '11:30-12:30', 'target': '±0.3%'},
+            {'stock': 'Tata Motors', 'trend': 'Bullish', 'time': '12:00-13:00', 'target': '+0.8%'},
+            {'stock': 'M&M', 'trend': 'Neutral', 'time': '11:45-12:45', 'target': '±0.4%'},
+            {'stock': 'Bajaj Auto', 'trend': 'Bearish', 'time': '13:30-14:30', 'target': '-0.6%'},
+            {'stock': 'Hero Motor', 'trend': 'Neutral', 'time': '11:00-12:00', 'target': '±0.2%'}
+        ],
+        'Metal': [
+            {'stock': 'Tata Steel', 'trend': 'Bearish', 'time': '13:30-14:30', 'target': '-1.8%'},
+            {'stock': 'JSW Steel', 'trend': 'Bearish', 'time': '13:45-14:45', 'target': '-1.5%'},
+            {'stock': 'Hindalco', 'trend': 'Bearish', 'time': '14:00-15:00', 'target': '-1.3%'},
+            {'stock': 'Vedanta', 'trend': 'Neutral', 'time': '12:00-13:00', 'target': '±0.5%'},
+            {'stock': 'SAIL', 'trend': 'Bearish', 'time': '13:30-14:30', 'target': '-2.1%'}
+        ],
+        'FMCG': [
+            {'stock': 'HUL', 'trend': 'Bullish', 'time': '09:15-10:15', 'target': '+0.6%'},
+            {'stock': 'ITC', 'trend': 'Bullish', 'time': '09:30-10:30', 'target': '+0.8%'},
+            {'stock': 'Nestle', 'trend': 'Neutral', 'time': '11:00-12:00', 'target': '±0.3%'},
+            {'stock': 'Britannia', 'trend': 'Bullish', 'time': '10:00-11:00', 'target': '+0.7%'},
+            {'stock': 'Dabur', 'trend': 'Bullish', 'time': '09:45-10:45', 'target': '+0.5%'}
+        ],
+        'Energy': [
+            {'stock': 'Reliance', 'trend': 'Volatile', 'time': '12:00-13:30', 'target': '±1.5%'},
+            {'stock': 'ONGC', 'trend': 'Bearish', 'time': '13:00-14:00', 'target': '-0.9%'},
+            {'stock': 'IOC', 'trend': 'Bearish', 'time': '13:30-14:30', 'target': '-0.7%'},
+            {'stock': 'BPCL', 'trend': 'Neutral', 'time': '12:30-13:30', 'target': '±0.4%'},
+            {'stock': 'GAIL', 'trend': 'Volatile', 'time': '12:15-13:45', 'target': '±1.2%'}
+        ],
+        'Realty': [
+            {'stock': 'DLF', 'trend': 'Bearish', 'time': '14:30-15:15', 'target': '-1.2%'},
+            {'stock': 'Godrej Prop', 'trend': 'Bearish', 'time': '14:15-15:15', 'target': '-0.9%'},
+            {'stock': 'Oberoi Realty', 'trend': 'Neutral', 'time': '13:00-14:00', 'target': '±0.5%'},
+            {'stock': 'Brigade', 'trend': 'Bearish', 'time': '14:00-15:00', 'target': '-0.8%'},
+            {'stock': 'Sobha', 'trend': 'Bearish', 'time': '14:30-15:30', 'target': '-1.0%'}
+        ]
+    }
+    
+    # Create expandable sections for each sector
+    for sector, stocks in sector_stocks_detail.items():
+        with st.expander(f"📊 {sector} Sector Analysis", expanded=False):
+            # Get sector-level prediction
+            sector_pred = st.session_state.astro_predictions['sectors'].get(
+                sector, 
+                {'trend': 'Neutral', 'planet': 'Mixed', 'timing': '09:15-15:30'}
+            )
+            
+            # Show sector overview
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.write(f"**Overall Trend:** {sector_pred['trend']}")
+            with col2:
+                st.write(f"**Planetary Influence:** {sector_pred['planet']}")
+            with col3:
+                st.write(f"**Best Hours:** {sector_pred['timing']}")
+            
+            st.write("---")
+            
+            # Show individual stocks
+            stock_data = []
+            for stock_info in stocks:
+                # Determine signal based on trend
+                if stock_info['trend'] == 'Bullish':
+                    signal = '🟢 BUY'
+                elif stock_info['trend'] == 'Bearish':
+                    signal = '🔴 SELL'
+                elif stock_info['trend'] == 'Volatile':
+                    signal = '🟡 CAUTION'
+                else:
+                    signal = '🟡 HOLD'
+                
+                stock_data.append({
+                    'Stock': stock_info['stock'],
+                    'Trend': stock_info['trend'],
+                    'Best Time': stock_info['time'],
+                    'Expected Move': stock_info['target'],
+                    'Signal': signal
+                })
+            
+            stock_df = pd.DataFrame(stock_data)
+            st.dataframe(stock_df, use_container_width=True, hide_index=True)
+            
+            # Add timing note
+            current_hour = datetime.now().hour
+            current_min = datetime.now().minute
+            current_time_str = f"{current_hour:02d}:{current_min:02d}"
+            
+            active_stocks = [s for s in stocks if is_time_in_range(current_time_str, s['time'])]
+            if active_stocks:
+                st.success(f"🔔 Active Now: {', '.join([s['stock'] for s in active_stocks])}")
+            
+    # Add legend at the bottom
+    st.write("---")
+    st.write("### 📌 Signal Legend")
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.write("🟢 **BUY** - Strong bullish signal")
+    with col2:
+        st.write("🔴 **SELL** - Strong bearish signal")
+    with col3:
+        st.write("🟡 **HOLD** - Neutral, wait for clarity")
+    with col4:
+        st.write("🟡 **CAUTION** - High volatility expected")
 
 with tab2:
     st.subheader("🏭 Commodity Trading Windows")
     
-    commodity_windows = []
-    for commodity, data in st.session_state.astro_predictions['commodities'].items():
-        commodity_windows.append({
-            'Commodity': commodity,
-            'Trend': data['trend'],
-            'Ruling Planet': data['planet'],
-            'Active Hours': data['timing'],
-            'Today\'s Range': f"±{random.uniform(0.5, 2.5):.1f}%"
-        })
+    # Define detailed commodity timings
+    commodity_details = {
+        'GOLD': {
+            'sessions': [
+                {'session': 'Asian Opening', 'time': '09:00-10:30', 'trend': 'Accumulation', 'action': 'BUY dips'},
+                {'session': 'Indian Morning', 'time': '10:30-12:00', 'trend': 'Range Bound', 'action': 'WAIT'},
+                {'session': 'European Open', 'time': '14:00-16:00', 'trend': 'Volatile', 'action': 'SCALP'},
+                {'session': 'US Pre-Open', 'time': '18:00-20:00', 'trend': 'Trending', 'action': 'FOLLOW trend'},
+                {'session': 'US Session', 'time': '20:00-23:30', 'trend': 'Strong Moves', 'action': 'POSITION'}
+            ],
+            'key_levels': {'support': 71500, 'resistance': 72200, 'pivot': 71850}
+        },
+        'SILVER': {
+            'sessions': [
+                {'session': 'Asian Opening', 'time': '09:00-10:30', 'trend': 'Quiet', 'action': 'WAIT'},
+                {'session': 'Indian Morning', 'time': '10:30-12:00', 'trend': 'Building', 'action': 'ACCUMULATE'},
+                {'session': 'European Open', 'time': '14:00-16:00', 'trend': 'Breakout', 'action': 'BUY breakouts'},
+                {'session': 'US Pre-Open', 'time': '18:00-20:00', 'trend': 'Volatile', 'action': 'TIGHT stops'},
+                {'session': 'US Session', 'time': '20:00-23:30', 'trend': 'Trending Strong', 'action': 'RIDE trend'}
+            ],
+            'key_levels': {'support': 90500, 'resistance': 92000, 'pivot': 91250}
+        },
+        'CRUDE': {
+            'sessions': [
+                {'session': 'Asian Session', 'time': '06:30-10:00', 'trend': 'Low Volume', 'action': 'AVOID'},
+                {'session': 'Indian Session', 'time': '10:00-14:30', 'trend': 'Range Trade', 'action': 'SCALP'},
+                {'session': 'Inventory Time', 'time': '20:00-21:00', 'trend': 'High Volatility', 'action': 'CAUTION'},
+                {'session': 'US Session', 'time': '19:00-23:30', 'trend': 'Trending', 'action': 'POSITION'}
+            ],
+            'key_levels': {'support': 6800, 'resistance': 6920, 'pivot': 6845}
+        },
+        'NATURALGAS': {
+            'sessions': [
+                {'session': 'Morning', 'time': '09:00-12:00', 'trend': 'Quiet', 'action': 'WAIT'},
+                {'session': 'Afternoon', 'time': '14:00-17:00', 'trend': 'Building', 'action': 'WATCH'},
+                {'session': 'US Open', 'time': '19:00-21:00', 'trend': 'Volatile', 'action': 'SCALP'},
+                {'session': 'Inventory', 'time': '20:00-20:30', 'trend': 'Spike', 'action': 'AVOID'}
+            ],
+            'key_levels': {'support': 220, 'resistance': 245, 'pivot': 232}
+        },
+        'COPPER': {
+            'sessions': [
+                {'session': 'Asian Trade', 'time': '06:30-10:00', 'trend': 'Active', 'action': 'TRADE'},
+                {'session': 'London Open', 'time': '13:30-16:00', 'trend': 'Trending', 'action': 'FOLLOW'},
+                {'session': 'US Session', 'time': '19:00-22:00', 'trend': 'Volatile', 'action': 'CAUTIOUS'}
+            ],
+            'key_levels': {'support': 745, 'resistance': 765, 'pivot': 755}
+        }
+    }
     
-    comm_df = pd.DataFrame(commodity_windows)
-    st.dataframe(comm_df, use_container_width=True)
+    # Create expandable sections for each commodity
+    for commodity, details in commodity_details.items():
+        with st.expander(f"📊 {commodity} Detailed Analysis", expanded=False):
+            # Get commodity prediction
+            comm_pred = st.session_state.astro_predictions['commodities'].get(
+                commodity,
+                {'trend': 'Neutral', 'planet': 'Mixed', 'timing': '09:00-23:30'}
+            )
+            
+            # Overview
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.write(f"**Overall Trend:** {comm_pred['trend']}")
+            with col2:
+                st.write(f"**Planetary Rule:** {comm_pred['planet']}")
+            with col3:
+                st.write(f"**Best Hours:** {comm_pred['timing']}")
+            
+            # Key levels
+            if 'key_levels' in details:
+                st.write("### 📍 Key Levels")
+                levels = details['key_levels']
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("Support", f"₹{levels['support']:,}")
+                with col2:
+                    st.metric("Pivot", f"₹{levels['pivot']:,}")
+                with col3:
+                    st.metric("Resistance", f"₹{levels['resistance']:,}")
+            
+            # Session-wise breakdown
+            st.write("### ⏰ Session Breakdown")
+            session_data = []
+            current_time_str = datetime.now().strftime('%H:%M')
+            
+            for session in details['sessions']:
+                # Check if session is active
+                is_active = is_time_in_range(current_time_str, session['time'])
+                
+                session_data.append({
+                    'Session': session['session'],
+                    'Timing': session['time'],
+                    'Market Nature': session['trend'],
+                    'Action': session['action'],
+                    'Status': '🟢 ACTIVE' if is_active else '⏸️ Inactive'
+                })
+            
+            session_df = pd.DataFrame(session_data)
+            st.dataframe(session_df, use_container_width=True, hide_index=True)
+            
+            # Current recommendation
+            active_sessions = [s for s in details['sessions'] if is_time_in_range(current_time_str, s['time'])]
+            if active_sessions:
+                st.success(f"🔔 Current Action: {active_sessions[0]['action']} ({active_sessions[0]['session']})")
+            else:
+                st.info("💤 No active session currently")
+    
+    # Add commodity trading tips
+    st.write("---")
+    st.write("### 💡 Commodity Trading Tips")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("**Best Trading Times:**")
+        st.write("• Gold: US Session (20:00-23:30)")
+        st.write("• Silver: European Open (14:00-16:00)")
+        st.write("• Crude: Inventory Time (20:00)")
+    with col2:
+        st.write("**Risk Management:**")
+        st.write("• Use 1% risk per trade")
+        st.write("• Avoid inventory announcements")
+        st.write("• Follow planetary hours")
 
 with tab3:
     st.subheader("🌍 Global Market Outlook")
