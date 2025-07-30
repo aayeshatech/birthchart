@@ -23,7 +23,7 @@ def initialize_market_data():
         'niftyIT': {'price': 32156.40, 'change': -425.30, 'changePercent': -1.31, 'high': 32600.20, 'low': 32100.15},
         'niftyPharma': {'price': 18925.60, 'change': 156.80, 'changePercent': 0.84, 'high': 19050.30, 'low': 18750.40},
         'niftyAuto': {'price': 22485.30, 'change': -185.60, 'changePercent': -0.82, 'high': 22680.50, 'low': 22400.20},
-        'niftyFMCG': {'price': 55342.80, 'change': 125.40, 'changePercent': 0.23, 'high': 55450.60, 'low': 55200.30),
+        'niftyFMCG': {'price': 55342.80, 'change': 125.40, 'changePercent': 0.23, 'high': 55450.60, 'low': 55200.30},
         'niftyMetal': {'price': 8956.45, 'change': -145.30, 'changePercent': -1.60, 'high': 9120.50, 'low': 8920.40},
         'niftyRealty': {'price': 785.25, 'change': 12.40, 'changePercent': 1.60, 'high': 792.30, 'low': 772.50},
         'niftyEnergy': {'price': 35426.90, 'change': -256.40, 'changePercent': -0.72, 'high': 35680.20, 'low': 35350.40},
@@ -37,7 +37,7 @@ def initialize_market_data():
         'nasdaq': {'price': 19456.80, 'change': 85.30, 'changePercent': 0.44, 'high': 19520.40, 'low': 19380.60},
         'ftse': {'price': 8445.60, 'change': -32.40, 'changePercent': -0.38, 'high': 8485.30, 'low': 8430.20},
         'dax': {'price': 19328.45, 'change': 125.60, 'changePercent': 0.65, 'high': 19380.60, 'low': 19250.40},
-        'nikkei': {'price': 41580.20, 'change': 325.40, 'changePercent': 0.79, 'high': 41650.80, 'low': 41250.60),
+        'nikkei': {'price': 41580.20, 'change': 325.40, 'changePercent': 0.79, 'high': 41650.80, 'low': 41250.60},
         'hangseng': {'price': 19845.60, 'change': -156.30, 'changePercent': -0.78, 'high': 20050.40, 'low': 19820.30},
         'shanghai': {'price': 3045.80, 'change': -28.60, 'changePercent': -0.93, 'high': 3080.40, 'low': 3040.20},
         
@@ -851,7 +851,7 @@ def api_market_content():
                 html += f'''
                 <div class="sector-card {sentiment}">
                     <h3>{name}</h3>
-                    <p>Index: {formatNumber(data['price'])}</p>
+                    <p>Index: {data['price']:.2f}</p>
                     <p class="{'price-positive' if data['changePercent'] > 0 else 'price-negative'}">
                         {'↑' if data['changePercent'] > 0 else '↓'} {abs(data['changePercent']):.2f}%
                     </p>
@@ -869,9 +869,9 @@ def api_market_content():
                 html += f'''
                 <div class="market-card">
                     <h4>{name}</h4>
-                    <div class="market-price">{formatNumber(data['price'])}</div>
+                    <div class="market-price">{data['price']:.2f}</div>
                     <div class="market-change {'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
-                        {formatChange(data['change'], data['changePercent'])}
+                        {'+' if data['changePercent'] >= 0 else ''}{data['change']:.2f} ({data['changePercent']:+.2f}%)
                     </div>
                 </div>
                 '''
@@ -886,9 +886,9 @@ def api_market_content():
                 html += f'''
                 <div class="market-card">
                     <h4>{flag} {name}</h4>
-                    <div class="market-price">{formatNumber(data['price'])}</div>
+                    <div class="market-price">{data['price']:.2f}</div>
                     <div class="market-change {'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
-                        {formatChange(data['change'], data['changePercent'])}
+                        {'+' if data['changePercent'] >= 0 else ''}{data['change']:.2f} ({data['changePercent']:+.2f}%)
                     </div>
                 </div>
                 '''
@@ -903,9 +903,9 @@ def api_market_content():
                 html += f'''
                 <div class="market-card">
                     <h4>{name}</h4>
-                    <div class="market-price">{symbol}{formatNumber(data['price'])}</div>
+                    <div class="market-price">{symbol}{data['price']:.2f}</div>
                     <div class="market-change {'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
-                        {formatChange(data['change'], data['changePercent'])}
+                        {'+' if data['changePercent'] >= 0 else ''}{data['change']:.2f} ({data['changePercent']:+.2f}%)
                     </div>
                 </div>
                 '''
@@ -930,9 +930,9 @@ def api_live_content():
                 html += f'''
                 <div class="market-card">
                     <h4>LIVE - {name}</h4>
-                    <div class="market-price">{formatNumber(data['price'])}</div>
+                    <div class="market-price">{data['price']:.2f}</div>
                     <div class="market-change {'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
-                        {'▲' if data['changePercent'] >= 0 else '▼'} {formatChange(data['change'], data['changePercent'])}
+                        {'▲' if data['changePercent'] >= 0 else '▼'} {'+' if data['changePercent'] >= 0 else ''}{data['change']:.2f} ({data['changePercent']:+.2f}%)
                     </div>
                 </div>
                 '''
@@ -948,9 +948,9 @@ def api_live_content():
                 html += f'''
                 <div class="market-card">
                     <h4>{name}</h4>
-                    <div class="market-price">{formatNumber(data['price'])}</div>
+                    <div class="market-price">{data['price']:.2f}</div>
                     <div class="market-change {'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
-                        {formatChange(data['change'], data['changePercent'])}
+                        {'+' if data['changePercent'] >= 0 else ''}{data['change']:.2f} ({data['changePercent']:+.2f}%)
                     </div>
                 </div>
                 '''
