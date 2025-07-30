@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-import time
 import random
 import json
 
@@ -110,6 +109,9 @@ if 'market_data' not in st.session_state:
         'ethereum': {'price': 3685.40, 'change': 125.60, 'changePercent': 3.53, 'high': 3720.00, 'low': 3560.00},
     }
 
+if 'last_update' not in st.session_state:
+    st.session_state.last_update = datetime.now()
+
 # Planetary data
 planetary_data = {
     'sun': {'sign': 'Cancer', 'degree': '7°15\'', 'nakshatra': 'Pushya', 'house': 4, 'symbol': '☀️'},
@@ -125,33 +127,44 @@ planetary_data = {
 
 def update_market_data():
     """Simulate market data updates"""
-    for key, data in st.session_state.market_data.items():
-        volatility = 0.1
-        if 'bitcoin' in key or 'ethereum' in key:
-            volatility = 0.3
-        elif 'gold' in key or 'silver' in key:
-            volatility = 0.05
+    current_time = datetime.now()
+    if (current_time - st.session_state.last_update).seconds > 5:  # Update every 5 seconds
+        for key, data in st.session_state.market_data.items():
+            volatility = 0.1
+            if 'bitcoin' in key or 'ethereum' in key:
+                volatility = 0.3
+            elif 'gold' in key or 'silver' in key:
+                volatility = 0.05
+            
+            change_percent = (random.random() - 0.5) * volatility
+            new_change = data['price'] * change_percent / 100
+            data['price'] += new_change
+            data['change'] = new_change
+            data['changePercent'] = change_percent
+            
+            if data['price'] > data['high']:
+                data['high'] = data['price']
+            if data['price'] < data['low']:
+                data['low'] = data['price']
         
-        change_percent = (random.random() - 0.5) * volatility
-        data['change'] = data['price'] * change_percent / 100
-        data['changePercent'] += change_percent
-        data['price'] += data['change']
-        
-        if data['price'] > data['high']:
-            data['high'] = data['price']
-        if data['price'] < data['low']:
-            data['low'] = data['price']
+        st.session_state.last_update = current_time
 
 def create_ticker():
     """Create ticker string"""
     ticker_items = []
     for key in ['nifty', 'bankNifty', 'sensex', 'gold', 'bitcoin', 'crudeOil', 'usdinr']:
-        data = st.session_state.market_data[key]
-        symbol = key.upper().replace('NIFTY', 'NIFTY 50').replace('BANKNIFTY', 'BANK NIFTY')
-        arrow = '▲' if data['changePercent'] >= 0 else '▼'
-        ticker_items.append(f"{symbol} {data['price']:.2f} {arrow} {abs(data['changePercent']):.2f}%")
+        if key in st.session_state.market_data:
+            data = st.session_state.market_data[key]
+            symbol = key.upper().replace('NIFTY', 'NIFTY 50').replace('BANKNIFTY', 'BANK NIFTY')
+            arrow = '▲' if data['changePercent'] >= 0 else '▼'
+            ticker_items.append(f"{symbol} {data['price']:.2f} {arrow} {abs(data['changePercent']):.2f}%")
     
     return ' | '.join(ticker_items) + ' | ' + ' | '.join(ticker_items)
+
+# Update market data if auto-refresh is enabled
+auto_refresh = st.sidebar.checkbox("Enable Auto-Refresh", value=False)
+if auto_refresh:
+    update_market_data()
 
 # Header
 st.markdown("""
@@ -162,8 +175,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Ticker
-ticker_placeholder = st.empty()
-ticker_placeholder.markdown(f'<div class="ticker">{create_ticker()}</div>', unsafe_allow_html=True)
+st.markdown(f'<div class="ticker">{create_ticker()}</div>', unsafe_allow_html=True)
 
 # Main layout
 col1, col2 = st.columns([1, 2])
@@ -196,17 +208,18 @@ with col2:
         ]
         
         for name, key, col in indices:
-            data = st.session_state.market_data[key]
-            with col:
-                st.markdown(f"""
-                <div class="market-card">
-                    <h4>{name}</h4>
-                    <h2>{data['price']:.2f}</h2>
-                    <p class="{'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
-                        {'▲' if data['changePercent'] >= 0 else '▼'} {abs(data['change']):.2f} ({data['changePercent']:.2f}%)
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
+            if key in st.session_state.market_data:
+                data = st.session_state.market_data[key]
+                with col:
+                    st.markdown(f"""
+                    <div class="market-card">
+                        <h4>{name}</h4>
+                        <h2>{data['price']:.2f}</h2>
+                        <p class="{'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
+                            {'▲' if data['changePercent'] >= 0 else '▼'} {abs(data['change']):.2f} ({data['changePercent']:.2f}%)
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
         
         # Planetary transits
         st.subheader("Today's Important Planetary Transits")
@@ -236,24 +249,22 @@ with col2:
         ]
         
         for name, key, stocks in sectors:
-            data = st.session_state.market_data[key]
-            sentiment = 'bullish' if data['changePercent'] > 0 else 'bearish' if data['changePercent'] < -0.5 else 'neutral'
-            
-            st.markdown(f"""
-            <div class="sector-card sector-{sentiment}">
-                <h3>{name} - {data['price']:.2f}</h3>
-                <p class="{'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
-                    {'↑' if data['changePercent'] > 0 else '↓'} {abs(data['changePercent']):.2f}%
-                </p>
-                <p><strong>Key Stocks:</strong> {stocks}</p>
-            </div>
-            """, unsafe_allow_html=True)
+            if key in st.session_state.market_data:
+                data = st.session_state.market_data[key]
+                sentiment = 'bullish' if data['changePercent'] > 0 else 'bearish' if data['changePercent'] < -0.5 else 'neutral'
+                
+                st.markdown(f"""
+                <div class="sector-card sector-{sentiment}">
+                    <h3>{name} - {data['price']:.2f}</h3>
+                    <p class="{'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
+                        {'↑' if data['changePercent'] > 0 else '↓'} {abs(data['changePercent']):.2f}%
+                    </p>
+                    <p><strong>Key Stocks:</strong> {stocks}</p>
+                </div>
+                """, unsafe_allow_html=True)
     
     with tab3:
         st.subheader("Live Market Data")
-        
-        # Create live updating section
-        live_placeholder = st.empty()
         
         # Display all indices
         indices_data = []
@@ -268,26 +279,32 @@ with col2:
                     'Low': f"{data['low']:.2f}"
                 })
         
-        df = pd.DataFrame(indices_data)
-        live_placeholder.dataframe(df, use_container_width=True)
+        if indices_data:
+            df = pd.DataFrame(indices_data)
+            st.dataframe(df, use_container_width=True)
         
         # Commodities section
         st.subheader("Commodities")
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            gold = st.session_state.market_data['gold']
-            st.metric("Gold (COMEX)", f"${gold['price']:.2f}/oz", f"{gold['changePercent']:.2f}%")
-            st.caption(f"MCX: ₹{st.session_state.market_data['goldMCX']['price']}/10g")
+            if 'gold' in st.session_state.market_data:
+                gold = st.session_state.market_data['gold']
+                st.metric("Gold (COMEX)", f"${gold['price']:.2f}/oz", f"{gold['changePercent']:.2f}%")
+                if 'goldMCX' in st.session_state.market_data:
+                    st.caption(f"MCX: ₹{st.session_state.market_data['goldMCX']['price']}/10g")
         
         with col2:
-            silver = st.session_state.market_data['silver']
-            st.metric("Silver (COMEX)", f"${silver['price']:.2f}/oz", f"{silver['changePercent']:.2f}%")
-            st.caption(f"MCX: ₹{st.session_state.market_data['silverMCX']['price']}/kg")
+            if 'silver' in st.session_state.market_data:
+                silver = st.session_state.market_data['silver']
+                st.metric("Silver (COMEX)", f"${silver['price']:.2f}/oz", f"{silver['changePercent']:.2f}%")
+                if 'silverMCX' in st.session_state.market_data:
+                    st.caption(f"MCX: ₹{st.session_state.market_data['silverMCX']['price']}/kg")
         
         with col3:
-            crude = st.session_state.market_data['crudeOil']
-            st.metric("Crude Oil", f"${crude['price']:.2f}/bbl", f"{crude['changePercent']:.2f}%")
+            if 'crudeOil' in st.session_state.market_data:
+                crude = st.session_state.market_data['crudeOil']
+                st.metric("Crude Oil", f"${crude['price']:.2f}/bbl", f"{crude['changePercent']:.2f}%")
     
     with tab4:
         st.subheader("Today's Astrological Analysis")
@@ -322,15 +339,16 @@ with col2:
             }
         }
         
-        data = astro_data[analysis_type]
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.info(f"**Prediction:** {data['prediction']}")
-            st.success(f"**Expected Range:** {data['range']}")
-        
-        with col2:
-            st.warning(f"**Advice:** {data['advice']}")
+        if analysis_type in astro_data:
+            data = astro_data[analysis_type]
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                st.info(f"**Prediction:** {data['prediction']}")
+                st.success(f"**Expected Range:** {data['range']}")
+            
+            with col2:
+                st.warning(f"**Advice:** {data['advice']}")
         
         st.subheader("Key Time Zones")
         st.write("**09:15-09:45 AM:** Opening volatility - Moon influence")
@@ -351,10 +369,15 @@ with st.sidebar:
         House: {data['house']}
         """)
         st.divider()
+    
+    # Refresh button
+    if st.button("🔄 Refresh Data"):
+        update_market_data()
+        st.rerun()
+    
+    # Show last update time
+    st.caption(f"Last Updated: {st.session_state.last_update.strftime('%H:%M:%S')}")
 
-# Auto-refresh
-if st.checkbox("Enable Auto-Refresh (5 seconds)", value=True):
-    time.sleep(5)
-    update_market_data()
-    ticker_placeholder.markdown(f'<div class="ticker">{create_ticker()}</div>', unsafe_allow_html=True)
+# Auto-refresh trigger (moved to bottom to avoid infinite loops)
+if auto_refresh:
     st.rerun()
