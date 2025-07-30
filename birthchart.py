@@ -113,10 +113,10 @@ def update_market_data():
         st.error(f"Error updating market data: {e}")
         return False
 
-# Header - Always show this first
+# Header - Updated without Om symbol in title
 st.markdown("""
 <div class="main-header">
-    <h1>🕉️ Vedic Birth Chart & Live Market Intelligence 🕉️</h1>
+    <h1>Vedic Birth Chart & Live Market Intelligence</h1>
     <p>Real-time Kundali Analysis with Live Market Data & Astrological Predictions</p>
 </div>
 """, unsafe_allow_html=True)
@@ -232,7 +232,7 @@ with main_col1:
     st.write("### 📊 Birth Chart (North Indian Style)")
     st.info("💡 **Tip:** This is a simplified representation. For detailed calculations, exact birth time and location are crucial.")
     
-    # Create a simple 4x4 grid for the chart
+    # Create a simple 4x4 grid for the chart - FIXED with unique column names
     chart_data = [
         ['12♓', '1♈', '2♉', '3♊'],
         ['11♒', '🕉️', 'Rasi', '4♋'],
@@ -240,8 +240,17 @@ with main_col1:
         ['9♐', '8♏', '7♎', '6♍']
     ]
     
-    chart_df = pd.DataFrame(chart_data, columns=['', '', '', ''])
-    st.table(chart_df)
+    # Fix: Use unique column names instead of empty strings
+    chart_df = pd.DataFrame(chart_data, columns=['Col1', 'Col2', 'Col3', 'Col4'])
+    
+    # Display without column headers using st.dataframe with hide_index
+    st.dataframe(chart_df, hide_index=True, use_container_width=True, 
+                 column_config={
+                     "Col1": st.column_config.TextColumn(label=""),
+                     "Col2": st.column_config.TextColumn(label=""),
+                     "Col3": st.column_config.TextColumn(label=""),
+                     "Col4": st.column_config.TextColumn(label="")
+                 })
     
     # Display current birth details
     st.write(f"**Current Settings:** {birth_date} | {birth_time} | {birth_place}")
