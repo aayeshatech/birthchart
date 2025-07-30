@@ -168,28 +168,97 @@ with main_col1:
     # Birth chart inputs
     col_a, col_b = st.columns(2)
     with col_a:
-        birth_date = st.date_input("Birth Date", datetime(1990, 1, 1))
+        birth_date = st.date_input(
+            "Birth Date", 
+            value=datetime(1990, 1, 1),
+            min_value=datetime(1900, 1, 1),
+            max_value=datetime(2025, 12, 31)
+        )
         birth_place = st.text_input("Birth Place", "Mumbai, India")
     with col_b:
-        birth_time = st.time_input("Birth Time", datetime.now().time())
-        timezone = st.selectbox("Timezone", ["IST (+05:30)", "UTC (+00:00)"])
+        birth_time = st.time_input(
+            "Birth Time", 
+            value=datetime.now().time(),
+            help="Select exact birth time for accurate chart"
+        )
+        timezone = st.selectbox(
+            "Timezone", 
+            ["IST (+05:30)", "UTC (+00:00)", "EST (-05:00)", "PST (-08:00)", "CST (+08:00)", "JST (+09:00)"],
+            help="Choose your birth location timezone"
+        )
     
     if st.button("✨ Generate Chart"):
-        st.success("Birth chart generated!")
+        st.success(f"Birth chart generated for {birth_date} at {birth_time}!")
+        st.info(f"📍 Location: {birth_place} | 🕐 Timezone: {timezone}")
+        # Update planetary positions based on birth date
+        try:
+            # Simple calculation based on birth date
+            birth_year = birth_date.year
+            day_offset = (datetime.now() - datetime(birth_year, birth_date.month, birth_date.day)).days
+            
+            # Update planetary positions (simplified)
+            for planet in st.session_state.planetary_data:
+                current_degree = (15 + (day_offset * 0.1)) % 30
+                degree_str = f"{int(current_degree)}°{int((current_degree % 1) * 60)}'"
+                st.session_state.planetary_data[planet]['degree'] = degree_str
+            
+            st.balloons()
+        except Exception as e:
+            st.warning(f"Chart generated with default positions. Error: {e}")
+    
+    # Alternative year input if date picker doesn't work
+    st.write("**Alternative:** If date picker doesn't work:")
+    year_input = st.number_input(
+        "Enter Birth Year", 
+        min_value=1900, 
+        max_value=2025, 
+        value=1990,
+        step=1
+    )
+    month_input = st.selectbox(
+        "Birth Month", 
+        list(range(1, 13)), 
+        index=0,
+        format_func=lambda x: datetime(2000, x, 1).strftime('%B')
+    )
+    day_input = st.number_input(
+        "Birth Day", 
+        min_value=1, 
+        max_value=31, 
+        value=1
+    )
     
     # Simple birth chart representation
-    st.write("### 📊 Birth Chart (Simplified)")
+    st.write("### 📊 Birth Chart (North Indian Style)")
+    st.info("💡 **Tip:** This is a simplified representation. For detailed calculations, exact birth time and location are crucial.")
     
     # Create a simple 4x4 grid for the chart
     chart_data = [
-        ['12', '1', '2', '3'],
-        ['11', 'Rasi', 'Chart', '4'],
-        ['10', 'Vedic', 'Astro', '5'],
-        ['9', '8', '7', '6']
+        ['12♓', '1♈', '2♉', '3♊'],
+        ['11♒', '🕉️', 'Rasi', '4♋'],
+        ['10♑', 'Chart', '⭐', '5♌'],
+        ['9♐', '8♏', '7♎', '6♍']
     ]
     
-    chart_df = pd.DataFrame(chart_data)
+    chart_df = pd.DataFrame(chart_data, columns=['', '', '', ''])
     st.table(chart_df)
+    
+    # Display current birth details
+    st.write(f"**Current Settings:** {birth_date} | {birth_time} | {birth_place}")
+    
+    # Show planetary placements in houses
+    st.write("### 🏠 Planetary House Placements")
+    house_placements = {
+        1: "☊ Rahu (Ashwini)",
+        3: "♃ Jupiter, ♀ Venus (Punarvasu, Ardra)", 
+        4: "☀️ Sun, ☿️ Mercury (Pushya, Ashlesha)",
+        6: "🌙 Moon, ♂️ Mars (Hasta, Chitra)",
+        7: "☋ Ketu (Swati)",
+        12: "♄ Saturn (Revati)"
+    }
+    
+    for house, planets in house_placements.items():
+        st.write(f"**House {house}:** {planets}")
     
     # Planetary positions
     st.write("### 🪐 Planetary Positions")
