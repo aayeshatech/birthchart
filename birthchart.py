@@ -436,50 +436,9 @@ elif view_mode == "Bearish Only":
 elif view_mode == "Active Now":
     st.markdown("<p style='color: #ff6b35; font-weight: bold'>🔥 Showing only active trading opportunities</p>", unsafe_allow_html=True)
 
-# Quick Alerts Section
-if st.session_state.get('show_alerts', True):
-    current_hour = datetime.now().hour
-    current_minute = datetime.now().minute
-    
-    # Morning alerts (9:00 - 10:30)
-    if 9 <= current_hour < 10 or (current_hour == 10 and current_minute <= 30):
-        st.markdown("""
-        <div style='background-color: #d4edda; padding: 10px; border-radius: 5px; margin: 10px 0;'>
-            <strong>🌅 Morning Session Alert:</strong>
-            <span class='bullish-text'>FMCG & Pharma sectors favorable</span> | 
-            <span class='bearish-text'>Avoid Metal stocks</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Noon alerts (12:00 - 13:30)
-    elif 12 <= current_hour < 13 or (current_hour == 13 and current_minute <= 30):
-        st.markdown("""
-        <div style='background-color: #fff3cd; padding: 10px; border-radius: 5px; margin: 10px 0;'>
-            <strong>🌞 Midday Alert:</strong>
-            <span class='volatile-text'>Energy sector volatile</span> | 
-            <span class='neutral-text'>Auto sector ranging</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Closing alerts (14:00 - 15:30)
-    elif 14 <= current_hour < 15 or (current_hour == 15 and current_minute <= 30):
-        st.markdown("""
-        <div style='background-color: #f8d7da; padding: 10px; border-radius: 5px; margin: 10px 0;'>
-            <strong>🌆 Closing Session Alert:</strong>
-            <span class='bearish-text'>IT & Metal sectors weak</span> | 
-            <span class='bullish-text'>Book profits in morning trades</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Evening/Global alerts (19:00 - 23:30)
-    elif 19 <= current_hour <= 23:
-        st.markdown("""
-        <div style='background-color: #d1ecf1; padding: 10px; border-radius: 5px; margin: 10px 0;'>
-            <strong>🌙 Global Session Alert:</strong>
-            <span class='bullish-text'>Gold & Silver active</span> | 
-            <span class='volatile-text'>Watch US market opening</span>
-        </div>
-        """, unsafe_allow_html=True)
+# Show current time and planetary hour
+current_time = datetime.now()
+planet, symbol, influence = get_planetary_influence(current_time)
 
 col1, col2, col3 = st.columns(3)
 with col1:
