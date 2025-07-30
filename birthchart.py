@@ -228,7 +228,7 @@ def is_time_in_range(current_time_str, time_range):
     except:
         return False
 
-# Function to get market-specific timing
+# Function to format market timings based on selected market type
 def get_market_timing(market_type, selected_item):
     current_time = datetime.now()
     timings = []
@@ -245,20 +245,74 @@ def get_market_timing(market_type, selected_item):
         
         if selected_item in sector_stocks:
             stocks = sector_stocks[selected_item]
+            
+            # Predefined timing patterns based on sector
+            sector_timings = {
+                'Banking': [
+                    ('10:30-11:15', 'Bullish'),
+                    ('11:00-12:00', 'Bullish'),
+                    ('13:00-14:00', 'Neutral'),
+                    ('14:30-15:15', 'Bearish'),
+                    ('09:30-10:30', 'Bullish')
+                ],
+                'IT': [
+                    ('14:00-15:00', 'Bearish'),
+                    ('14:15-15:15', 'Bearish'),
+                    ('11:30-12:30', 'Neutral'),
+                    ('13:45-14:45', 'Bearish'),
+                    ('14:00-15:00', 'Bearish')
+                ],
+                'Pharma': [
+                    ('09:30-10:30', 'Bullish'),
+                    ('10:00-11:00', 'Bullish'),
+                    ('11:30-12:30', 'Neutral'),
+                    ('09:45-10:45', 'Bullish'),
+                    ('14:00-15:00', 'Bearish')
+                ],
+                'Auto': [
+                    ('11:30-12:30', 'Neutral'),
+                    ('12:00-13:00', 'Bullish'),
+                    ('11:45-12:45', 'Neutral'),
+                    ('13:30-14:30', 'Bearish'),
+                    ('11:00-12:00', 'Neutral')
+                ],
+                'Metal': [
+                    ('13:30-14:30', 'Bearish'),
+                    ('13:45-14:45', 'Bearish'),
+                    ('14:00-15:00', 'Bearish'),
+                    ('12:00-13:00', 'Neutral'),
+                    ('13:30-14:30', 'Bearish')
+                ],
+                'FMCG': [
+                    ('09:15-10:15', 'Bullish'),
+                    ('09:30-10:30', 'Bullish'),
+                    ('11:00-12:00', 'Neutral'),
+                    ('10:00-11:00', 'Bullish'),
+                    ('09:45-10:45', 'Bullish')
+                ]
+            }
+            
+            stock_timings = sector_timings.get(selected_item, [])
+            
             for i, stock in enumerate(stocks):
-                # Generate timing based on planetary positions
-                start_time = current_time + timedelta(minutes=30*i)
-                end_time = start_time + timedelta(minutes=45)
-                trend = "Bullish" if i % 2 == 0 else "Bearish"
+                if i < len(stock_timings):
+                    time_range, trend = stock_timings[i]
+                    start_time, end_time = time_range.split('-')
+                else:
+                    # Default timing if not enough predefined
+                    start_time = f"{9 + i}:00"
+                    end_time = f"{10 + i}:00"
+                    trend = "Neutral"
+                
                 planet = list(st.session_state.planetary_data.keys())[i % 9]
                 
                 timings.append({
                     'Stock': stock,
                     'Trend': trend,
-                    'Start': start_time.strftime('%H:%M'),
-                    'End': end_time.strftime('%H:%M'),
+                    'Start': start_time,
+                    'End': end_time,
                     'Planet': st.session_state.planetary_data[planet]['symbol'] + ' ' + planet,
-                    'Target': f"+{1.5 + (i*0.2):.1f}%" if trend == "Bullish" else f"-{1.2 + (i*0.2):.1f}%"
+                    'Target': f"+{1.5 + (i*0.2):.1f}%" if trend == "Bullish" else f"-{1.2 + (i*0.2):.1f}%" if trend == "Bearish" else f"±{0.5:.1f}%"
                 })
     
     elif market_type == "Commodity":
@@ -356,7 +410,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Controls
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     auto_refresh = st.checkbox("🔄 Auto-Refresh", value=False)
@@ -370,9 +424,62 @@ with col2:
 with col3:
     refresh_rate = st.selectbox("Rate (sec)", [5, 10, 30], index=0)
 
-# Show current time and planetary hour
-current_time = datetime.now()
-planet, symbol, influence = get_planetary_influence(current_time)
+with col4:
+    # Quick view buttons
+    view_mode = st.selectbox("Quick View", ["Overview", "Bullish Only", "Bearish Only", "Active Now"])
+
+# Apply quick view filter
+if view_mode == "Bullish Only":
+    st.markdown("<p style='color: #28a745; font-weight: bold'>🟢 Showing only Bullish markets/sectors</p>", unsafe_allow_html=True)
+elif view_mode == "Bearish Only":
+    st.markdown("<p style='color: #dc3545; font-weight: bold'>🔴 Showing only Bearish markets/sectors</p>", unsafe_allow_html=True)
+elif view_mode == "Active Now":
+    st.markdown("<p style='color: #ff6b35; font-weight: bold'>🔥 Showing only active trading opportunities</p>", unsafe_allow_html=True)
+
+# Quick Alerts Section
+if st.session_state.get('show_alerts', True):
+    current_hour = datetime.now().hour
+    current_minute = datetime.now().minute
+    
+    # Morning alerts (9:00 - 10:30)
+    if 9 <= current_hour < 10 or (current_hour == 10 and current_minute <= 30):
+        st.markdown("""
+        <div style='background-color: #d4edda; padding: 10px; border-radius: 5px; margin: 10px 0;'>
+            <strong>🌅 Morning Session Alert:</strong>
+            <span class='bullish-text'>FMCG & Pharma sectors favorable</span> | 
+            <span class='bearish-text'>Avoid Metal stocks</span>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Noon alerts (12:00 - 13:30)
+    elif 12 <= current_hour < 13 or (current_hour == 13 and current_minute <= 30):
+        st.markdown("""
+        <div style='background-color: #fff3cd; padding: 10px; border-radius: 5px; margin: 10px 0;'>
+            <strong>🌞 Midday Alert:</strong>
+            <span class='volatile-text'>Energy sector volatile</span> | 
+            <span class='neutral-text'>Auto sector ranging</span>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Closing alerts (14:00 - 15:30)
+    elif 14 <= current_hour < 15 or (current_hour == 15 and current_minute <= 30):
+        st.markdown("""
+        <div style='background-color: #f8d7da; padding: 10px; border-radius: 5px; margin: 10px 0;'>
+            <strong>🌆 Closing Session Alert:</strong>
+            <span class='bearish-text'>IT & Metal sectors weak</span> | 
+            <span class='bullish-text'>Book profits in morning trades</span>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Evening/Global alerts (19:00 - 23:30)
+    elif 19 <= current_hour <= 23:
+        st.markdown("""
+        <div style='background-color: #d1ecf1; padding: 10px; border-radius: 5px; margin: 10px 0;'>
+            <strong>🌙 Global Session Alert:</strong>
+            <span class='bullish-text'>Gold & Silver active</span> | 
+            <span class='volatile-text'>Watch US market opening</span>
+        </div>
+        """, unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -381,6 +488,33 @@ with col2:
     st.write(f"{symbol} **Planetary Hour:** {planet}")
 with col3:
     st.write(f"📊 **Influence:** {influence}")
+
+# Market Sentiment Summary
+st.write("---")
+sentiment_col1, sentiment_col2, sentiment_col3, sentiment_col4 = st.columns(4)
+
+with sentiment_col1:
+    bullish_count = sum(1 for _, data in st.session_state.astro_predictions['sectors'].items() if 'Bullish' in data['trend'])
+    st.markdown(f"<div style='text-align: center'><h3 style='color: #28a745'>🟢 {bullish_count}</h3><p>Bullish Sectors</p></div>", unsafe_allow_html=True)
+
+with sentiment_col2:
+    bearish_count = sum(1 for _, data in st.session_state.astro_predictions['sectors'].items() if 'Bearish' in data['trend'])
+    st.markdown(f"<div style='text-align: center'><h3 style='color: #dc3545'>🔴 {bearish_count}</h3><p>Bearish Sectors</p></div>", unsafe_allow_html=True)
+
+with sentiment_col3:
+    neutral_count = sum(1 for _, data in st.session_state.astro_predictions['sectors'].items() if 'Neutral' in data['trend'] or 'Volatile' in data['trend'])
+    st.markdown(f"<div style='text-align: center'><h3 style='color: #ffc107'>🟡 {neutral_count}</h3><p>Neutral/Volatile</p></div>", unsafe_allow_html=True)
+
+with sentiment_col4:
+    # Overall market sentiment based on planetary hour
+    if planet in ['Sun', 'Jupiter', 'Venus']:
+        st.markdown("<div style='text-align: center'><h3 style='color: #28a745'>BULLISH</h3><p>Overall Sentiment</p></div>", unsafe_allow_html=True)
+    elif planet in ['Saturn', 'Mars']:
+        st.markdown("<div style='text-align: center'><h3 style='color: #dc3545'>BEARISH</h3><p>Overall Sentiment</p></div>", unsafe_allow_html=True)
+    else:
+        st.markdown("<div style='text-align: center'><h3 style='color: #ffc107'>MIXED</h3><p>Overall Sentiment</p></div>", unsafe_allow_html=True)
+
+st.write("---")
 
 # Auto-refresh logic
 if auto_refresh:
@@ -706,7 +840,18 @@ with main_col2:
         )
         
         global_data = st.session_state.astro_predictions['global'][selected_global]
-        st.info(f"**{selected_global}:** {global_data['trend']} | {global_data['planet']} | Trading Hours: {global_data['timing']} IST")
+        
+        # Apply colored styling to trend
+        if "Bullish" in global_data['trend']:
+            trend_html = f'<span class="trend-bullish">{global_data["trend"]}</span>'
+        elif "Bearish" in global_data['trend']:
+            trend_html = f'<span class="trend-bearish">{global_data["trend"]}</span>'
+        elif "Volatile" in global_data['trend']:
+            trend_html = f'<span class="trend-volatile">{global_data["trend"]}</span>'
+        else:
+            trend_html = f'<span class="trend-neutral">{global_data["trend"]}</span>'
+        
+        st.markdown(f'**{selected_global}:** {trend_html} | {global_data["planet"]} | Trading Hours: {global_data["timing"]} IST', unsafe_allow_html=True)
         
         # Show global market status
         timings = get_market_timing("Global", selected_global)
@@ -754,7 +899,8 @@ for sector, stocks in sector_stocks_quick.items():
                 'Type': 'Stock',
                 'Name': stock_info['stock'],
                 'Sector': sector,
-                'Signal': '🟢 BUY' if stock_info['trend'] == 'Bullish' else '🔴 SELL',
+                'Trend': stock_info['trend'],
+                'Signal': 'BUY' if stock_info['trend'] == 'Bullish' else 'SELL',
                 'Active Till': stock_info['time'].split('-')[1]
             })
 
@@ -764,20 +910,49 @@ if 20 <= current_hour <= 23:
         'Type': 'Commodity',
         'Name': 'GOLD',
         'Sector': 'Precious Metal',
-        'Signal': '🟢 BUY',
+        'Trend': 'Bullish',
+        'Signal': 'BUY',
         'Active Till': '23:30'
     })
     active_opportunities.append({
         'Type': 'Commodity',
         'Name': 'SILVER',
         'Sector': 'Precious Metal',
-        'Signal': '🟢 STRONG BUY',
+        'Trend': 'Strong Bullish',
+        'Signal': 'BUY',
         'Active Till': '23:30'
     })
 
 if active_opportunities:
-    opp_df = pd.DataFrame(active_opportunities)
-    st.dataframe(opp_df, use_container_width=True, hide_index=True)
+    # Display opportunities with custom formatting
+    for opp in active_opportunities:
+        col1, col2, col3, col4, col5, col6 = st.columns([1, 1.5, 1.5, 1, 1, 1])
+        
+        with col1:
+            st.write(opp['Type'])
+        
+        with col2:
+            st.write(f"**{opp['Name']}**")
+        
+        with col3:
+            st.write(opp['Sector'])
+        
+        with col4:
+            if 'Bullish' in opp['Trend']:
+                st.markdown(f'<span class="trend-bullish">{opp["Trend"]}</span>', unsafe_allow_html=True)
+            elif 'Bearish' in opp['Trend']:
+                st.markdown(f'<span class="trend-bearish">{opp["Trend"]}</span>', unsafe_allow_html=True)
+            else:
+                st.markdown(f'<span class="trend-neutral">{opp["Trend"]}</span>', unsafe_allow_html=True)
+        
+        with col5:
+            if opp['Signal'] == 'BUY':
+                st.markdown('<span class="bullish-text">🟢 BUY</span>', unsafe_allow_html=True)
+            else:
+                st.markdown('<span class="bearish-text">🔴 SELL</span>', unsafe_allow_html=True)
+        
+        with col6:
+            st.write(f"Till {opp['Active Till']}")
 else:
     st.info("No active opportunities at current time. Check sector/commodity tabs for upcoming timings.")
 
@@ -790,23 +965,23 @@ with transit_col1:
     </div>
     """, unsafe_allow_html=True)
     
-    # Show current planetary transits
+    # Show current planetary transits with colored predictions
     current_hour = datetime.now().hour
     if 9 <= current_hour < 15:
         st.write("**🌞 Day Trading Hours**")
-        st.write("- Moon in Virgo: Technical stocks favorable")
-        st.write("- Mercury direct: IT sector clarity")
-        st.write("- Mars aspect: Energy sector volatile")
+        st.markdown("- Moon in Virgo: <span class='bullish-text'>Technical stocks favorable</span>", unsafe_allow_html=True)
+        st.markdown("- Mercury direct: <span class='neutral-text'>IT sector clarity</span>", unsafe_allow_html=True)
+        st.markdown("- Mars aspect: <span class='volatile-text'>Energy sector volatile</span>", unsafe_allow_html=True)
     elif 15 <= current_hour < 20:
         st.write("**🌅 Evening Session**")
-        st.write("- Venus active: Auto sector positive")
-        st.write("- Jupiter aspect: Banking stable")
-        st.write("- Saturn influence: Metals cautious")
+        st.markdown("- Venus active: <span class='bullish-text'>Auto sector positive</span>", unsafe_allow_html=True)
+        st.markdown("- Jupiter aspect: <span class='bullish-text'>Banking stable</span>", unsafe_allow_html=True)
+        st.markdown("- Saturn influence: <span class='bearish-text'>Metals cautious</span>", unsafe_allow_html=True)
     else:
         st.write("**🌙 Global Market Hours**")
-        st.write("- Moon aspects: Commodities active")
-        st.write("- Rahu influence: Crypto volatile")
-        st.write("- Mercury in tech: NASDAQ positive")
+        st.markdown("- Moon aspects: <span class='bullish-text'>Commodities active</span>", unsafe_allow_html=True)
+        st.markdown("- Rahu influence: <span class='volatile-text'>Crypto volatile</span>", unsafe_allow_html=True)
+        st.markdown("- Mercury in tech: <span class='bullish-text'>NASDAQ positive</span>", unsafe_allow_html=True)
 
 with transit_col2:
     st.markdown("""
@@ -815,17 +990,33 @@ with transit_col2:
     </div>
     """, unsafe_allow_html=True)
     
-    # Show upcoming important timings
+    # Show upcoming important timings with trend indicators
     upcoming_times = []
     current = datetime.now()
     
-    for i in range(4):
-        future_time = current + timedelta(hours=i+1)
-        planet, symbol, influence = get_planetary_influence(future_time)
-        upcoming_times.append(f"{future_time.strftime('%H:%M')} - {symbol} {planet}: {influence}")
+    timing_predictions = [
+        (1, "Bullish", "Banking, FMCG strong"),
+        (2, "Neutral", "Range-bound movement"),
+        (3, "Bearish", "Profit booking likely"),
+        (4, "Volatile", "News-based moves")
+    ]
     
-    for timing in upcoming_times:
-        st.write(f"• {timing}")
+    for i, (hours_ahead, trend, desc) in enumerate(timing_predictions):
+        future_time = current + timedelta(hours=hours_ahead)
+        planet, symbol, _ = get_planetary_influence(future_time)
+        
+        time_str = future_time.strftime('%H:%M')
+        
+        if trend == "Bullish":
+            trend_html = f'<span class="bullish-text">{desc}</span>'
+        elif trend == "Bearish":
+            trend_html = f'<span class="bearish-text">{desc}</span>'
+        elif trend == "Volatile":
+            trend_html = f'<span class="volatile-text">{desc}</span>'
+        else:
+            trend_html = f'<span class="neutral-text">{desc}</span>'
+        
+        st.markdown(f"• {time_str} - {symbol} {planet}: {trend_html}", unsafe_allow_html=True)
 
 # Detailed analysis tabs
 tab1, tab2, tab3, tab4 = st.tabs(["📈 Sector Analysis", "🏭 Commodities", "🌍 Global Markets", "⚡ Intraday Signals"])
@@ -840,10 +1031,16 @@ with tab1:
     for sector, data in st.session_state.astro_predictions['sectors'].items():
         if is_time_in_range(current_time_str, data['timing']):
             trend_icon = "🟢" if "Bullish" in data['trend'] else "🔴" if "Bearish" in data['trend'] else "🟡"
-            active_sectors.append(f"{trend_icon} **{sector}** ({data['trend']})")
+            if "Bullish" in data['trend']:
+                trend_html = f'<span class="trend-bullish">{data["trend"]}</span>'
+            elif "Bearish" in data['trend']:
+                trend_html = f'<span class="trend-bearish">{data["trend"]}</span>'
+            else:
+                trend_html = f'<span class="trend-neutral">{data["trend"]}</span>'
+            active_sectors.append(f"{trend_icon} **{sector}** ({trend_html})")
     
     if active_sectors:
-        st.success(f"🔥 **Currently Active Sectors:** {', '.join(active_sectors)}")
+        st.markdown(f"🔥 **Currently Active Sectors:** {', '.join(active_sectors)}", unsafe_allow_html=True)
     else:
         st.info("💤 No sectors in their optimal trading window currently")
     
@@ -918,10 +1115,16 @@ with tab1:
                 {'trend': 'Neutral', 'planet': 'Mixed', 'timing': '09:15-15:30'}
             )
             
-            # Show sector overview
+            # Show sector overview with colored trend
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.write(f"**Overall Trend:** {sector_pred['trend']}")
+                if "Bullish" in sector_pred['trend']:
+                    trend_display = '<span class="trend-bullish">Bullish</span>'
+                elif "Bearish" in sector_pred['trend']:
+                    trend_display = '<span class="trend-bearish">Bearish</span>'
+                else:
+                    trend_display = '<span class="trend-neutral">Neutral</span>'
+                st.markdown(f"**Overall Trend:** {trend_display}", unsafe_allow_html=True)
             with col2:
                 st.write(f"**Planetary Influence:** {sector_pred['planet']}")
             with col3:
@@ -929,29 +1132,41 @@ with tab1:
             
             st.write("---")
             
-            # Show individual stocks
+            # Show individual stocks with colored trends
             stock_data = []
             for stock_info in stocks:
-                # Determine signal based on trend
-                if stock_info['trend'] == 'Bullish':
-                    signal = '🟢 BUY'
-                elif stock_info['trend'] == 'Bearish':
-                    signal = '🔴 SELL'
-                elif stock_info['trend'] == 'Volatile':
-                    signal = '🟡 CAUTION'
-                else:
-                    signal = '🟡 HOLD'
-                
                 stock_data.append({
                     'Stock': stock_info['stock'],
                     'Trend': stock_info['trend'],
                     'Best Time': stock_info['time'],
                     'Expected Move': stock_info['target'],
-                    'Signal': signal
+                    'Signal': '🟢 BUY' if stock_info['trend'] == 'Bullish' else '🔴 SELL' if stock_info['trend'] == 'Bearish' else '🟡 CAUTION' if stock_info['trend'] == 'Volatile' else '🟡 HOLD'
                 })
             
+            # Create custom styled dataframe
             stock_df = pd.DataFrame(stock_data)
-            st.dataframe(stock_df, use_container_width=True, hide_index=True)
+            
+            # Apply custom styling
+            def style_trend(val):
+                if val == 'Bullish':
+                    return 'background-color: #d4edda; color: #155724; font-weight: bold'
+                elif val == 'Bearish':
+                    return 'background-color: #f8d7da; color: #721c24; font-weight: bold'
+                elif val == 'Volatile':
+                    return 'background-color: #ffe5d4; color: #a04000; font-weight: bold'
+                else:
+                    return 'background-color: #fff3cd; color: #856404; font-weight: bold'
+            
+            def style_target(val):
+                if val.startswith('+'):
+                    return 'color: #28a745; font-weight: bold'
+                elif val.startswith('-'):
+                    return 'color: #dc3545; font-weight: bold'
+                else:
+                    return 'color: #ffc107; font-weight: bold'
+            
+            styled_df = stock_df.style.applymap(style_trend, subset=['Trend']).applymap(style_target, subset=['Expected Move'])
+            st.dataframe(styled_df, use_container_width=True, hide_index=True)
             
             # Add timing note
             current_hour = datetime.now().hour
@@ -1037,10 +1252,18 @@ with tab2:
                 {'trend': 'Neutral', 'planet': 'Mixed', 'timing': '09:00-23:30'}
             )
             
-            # Overview
+            # Overview with colored trend
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.write(f"**Overall Trend:** {comm_pred['trend']}")
+                if "Bullish" in comm_pred['trend']:
+                    trend_display = '<span class="trend-bullish">Strong Bullish</span>' if "Strong" in comm_pred['trend'] else '<span class="trend-bullish">Bullish</span>'
+                elif "Bearish" in comm_pred['trend']:
+                    trend_display = '<span class="trend-bearish">Bearish</span>'
+                elif "Volatile" in comm_pred['trend']:
+                    trend_display = '<span class="trend-volatile">Volatile</span>'
+                else:
+                    trend_display = '<span class="trend-neutral">Neutral</span>'
+                st.markdown(f"**Overall Trend:** {trend_display}", unsafe_allow_html=True)
             with col2:
                 st.write(f"**Planetary Rule:** {comm_pred['planet']}")
             with col3:
@@ -1067,21 +1290,52 @@ with tab2:
                 # Check if session is active
                 is_active = is_time_in_range(current_time_str, session['time'])
                 
+                # Determine action color
+                if 'BUY' in session['action'] or 'ACCUMULATE' in session['action'] or 'POSITION' in session['action']:
+                    action_style = 'bullish-text'
+                elif 'AVOID' in session['action'] or 'CAUTION' in session['action']:
+                    action_style = 'bearish-text'
+                elif 'WAIT' in session['action'] or 'WATCH' in session['action']:
+                    action_style = 'neutral-text'
+                else:
+                    action_style = 'volatile-text'
+                
                 session_data.append({
                     'Session': session['session'],
                     'Timing': session['time'],
                     'Market Nature': session['trend'],
                     'Action': session['action'],
+                    'Action_Style': action_style,
                     'Status': '🟢 ACTIVE' if is_active else '⏸️ Inactive'
                 })
             
-            session_df = pd.DataFrame(session_data)
-            st.dataframe(session_df, use_container_width=True, hide_index=True)
+            # Display session table with styled actions
+            for idx, session in enumerate(session_data):
+                col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 1])
+                with col1:
+                    st.write(session['Session'])
+                with col2:
+                    st.write(session['Timing'])
+                with col3:
+                    st.write(session['Market Nature'])
+                with col4:
+                    st.markdown(f'<span class="{session["Action_Style"]}">{session["Action"]}</span>', unsafe_allow_html=True)
+                with col5:
+                    st.write(session['Status'])
+                
+                if idx < len(session_data) - 1:
+                    st.write("---")
             
             # Current recommendation
             active_sessions = [s for s in details['sessions'] if is_time_in_range(current_time_str, s['time'])]
             if active_sessions:
-                st.success(f"🔔 Current Action: {active_sessions[0]['action']} ({active_sessions[0]['session']})")
+                action = active_sessions[0]['action']
+                if 'BUY' in action or 'ACCUMULATE' in action:
+                    st.success(f"🔔 Current Action: {action} ({active_sessions[0]['session']})")
+                elif 'AVOID' in action or 'CAUTION' in action:
+                    st.error(f"⚠️ Current Action: {action} ({active_sessions[0]['session']})")
+                else:
+                    st.info(f"💡 Current Action: {action} ({active_sessions[0]['session']})")
             else:
                 st.info("💤 No active session currently")
     
@@ -1091,9 +1345,9 @@ with tab2:
     col1, col2 = st.columns(2)
     with col1:
         st.write("**Best Trading Times:**")
-        st.write("• Gold: US Session (20:00-23:30)")
-        st.write("• Silver: European Open (14:00-16:00)")
-        st.write("• Crude: Inventory Time (20:00)")
+        st.markdown("• Gold: <span class='bullish-text'>US Session (20:00-23:30)</span>", unsafe_allow_html=True)
+        st.markdown("• Silver: <span class='bullish-text'>European Open (14:00-16:00)</span>", unsafe_allow_html=True)
+        st.markdown("• Crude: <span class='bearish-text'>Avoid Inventory (20:00)</span>", unsafe_allow_html=True)
     with col2:
         st.write("**Risk Management:**")
         st.write("• Use 1% risk per trade")
@@ -1103,6 +1357,19 @@ with tab2:
 with tab3:
     st.subheader("🌍 Global Market Outlook")
     
+    # Show current global market status
+    current_hour = datetime.now().hour
+    if 19 <= current_hour <= 23 or 0 <= current_hour <= 2:
+        st.success("🟢 US Markets are OPEN")
+    elif 13 <= current_hour <= 20:
+        st.success("🟢 European Markets are OPEN")
+    elif 5 <= current_hour <= 11:
+        st.success("🟢 Asian Markets are OPEN")
+    else:
+        st.info("💤 Major global markets in transition period")
+    
+    st.write("---")
+    
     global_outlook = []
     for market, data in st.session_state.astro_predictions['global'].items():
         global_outlook.append({
@@ -1110,11 +1377,62 @@ with tab3:
             'Trend': data['trend'],
             'Astrological Factor': data['planet'],
             'Trading Hours (IST)': data['timing'],
-            'Expected Move': f"{'+' if 'Bullish' in data['trend'] else '-'}{random.uniform(0.3, 1.8):.1f}%"
+            'Expected Move': f"{'+' if 'Bullish' in data['trend'] else '-' if 'Bearish' in data['trend'] else '±'}{random.uniform(0.3, 1.8):.1f}%"
         })
     
-    global_df = pd.DataFrame(global_outlook)
-    st.dataframe(global_df, use_container_width=True)
+    # Display with custom formatting
+    st.write("### 📊 Market-wise Analysis")
+    for market_data in global_outlook:
+        with st.expander(f"🌐 {market_data['Market']}", expanded=False):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # Colored trend display
+                if "Bullish" in market_data['Trend']:
+                    st.markdown(f"**Trend:** <span class='trend-bullish'>{market_data['Trend']}</span>", unsafe_allow_html=True)
+                elif "Bearish" in market_data['Trend']:
+                    st.markdown(f"**Trend:** <span class='trend-bearish'>{market_data['Trend']}</span>", unsafe_allow_html=True)
+                elif "Volatile" in market_data['Trend']:
+                    st.markdown(f"**Trend:** <span class='trend-volatile'>{market_data['Trend']}</span>", unsafe_allow_html=True)
+                else:
+                    st.markdown(f"**Trend:** <span class='trend-neutral'>{market_data['Trend']}</span>", unsafe_allow_html=True)
+                
+                st.write(f"**Planetary Factor:** {market_data['Astrological Factor']}")
+            
+            with col2:
+                st.write(f"**Trading Hours:** {market_data['Trading Hours (IST)']}")
+                
+                # Colored expected move
+                if market_data['Expected Move'].startswith('+'):
+                    st.markdown(f"**Expected Move:** <span class='bullish-text'>{market_data['Expected Move']}</span>", unsafe_allow_html=True)
+                elif market_data['Expected Move'].startswith('-'):
+                    st.markdown(f"**Expected Move:** <span class='bearish-text'>{market_data['Expected Move']}</span>", unsafe_allow_html=True)
+                else:
+                    st.markdown(f"**Expected Move:** <span class='neutral-text'>{market_data['Expected Move']}</span>", unsafe_allow_html=True)
+            
+            # Check if market is currently open
+            start, end = market_data['Trading Hours (IST)'].split('-')
+            if is_market_open(start, end):
+                st.success("🟢 Market is OPEN NOW")
+            else:
+                st.info("🔴 Market is CLOSED")
+    
+    # Global market correlation
+    st.write("---")
+    st.write("### 🔗 Market Correlations & Impact")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("**Positive Correlations:**")
+        st.markdown("• <span class='bullish-text'>NASDAQ ↑</span> → <span class='bullish-text'>IT Stocks ↑</span>", unsafe_allow_html=True)
+        st.markdown("• <span class='bullish-text'>DOWJONES ↑</span> → <span class='bullish-text'>Banking ↑</span>", unsafe_allow_html=True)
+        st.markdown("• <span class='bullish-text'>Crude ↑</span> → <span class='bullish-text'>Energy Stocks ↑</span>", unsafe_allow_html=True)
+    
+    with col2:
+        st.write("**Inverse Correlations:**")
+        st.markdown("• <span class='bearish-text'>Dollar ↑</span> → <span class='bearish-text'>Gold ↓</span>", unsafe_allow_html=True)
+        st.markdown("• <span class='bearish-text'>VIX ↑</span> → <span class='bearish-text'>Markets ↓</span>", unsafe_allow_html=True)
+        st.markdown("• <span class='bullish-text'>Gold ↑</span> → <span class='bearish-text'>Banking ↓</span>", unsafe_allow_html=True)
 
 with tab4:
     st.subheader("⚡ Live Intraday Signals")
@@ -1130,19 +1448,133 @@ with tab4:
         signals.append({
             'Time': datetime.now().strftime('%H:%M:%S'),
             'Market': market,
-            'Signal': f"{'🟢' if signal_type == 'BUY' else '🔴' if signal_type == 'SELL' else '🟡'} {signal_type}",
+            'Signal': signal_type,
             'Entry': st.session_state.market_data[market]['price'],
             'Target': st.session_state.market_data[market]['price'] * (1.01 if signal_type == 'BUY' else 0.99),
             'SL': st.session_state.market_data[market]['price'] * (0.995 if signal_type == 'BUY' else 1.005),
             'Planet': f"{symbol} {planet}"
         })
     
+    # Create DataFrame
     signals_df = pd.DataFrame(signals)
-    st.dataframe(signals_df, use_container_width=True)
+    
+    # Custom styling function
+    def style_signal(val):
+        if val == 'BUY':
+            return 'background-color: #d4edda; color: #155724; font-weight: bold'
+        elif val == 'SELL':
+            return 'background-color: #f8d7da; color: #721c24; font-weight: bold'
+        else:
+            return 'background-color: #fff3cd; color: #856404; font-weight: bold'
+    
+    # Apply styling
+    styled_signals = signals_df.style.applymap(style_signal, subset=['Signal'])
+    
+    # Display with icons
+    st.write("### 📊 Current Trading Signals")
+    for idx, signal in signals_df.iterrows():
+        col1, col2, col3, col4, col5, col6, col7 = st.columns([1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5])
+        
+        with col1:
+            st.write(f"⏰ {signal['Time']}")
+        
+        with col2:
+            st.write(f"**{signal['Market']}**")
+        
+        with col3:
+            if signal['Signal'] == 'BUY':
+                st.markdown('<span class="trend-bullish">🟢 BUY</span>', unsafe_allow_html=True)
+            elif signal['Signal'] == 'SELL':
+                st.markdown('<span class="trend-bearish">🔴 SELL</span>', unsafe_allow_html=True)
+            else:
+                st.markdown('<span class="trend-neutral">🟡 HOLD</span>', unsafe_allow_html=True)
+        
+        with col4:
+            st.write(f"₹{signal['Entry']:.2f}")
+        
+        with col5:
+            if signal['Signal'] == 'BUY':
+                st.markdown(f'<span class="bullish-text">₹{signal["Target"]:.2f}</span>', unsafe_allow_html=True)
+            else:
+                st.markdown(f'<span class="bearish-text">₹{signal["Target"]:.2f}</span>', unsafe_allow_html=True)
+        
+        with col6:
+            st.write(f"₹{signal['SL']:.2f}")
+        
+        with col7:
+            st.write(signal['Planet'])
+    
+    st.write("---")
+    
+    # Add risk-reward info
+    st.write("### 📈 Signal Performance")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        buy_signals = len([s for s in signals if s['Signal'] == 'BUY'])
+        st.metric("Buy Signals", buy_signals, f"{(buy_signals/len(signals)*100):.0f}%")
+    
+    with col2:
+        sell_signals = len([s for s in signals if s['Signal'] == 'SELL'])
+        st.metric("Sell Signals", sell_signals, f"{(sell_signals/len(signals)*100):.0f}%")
+    
+    with col3:
+        hold_signals = len([s for s in signals if s['Signal'] == 'HOLD'])
+        st.metric("Hold Signals", hold_signals, f"{(hold_signals/len(signals)*100):.0f}%")
+    
+    # Trading tips based on planetary hour
+    planet, symbol, influence = get_planetary_influence(datetime.now())
+    st.write("---")
+    st.write(f"### {symbol} Current Planetary Hour: {planet}")
+    st.info(f"💡 {influence}")
+    
+    # Suggested actions based on planetary hour
+    if planet in ['Sun', 'Jupiter']:
+        st.success("✅ Favorable time for long positions in index and banking stocks")
+    elif planet in ['Venus']:
+        st.success("✅ Good time for auto and luxury sector trades")
+    elif planet in ['Mercury']:
+        st.warning("⚡ High volatility expected in IT and communication stocks")
+    elif planet in ['Saturn', 'Mars']:
+        st.error("⚠️ Exercise caution - favorable for short positions in metals")
+    else:
+        st.info("💡 Mixed influences - trade with smaller positions")
+
+# Help/Legend Section (Add before footer)
+with st.expander("📚 Color Guide & Trading Legend", expanded=False):
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.write("### 🎨 Trend Colors")
+        st.markdown('<span class="trend-bullish">BULLISH</span> - Upward trend expected', unsafe_allow_html=True)
+        st.markdown('<span class="trend-bearish">BEARISH</span> - Downward trend expected', unsafe_allow_html=True)
+        st.markdown('<span class="trend-neutral">NEUTRAL</span> - Sideways movement', unsafe_allow_html=True)
+        st.markdown('<span class="trend-volatile">VOLATILE</span> - High fluctuation', unsafe_allow_html=True)
+    
+    with col2:
+        st.write("### 📊 Signal Meanings")
+        st.write("🟢 **BUY** - Enter long position")
+        st.write("🔴 **SELL** - Enter short position")
+        st.write("🟡 **HOLD** - Wait for clarity")
+        st.write("🟡 **CAUTION** - Trade carefully")
+    
+    with col3:
+        st.write("### ⏰ Time Indicators")
+        st.write("🔥 **ACTIVE NOW** - In trading window")
+        st.write("⏸️ **Inactive** - Outside window")
+        st.write("🟢 **Market Open** - Trading hours")
+        st.write("🔴 **Market Closed** - Non-trading")
+    
+    with col4:
+        st.write("### 🪐 Planetary Effects")
+        st.write("☀️ **Sun** - Leadership stocks")
+        st.write("🌙 **Moon** - FMCG, Consumer")
+        st.write("♃ **Jupiter** - Banking, Finance")
+        st.write("♄ **Saturn** - Metals, Mining")
 
 # Footer
 st.write("---")
-footer_col1, footer_col2, footer_col3 = st.columns(3)
+footer_col1, footer_col2, footer_col3, footer_col4 = st.columns(4)
 
 with footer_col1:
     st.caption(f"🕐 Last Updated: {st.session_state.last_update.strftime('%H:%M:%S')}")
@@ -1152,4 +1584,16 @@ with footer_col2:
     st.caption(f"{current_symbol} Current Planetary Hour: {current_planet}")
 
 with footer_col3:
+    # Show overall market direction
+    bullish_markets = sum(1 for _, data in st.session_state.market_data.items() if data['change'] > 0)
+    bearish_markets = sum(1 for _, data in st.session_state.market_data.items() if data['change'] < 0)
+    
+    if bullish_markets > bearish_markets:
+        st.caption("📈 Market Direction: BULLISH")
+    elif bearish_markets > bullish_markets:
+        st.caption("📉 Market Direction: BEARISH")
+    else:
+        st.caption("➡️ Market Direction: SIDEWAYS")
+
+with footer_col4:
     st.caption("🕉️ Vedic Market Intelligence - Live Predictions")
