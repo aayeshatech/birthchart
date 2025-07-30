@@ -1,21 +1,181 @@
-from flask import Flask, render_template_string, jsonify, request
-from datetime import datetime, timedelta
-import json
+import streamlit as st
+import pandas as pd
 import random
-import threading
+from datetime import datetime, timedelta
 import time
+import threading
 
-app = Flask(__name__)
+# Page configuration
+st.set_page_config(
+    page_title="Vedic Market Intelligence",
+    page_icon="🕉️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# Global market data storage
-market_data = {}
-last_update = datetime.now()
-update_lock = threading.Lock()
+# Custom CSS
+st.markdown("""
+<style>
+    .stApp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .main-header {
+        background: linear-gradient(45deg, #ff6b35, #f7931e);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .ticker {
+        background: #000;
+        color: #00ff00;
+        padding: 15px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        white-space: nowrap;
+        animation: scroll-left 30s linear infinite;
+    }
+    @keyframes scroll-left {
+        0% { transform: translate3d(100%, 0, 0); }
+        100% { transform: translate3d(-100%, 0, 0); }
+    }
+    .market-card {
+        background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        margin: 10px 0;
+        border: 2px solid #dee2e6;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+    .market-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .price-positive { 
+        color: #28a745; 
+        font-weight: bold; 
+        text-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+    }
+    .price-negative { 
+        color: #dc3545; 
+        font-weight: bold; 
+        text-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
+    }
+    .chart-container {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin: 20px 0;
+    }
+    .planetary-card {
+        background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+        padding: 15px;
+        border-radius: 10px;
+        margin: 10px 0;
+        border-left: 4px solid #2196f3;
+    }
+    .sector-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 15px 0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        border-left: 5px solid;
+        transition: all 0.3s;
+    }
+    .sector-card:hover {
+        transform: translateX(5px);
+    }
+    .sector-bullish { border-left-color: #28a745; }
+    .sector-bearish { border-left-color: #dc3545; }
+    .sector-neutral { border-left-color: #ffc107; }
+    .birth-chart-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        gap: 2px;
+        background: #8B4513;
+        border-radius: 10px;
+        overflow: hidden;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    .house-cell {
+        background: linear-gradient(45deg, #F5DEB3, #DDD0C0);
+        padding: 8px;
+        font-size: 10px;
+        text-align: center;
+        position: relative;
+        min-height: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .house-number {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        font-weight: bold;
+        color: #8B4513;
+        font-size: 11px;
+    }
+    .house-sign {
+        font-size: 9px;
+        font-weight: bold;
+        color: #4169E1;
+        margin-bottom: 3px;
+    }
+    .planet-symbol {
+        font-size: 12px;
+        color: #d32f2f;
+        font-weight: bold;
+        margin: 1px;
+    }
+    .center-cell {
+        background: linear-gradient(45deg, #ff6b35, #f7931e);
+        color: white;
+        font-weight: bold;
+        font-size: 9px;
+    }
+    .info-box {
+        background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+        border: 1px solid #2196f3;
+    }
+    .transit-item {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 8px;
+        margin: 5px 0;
+        border-left: 3px solid #ff6b35;
+    }
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: bold;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# Initialize market data
-def initialize_market_data():
-    global market_data
-    market_data = {
+# Initialize session state
+if 'market_data' not in st.session_state:
+    st.session_state.market_data = {
         # Indian Indices
         'nifty': {'price': 24780.50, 'change': -125.30, 'changePercent': -0.50, 'high': 24920.15, 'low': 24750.20},
         'bankNifty': {'price': 52435.75, 'change': 315.25, 'changePercent': 0.60, 'high': 52580.40, 'low': 52120.50},
@@ -59,60 +219,50 @@ def initialize_market_data():
         'ethereum': {'price': 3685.40, 'change': 125.60, 'changePercent': 3.53, 'high': 3720.00, 'low': 3560.00},
     }
 
+if 'last_update' not in st.session_state:
+    st.session_state.last_update = datetime.now()
+
+if 'planetary_data' not in st.session_state:
+    st.session_state.planetary_data = {}
+
 # Dynamic market data updater
 def update_market_data():
-    global market_data, last_update
-    with update_lock:
-        try:
-            for key, data in market_data.items():
-                # Different volatility for different asset classes
-                if 'bitcoin' in key.lower() or 'ethereum' in key.lower():
-                    volatility = 0.5  # Higher for crypto
-                elif 'gold' in key.lower() or 'silver' in key.lower():
-                    volatility = 0.1  # Lower for precious metals
-                elif 'usd' in key.lower() or 'eur' in key.lower():
-                    volatility = 0.05  # Very low for forex
-                else:
-                    volatility = 0.2  # Normal for indices
-                
-                # Generate realistic price movement
-                change_percent = (random.gauss(0, 1) * volatility)
-                new_change = data['price'] * change_percent / 100
-                
-                # Update price and prevent negative prices
-                new_price = max(data['price'] + new_change, data['price'] * 0.01)
-                data['price'] = new_price
-                data['change'] = new_change
-                data['changePercent'] = change_percent
-                
-                # Update high/low
-                if data['price'] > data['high']:
-                    data['high'] = data['price']
-                if data['price'] < data['low']:
-                    data['low'] = data['price']
-            
-            last_update = datetime.now()
-        except Exception as e:
-            print(f"Error updating market data: {e}")
+    """Update market data with realistic movements"""
+    for key, data in st.session_state.market_data.items():
+        # Different volatility for different asset classes
+        if 'bitcoin' in key.lower() or 'ethereum' in key.lower():
+            volatility = 0.5  # Higher for crypto
+        elif 'gold' in key.lower() or 'silver' in key.lower():
+            volatility = 0.1  # Lower for precious metals
+        elif 'usd' in key.lower() or 'eur' in key.lower():
+            volatility = 0.05  # Very low for forex
+        else:
+            volatility = 0.2  # Normal for indices
+        
+        # Generate realistic price movement
+        change_percent = random.gauss(0, 1) * volatility
+        new_change = data['price'] * change_percent / 100
+        
+        # Update price and prevent negative prices
+        new_price = max(data['price'] + new_change, data['price'] * 0.01)
+        data['price'] = new_price
+        data['change'] = new_change
+        data['changePercent'] = change_percent
+        
+        # Update high/low
+        if data['price'] > data['high']:
+            data['high'] = data['price']
+        if data['price'] < data['low']:
+            data['low'] = data['price']
+    
+    st.session_state.last_update = datetime.now()
 
-# Background updater thread
-def background_updater():
-    while True:
-        update_market_data()
-        time.sleep(3)  # Update every 3 seconds
-
-# Start background thread
-def start_background_updater():
-    updater_thread = threading.Thread(target=background_updater, daemon=True)
-    updater_thread.start()
-
-# Planetary data with dynamic calculation
+# Get dynamic planetary data
 def get_planetary_data():
-    # Simplified dynamic planetary positions based on current date
+    """Calculate dynamic planetary positions"""
     now = datetime.now()
     day_of_year = now.timetuple().tm_yday
     
-    # Base positions with daily movement simulation
     base_positions = {
         'sun': {'sign': 'Cancer', 'base_degree': 7.25, 'daily_move': 1.0, 'nakshatra': 'Pushya', 'house': 4, 'symbol': '☀️'},
         'moon': {'sign': 'Virgo', 'base_degree': 12.50, 'daily_move': 13.2, 'nakshatra': 'Hasta', 'house': 6, 'symbol': '🌙'},
@@ -127,7 +277,6 @@ def get_planetary_data():
     
     planetary_data = {}
     for planet, data in base_positions.items():
-        # Calculate current degree based on days passed
         current_degree = (data['base_degree'] + (day_of_year * data['daily_move'])) % 30
         degree_str = f"{int(current_degree)}°{int((current_degree % 1) * 60)}'"
         
@@ -141,864 +290,519 @@ def get_planetary_data():
     
     return planetary_data
 
-# HTML Template (simplified and error-free)
-HTML_TEMPLATE = '''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vedic Market Intelligence</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: Arial, sans-serif; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            min-height: 100vh; 
-            padding: 10px; 
-        }
-        .container { 
-            max-width: 1400px; 
-            margin: 0 auto; 
-            background: white; 
-            border-radius: 15px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
-            overflow: hidden; 
-        }
-        .header { 
-            background: linear-gradient(45deg, #ff6b35, #f7931e); 
-            color: white; 
-            padding: 20px; 
-            text-align: center; 
-        }
-        .ticker { 
-            background: #000; 
-            color: #00ff00; 
-            padding: 10px; 
-            font-family: 'Courier New', monospace; 
-            font-size: 14px; 
-            overflow: hidden; 
-            white-space: nowrap; 
-        }
-        .controls { 
-            background: #f8f9fa; 
-            padding: 15px; 
-            display: flex; 
-            gap: 15px; 
-            flex-wrap: wrap; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        .input-group { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 5px; 
-        }
-        .input-group label { 
-            font-weight: bold; 
-            color: #333; 
-        }
-        .input-group input, .input-group select { 
-            padding: 8px; 
-            border: 2px solid #ddd; 
-            border-radius: 5px; 
-            font-size: 14px; 
-        }
-        .btn { 
-            background: linear-gradient(45deg, #28a745, #20c997); 
-            color: white; 
-            border: none; 
-            padding: 10px 20px; 
-            border-radius: 25px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: transform 0.2s; 
-            margin: 5px;
-        }
-        .btn:hover { transform: scale(1.05); }
-        .btn-primary { background: linear-gradient(45deg, #007bff, #0056b3); }
-        .btn-danger { background: linear-gradient(45deg, #dc3545, #c82333); }
-        .btn-purple { background: linear-gradient(45deg, #6f42c1, #d63384); }
-        .main-content { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 20px; 
-            padding: 20px; 
-        }
-        .chart-section { 
-            background: #fff; 
-        }
-        .chart-title { 
-            background: linear-gradient(45deg, #ff6b35, #f7931e); 
-            color: white; 
-            padding: 15px; 
-            text-align: center; 
-            font-size: 1.2em; 
-            font-weight: bold; 
-            margin-bottom: 15px; 
-            border-radius: 10px; 
-        }
-        .birth-chart { 
-            width: 100%; 
-            max-width: 400px; 
-            margin: 0 auto; 
-            border: 3px solid #8B4513; 
-            background: linear-gradient(45deg, #F5DEB3, #DDD0C0); 
-        }
-        .chart-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            grid-template-rows: repeat(4, 1fr); 
-            width: 100%; 
-            height: 400px; 
-        }
-        .house { 
-            border: 2px solid #8B4513; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 5px; 
-            font-size: 10px; 
-            text-align: center; 
-            position: relative; 
-        }
-        .house-number { 
-            font-size: 11px; 
-            font-weight: bold; 
-            color: #8B4513; 
-            position: absolute; 
-            top: 3px; 
-            left: 3px; 
-        }
-        .house-sign { 
-            font-size: 9px; 
-            font-weight: bold; 
-            color: #4169E1; 
-            margin-bottom: 3px; 
-        }
-        .planets { 
-            font-weight: bold; 
-            color: #d32f2f; 
-            line-height: 1.2; 
-        }
-        .planet { 
-            display: block; 
-            margin: 1px 0; 
-            font-size: 10px; 
-        }
-        .current-info { 
-            background: #e3f2fd; 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 15px; 
-        }
-        .info-row { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 8px; 
-        }
-        .info-label { 
-            font-weight: bold; 
-            color: #1976d2; 
-        }
-        .planetary-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 15px; 
-        }
-        .planetary-table th { 
-            background: linear-gradient(45deg, #ff6b35, #f7931e); 
-            color: white; 
-            padding: 10px 5px; 
-            text-align: center; 
-            font-size: 11px; 
-        }
-        .planetary-table td { 
-            padding: 8px 5px; 
-            border: 1px solid #ddd; 
-            text-align: center; 
-            font-size: 10px; 
-        }
-        .planetary-table tr:nth-child(even) { 
-            background-color: #f8f9fa; 
-        }
-        .market-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-            gap: 15px; 
-            margin: 20px 0; 
-        }
-        .market-card { 
-            background: #f8f9fa; 
-            padding: 15px; 
-            border-radius: 10px; 
-            text-align: center; 
-            border: 1px solid #dee2e6;
-        }
-        .market-card h4 { 
-            color: #333; 
-            margin-bottom: 10px; 
-            font-size: 14px;
-        }
-        .market-price { 
-            font-size: 20px; 
-            font-weight: bold; 
-            margin: 8px 0; 
-        }
-        .market-change { 
-            font-size: 14px; 
-            font-weight: bold; 
-        }
-        .price-positive { color: #28a745; }
-        .price-negative { color: #dc3545; }
-        .modal { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.8); 
-            z-index: 1000; 
-            display: none; 
-        }
-        .modal-content { 
-            background: white; 
-            margin: 5% auto; 
-            padding: 20px; 
-            width: 95%; 
-            max-width: 1200px; 
-            border-radius: 15px; 
-            max-height: 80vh; 
-            overflow-y: auto; 
-        }
-        .close-btn { 
-            float: right; 
-            font-size: 25px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            color: #ff6b35; 
-        }
-        .close-btn:hover { color: #d32f2f; }
-        .tabs { 
-            display: flex; 
-            gap: 10px; 
-            margin-bottom: 20px; 
-            flex-wrap: wrap; 
-        }
-        .tab-btn { 
-            padding: 8px 15px; 
-            border: none; 
-            background: #f8f9fa; 
-            border-radius: 20px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 12px;
-            transition: all 0.3s; 
-        }
-        .tab-btn.active { 
-            background: linear-gradient(45deg, #007bff, #0056b3); 
-            color: white; 
-        }
-        .sector-card { 
-            background: white; 
-            border-radius: 10px; 
-            padding: 15px; 
-            margin-bottom: 10px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-            border-left: 4px solid; 
-        }
-        .sector-card.bullish { border-left-color: #28a745; }
-        .sector-card.bearish { border-left-color: #dc3545; }
-        .sector-card.neutral { border-left-color: #ffc107; }
-        .error-message { 
-            color: #dc3545; 
-            background: #f8d7da; 
-            padding: 10px; 
-            border-radius: 5px; 
-            margin: 10px 0; 
-        }
-        @media (max-width: 768px) { 
-            .main-content { grid-template-columns: 1fr; } 
-            .controls { flex-direction: column; }
-            .modal-content { margin: 10% auto; width: 98%; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🕉️ Vedic Market Intelligence 🕉️</h1>
-            <p>Real-time Market Analysis with Astrological Insights</p>
-        </div>
-        
-        <div class="ticker" id="liveTicker">Loading market data...</div>
-        
-        <div class="controls">
-            <div class="input-group">
-                <label for="birthDate">Birth Date:</label>
-                <input type="date" id="birthDate" value="1990-01-01">
-            </div>
-            <div class="input-group">
-                <label for="birthTime">Birth Time:</label>
-                <input type="time" id="birthTime" value="12:00">
-            </div>
-            <div class="input-group">
-                <label for="birthPlace">Birth Place:</label>
-                <input type="text" id="birthPlace" value="Mumbai, India">
-            </div>
-            <div class="input-group">
-                <label for="timezone">Timezone:</label>
-                <select id="timezone">
-                    <option value="+05:30" selected>IST (+05:30)</option>
-                    <option value="+00:00">UTC (+00:00)</option>
-                    <option value="-05:00">EST (-05:00)</option>
-                    <option value="+08:00">CST (+08:00)</option>
-                </select>
-            </div>
-            <button class="btn" onclick="updateChart()">🔄 Generate Chart</button>
-            <button class="btn btn-primary" onclick="openModal('marketModal')">📈 Market Analysis</button>
-            <button class="btn btn-danger" onclick="openModal('liveModal')">🔴 Live Market</button>
-            <button class="btn btn-purple" onclick="openModal('astroModal')">🌌 Astro Analysis</button>
-        </div>
-        
-        <div class="main-content">
-            <div class="chart-section">
-                <div class="chart-title">Birth Chart - North Indian Style</div>
-                
-                <div class="current-info">
-                    <div class="info-row">
-                        <span class="info-label">Date & Time:</span>
-                        <span id="currentDateTime">Loading...</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Location:</span>
-                        <span id="currentLocation">Mumbai, India</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Last Update:</span>
-                        <span id="lastUpdate">Just now</span>
-                    </div>
-                </div>
-                
-                <div class="birth-chart">
-                    <div class="chart-grid" id="chartGrid">
-                        <!-- Chart will be generated dynamically -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="chart-section">
-                <div class="chart-title">Planetary Positions</div>
-                
-                <table class="planetary-table">
-                    <thead>
-                        <tr>
-                            <th>Planet</th>
-                            <th>Sign</th>
-                            <th>Degree</th>
-                            <th>Nakshatra</th>
-                            <th>House</th>
-                        </tr>
-                    </thead>
-                    <tbody id="planetaryTableBody">
-                        <!-- Table will be populated dynamically -->
-                    </tbody>
-                </table>
-                
-                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
-                    <h4 style="color: #ff6b35; margin-bottom: 10px;">Today's Market Influences</h4>
-                    <div id="marketInfluences">Loading...</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="market-grid" id="quickMarketView"></div>
-    </div>
+# Create ticker display
+def create_ticker():
+    """Create scrolling ticker"""
+    ticker_items = []
+    for key in ['nifty', 'bankNifty', 'sensex', 'gold', 'bitcoin', 'crudeOil', 'usdinr']:
+        if key in st.session_state.market_data:
+            data = st.session_state.market_data[key]
+            symbol = key.upper().replace('NIFTY', 'NIFTY 50').replace('BANKNIFTY', 'BANK NIFTY')
+            arrow = '▲' if data['changePercent'] >= 0 else '▼'
+            ticker_items.append(f"{symbol}: {data['price']:.2f} {arrow} {abs(data['changePercent']):.2f}%")
     
-    <!-- Market Analysis Modal -->
-    <div class="modal" id="marketModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('marketModal')">&times;</span>
-            <h2>📈 Market Analysis Dashboard</h2>
-            <div class="tabs">
-                <button class="tab-btn active" onclick="showContent('market', 'sectors')">Sectors</button>
-                <button class="tab-btn" onclick="showContent('market', 'indices')">Indices</button>
-                <button class="tab-btn" onclick="showContent('market', 'global')">Global</button>
-                <button class="tab-btn" onclick="showContent('market', 'commodities')">Commodities</button>
-            </div>
-            <div id="marketContent">Loading...</div>
-        </div>
-    </div>
+    return ' | '.join(ticker_items) + ' | ' + ' | '.join(ticker_items)
+
+# Create birth chart
+def create_birth_chart(planetary_data):
+    """Generate North Indian style birth chart"""
+    # Chart layout mapping
+    layout = [
+        {'house': 12, 'planets': ['saturn']}, {'house': 1, 'planets': ['rahu']}, 
+        {'house': 2, 'planets': []}, {'house': 3, 'planets': ['venus', 'jupiter']},
+        {'house': 11, 'planets': []}, {'center': True, 'content': 'birth'}, 
+        {'center': True, 'content': 'time'}, {'house': 4, 'planets': ['sun', 'mercury']},
+        {'house': 10, 'planets': []}, {'center': True, 'content': 'rasi'}, 
+        {'center': True, 'content': 'chart'}, {'house': 5, 'planets': []},
+        {'house': 9, 'planets': []}, {'house': 8, 'planets': []}, 
+        {'house': 7, 'planets': ['ketu']}, {'house': 6, 'planets': ['moon', 'mars']}
+    ]
     
-    <!-- Live Market Modal -->
-    <div class="modal" id="liveModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('liveModal')">&times;</span>
-            <h2>🔴 Live Market Data</h2>
-            <div class="tabs">
-                <button class="tab-btn active" onclick="showContent('live', 'highlights')">Highlights</button>
-                <button class="tab-btn" onclick="showContent('live', 'indian')">Indian Markets</button>
-                <button class="tab-btn" onclick="showContent('live', 'global')">Global Markets</button>
-                <button class="tab-btn" onclick="showContent('live', 'crypto')">Crypto</button>
-            </div>
-            <div id="liveContent">Loading...</div>
-        </div>
-    </div>
+    house_signs = {1: 'Ar', 2: 'Ta', 3: 'Ge', 4: 'Ca', 5: 'Le', 6: 'Vi', 
+                   7: 'Li', 8: 'Sc', 9: 'Sg', 10: 'Cp', 11: 'Aq', 12: 'Pi'}
     
-    <!-- Astro Analysis Modal -->
-    <div class="modal" id="astroModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('astroModal')">&times;</span>
-            <h2>🌌 Astrological Market Analysis</h2>
-            <div class="tabs">
-                <button class="tab-btn active" onclick="showContent('astro', 'nifty')">NIFTY</button>
-                <button class="tab-btn" onclick="showContent('astro', 'banknifty')">BANK NIFTY</button>
-                <button class="tab-btn" onclick="showContent('astro', 'gold')">Gold</button>
-                <button class="tab-btn" onclick="showContent('astro', 'bitcoin')">Bitcoin</button>
+    chart_html = '<div class="birth-chart-grid">'
+    
+    for cell in layout:
+        if cell.get('center'):
+            if cell['content'] == 'birth':
+                chart_html += '<div class="house-cell center-cell">Vedic<br>Chart</div>'
+            elif cell['content'] == 'time':
+                chart_html += '<div class="house-cell center-cell">Real-time<br>Analysis</div>'
+            elif cell['content'] == 'rasi':
+                chart_html += '<div class="house-cell center-cell">Rasi<br>Kundali</div>'
+            else:
+                chart_html += '<div class="house-cell center-cell">Live<br>Market</div>'
+        else:
+            house_num = cell['house']
+            sign = house_signs[house_num]
+            planets_html = ''
+            
+            for planet in cell['planets']:
+                if planet in planetary_data:
+                    planets_html += f'<span class="planet-symbol">{planetary_data[planet]["symbol"]}</span>'
+            
+            chart_html += f'''
+            <div class="house-cell">
+                <div class="house-number">{house_num}</div>
+                <div class="house-sign">{sign}</div>
+                <div>{planets_html}</div>
             </div>
-            <div id="astroContent">Loading...</div>
+            '''
+    
+    chart_html += '</div>'
+    return chart_html
+
+# Header
+st.markdown("""
+<div class="main-header">
+    <h1>🕉️ Vedic Birth Chart & Live Market Intelligence 🕉️</h1>
+    <p>Real-time Kundali Analysis with Live Market Data & Astrological Predictions</p>
+</div>
+""", unsafe_allow_html=True)
+
+# Auto-refresh controls
+col1, col2, col3 = st.columns([2, 1, 1])
+with col1:
+    auto_refresh = st.checkbox("🔄 Enable Auto-Refresh (every 5 seconds)", value=True)
+with col2:
+    if st.button("📈 Update Now", type="primary"):
+        update_market_data()
+        st.session_state.planetary_data = get_planetary_data()
+        st.success("Data updated!")
+with col3:
+    refresh_rate = st.selectbox("Refresh Rate", [3, 5, 10, 30], index=1)
+
+# Auto-refresh logic
+if auto_refresh:
+    time.sleep(refresh_rate)
+    update_market_data()
+    st.session_state.planetary_data = get_planetary_data()
+    st.rerun()
+
+# Update planetary data if not exists
+if not st.session_state.planetary_data:
+    st.session_state.planetary_data = get_planetary_data()
+
+# Ticker display
+ticker_text = create_ticker()
+st.markdown(f'<div class="ticker">{ticker_text}</div>', unsafe_allow_html=True)
+
+# Sidebar - Birth Chart Inputs
+with st.sidebar:
+    st.header("📅 Birth Chart Details")
+    
+    birth_date = st.date_input("Birth Date", datetime(1990, 1, 1))
+    birth_time = st.time_input("Birth Time", datetime.now().time())
+    birth_place = st.text_input("Birth Place", "Mumbai, India")
+    timezone = st.selectbox("Timezone", ["IST (+05:30)", "UTC (+00:00)", "EST (-05:00)", "CST (+08:00)"])
+    
+    if st.button("✨ Generate Chart", type="primary"):
+        st.session_state.planetary_data = get_planetary_data()
+        st.success("Birth chart updated!")
+        st.rerun()
+    
+    st.header("🪐 Current Planetary Positions")
+    for planet, data in st.session_state.planetary_data.items():
+        st.markdown(f"""
+        <div class="planetary-card">
+            <strong>{data['symbol']} {planet.capitalize()}</strong><br>
+            Sign: {data['sign']}<br>
+            Degree: {data['degree']}<br>
+            Nakshatra: {data['nakshatra']}<br>
+            House: {data['house']}
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.caption(f"Last Updated: {st.session_state.last_update.strftime('%H:%M:%S')}")
+
+# Main content layout
+main_col1, main_col2 = st.columns([1, 1])
+
+with main_col1:
+    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+    st.subheader("🎯 Birth Chart - North Indian Style")
+    
+    # Current info
+    st.markdown(f"""
+    <div class="info-box">
+        <strong>📅 Date & Time:</strong> {birth_date} {birth_time}<br>
+        <strong>📍 Location:</strong> {birth_place}<br>
+        <strong>🕰️ Timezone:</strong> {timezone}<br>
+        <strong>🔄 Last Update:</strong> {st.session_state.last_update.strftime('%H:%M:%S')}
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Birth chart
+    chart_html = create_birth_chart(st.session_state.planetary_data)
+    st.markdown(chart_html, unsafe_allow_html=True)
+    
+    # Today's transits
+    st.markdown("""
+    <div class="info-box">
+        <h4>🌌 Today's Key Planetary Transits</h4>
+        <div class="transit-item">
+            <strong>09:15 AM:</strong> Moon enters Hasta Nakshatra - Bearish for IT sector
+        </div>
+        <div class="transit-item">
+            <strong>11:30 AM:</strong> Mars aspects Jupiter - Bullish for Banking
+        </div>
+        <div class="transit-item">
+            <strong>02:45 PM:</strong> Mercury in Ashlesha - Volatile for Communications
+        </div>
+        <div class="transit-item">
+            <strong>04:00 PM:</strong> Venus trine Saturn - Stable for Luxury goods
         </div>
     </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    <script>
-        let isLoading = false;
+with main_col2:
+    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+    st.subheader("📊 Live Market Dashboard")
+    
+    # Key market cards
+    major_markets = ['nifty', 'bankNifty', 'sensex', 'gold', 'bitcoin', 'usdinr']
+    
+    for i in range(0, len(major_markets), 2):
+        col1, col2 = st.columns(2)
         
-        // Utility functions
-        function showError(message) {
-            console.error(message);
-        }
-        
-        function formatNumber(num, decimals = 2) {
-            return parseFloat(num).toFixed(decimals);
-        }
-        
-        function formatChange(change, changePercent) {
-            const sign = changePercent >= 0 ? '+' : '';
-            return `${sign}${formatNumber(change)} (${sign}${formatNumber(changePercent)}%)`;
-        }
-        
-        // API functions with error handling
-        async function fetchWithRetry(url, retries = 3) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    return await response.json();
-                } catch (error) {
-                    if (i === retries - 1) throw error;
-                    await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-                }
-            }
-        }
-        
-        async function fetchMarketData() {
-            try {
-                const data = await fetchWithRetry('/api/market_data');
-                updateQuickMarketView(data);
-                updateTicker(data);
-            } catch (error) {
-                showError('Failed to fetch market data: ' + error.message);
-            }
-        }
-        
-        async function fetchPlanetaryData() {
-            try {
-                const data = await fetchWithRetry('/api/planetary_data');
-                updatePlanetaryTable(data);
-                generateChart(data);
-                updateMarketInfluences();
-            } catch (error) {
-                showError('Failed to fetch planetary data: ' + error.message);
-            }
-        }
-        
-        // Update functions
-        function updateQuickMarketView(marketData) {
-            const container = document.getElementById('quickMarketView');
-            const majorIndices = ['nifty', 'bankNifty', 'sensex', 'gold', 'bitcoin', 'usdinr'];
-            
-            let html = '';
-            majorIndices.forEach(key => {
-                if (marketData[key]) {
-                    const data = marketData[key];
-                    const name = key.replace('nifty', 'NIFTY 50').replace('bankNifty', 'BANK NIFTY').toUpperCase();
-                    html += `
-                        <div class="market-card">
-                            <h4>${name}</h4>
-                            <div class="market-price">${formatNumber(data.price)}</div>
-                            <div class="market-change ${data.changePercent >= 0 ? 'price-positive' : 'price-negative'}">
-                                ${'▲▼'[+(data.changePercent < 0)]} ${formatChange(data.change, data.changePercent)}
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-            container.innerHTML = html;
-        }
-        
-        function updateTicker(marketData) {
-            const ticker = document.getElementById('liveTicker');
-            const tickerItems = [];
-            
-            ['nifty', 'bankNifty', 'sensex', 'gold', 'bitcoin'].forEach(key => {
-                if (marketData[key]) {
-                    const data = marketData[key];
-                    const name = key.replace('nifty', 'NIFTY').replace('bankNifty', 'BANKNIFTY').toUpperCase();
-                    const arrow = data.changePercent >= 0 ? '▲' : '▼';
-                    tickerItems.push(`${name}: ${formatNumber(data.price)} ${arrow} ${formatNumber(Math.abs(data.changePercent))}%`);
-                }
-            });
-            
-            const tickerText = tickerItems.join(' | ') + ' | ' + tickerItems.join(' | ');
-            ticker.innerHTML = tickerText;
-        }
-        
-        function updatePlanetaryTable(planetaryData) {
-            const tbody = document.getElementById('planetaryTableBody');
-            tbody.innerHTML = '';
-            
-            Object.entries(planetaryData).forEach(([planet, data]) => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${data.symbol} ${planet.charAt(0).toUpperCase() + planet.slice(1)}</td>
-                    <td>${data.sign}</td>
-                    <td>${data.degree}</td>
-                    <td>${data.nakshatra}</td>
-                    <td>House ${data.house}</td>
-                `;
-            });
-        }
-        
-        function generateChart(planetaryData) {
-            const chartGrid = document.getElementById('chartGrid');
-            chartGrid.innerHTML = '';
-            
-            // Simplified chart layout
-            const layout = [
-                {house: 12, planets: ['saturn']}, {house: 1, planets: ['rahu']}, {house: 2, planets: []}, {house: 3, planets: ['venus', 'jupiter']},
-                {house: 11, planets: []}, {center: true, content: 'center'}, {center: true, content: 'time'}, {house: 4, planets: ['sun', 'mercury']},
-                {house: 10, planets: []}, {center: true, content: 'rasi'}, {center: true, content: 'nav'}, {house: 5, planets: []},
-                {house: 9, planets: []}, {house: 8, planets: []}, {house: 7, planets: ['ketu']}, {house: 6, planets: ['moon', 'mars']}
-            ];
-            
-            const houseSignMap = {1: 'Ar', 2: 'Ta', 3: 'Ge', 4: 'Ca', 5: 'Le', 6: 'Vi', 7: 'Li', 8: 'Sc', 9: 'Sg', 10: 'Cp', 11: 'Aq', 12: 'Pi'};
-            
-            layout.forEach(cell => {
-                const div = document.createElement('div');
-                div.className = 'house';
-                
-                if (cell.center) {
-                    if (cell.content === 'center') {
-                        div.innerHTML = '<div style="font-weight: bold; color: #8B4513; font-size: 10px;">Vedic<br>Chart</div>';
-                    } else if (cell.content === 'time') {
-                        const date = new Date(document.getElementById('birthDate').value + 'T' + document.getElementById('birthTime').value);
-                        div.innerHTML = `<div style="font-size: 9px; color: #8B4513;">${date.toLocaleDateString()}<br>${document.getElementById('birthTime').value}</div>`;
-                    } else {
-                        div.innerHTML = '<div style="font-size: 9px; color: #d32f2f;">Rasi<br>Kundali</div>';
-                    }
-                } else {
-                    const houseNum = cell.house;
-                    const sign = houseSignMap[houseNum];
-                    const planetsHtml = cell.planets.map(p => {
-                        const planet = planetaryData[p];
-                        return planet ? `<span class="planet">${planet.symbol}</span>` : '';
-                    }).join('');
-                    
-                    div.innerHTML = `
-                        <div class="house-number">${houseNum}</div>
-                        <div class="house-sign">${sign}</div>
-                        <div class="planets">${planetsHtml}</div>
-                    `;
-                }
-                
-                chartGrid.appendChild(div);
-            });
-        }
-        
-        function updateMarketInfluences() {
-            const influences = document.getElementById('marketInfluences');
-            const today = new Date();
-            const influences_list = [
-                "🌙 Moon in Virgo: Technical analysis favored for IT stocks",
-                "♂️ Mars aspect: Banking sector showing strength",
-                "☿️ Mercury transit: Communication stocks volatile",
-                "♃ Jupiter favorable: Long-term investments positive"
-            ];
-            
-            influences.innerHTML = influences_list.map(inf => `<div style="margin: 5px 0;">${inf}</div>`).join('');
-        }
-        
-        function updateDateTime() {
-            const now = new Date();
-            const options = {
-                weekday: 'short',
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
-            document.getElementById('currentDateTime').textContent = now.toLocaleString('en-US', options);
-            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString();
-        }
-        
-        function updateChart() {
-            const location = document.getElementById('birthPlace').value;
-            document.getElementById('currentLocation').textContent = location;
-            fetchPlanetaryData();
-            updateDateTime();
-        }
-        
-        // Modal functions
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-            if (modalId === 'marketModal') showContent('market', 'sectors');
-            if (modalId === 'liveModal') showContent('live', 'highlights');
-            if (modalId === 'astroModal') showContent('astro', 'nifty');
-        }
-        
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-        
-        async function showContent(type, tab) {
-            if (isLoading) return;
-            isLoading = true;
-            
-            try {
-                const response = await fetch(`/api/${type}_content?tab=${tab}`);
-                const html = await response.text();
-                document.getElementById(`${type}Content`).innerHTML = html;
-                
-                // Update active tab
-                document.querySelectorAll(`.modal#${type}Modal .tab-btn`).forEach(btn => btn.classList.remove('active'));
-                event?.target?.classList.add('active');
-            } catch (error) {
-                showError(`Failed to load ${type} content: ` + error.message);
-            } finally {
-                isLoading = false;
-            }
-        }
-        
-        // Initialize app
-        function initializeApp() {
-            updateDateTime();
-            fetchMarketData();
-            fetchPlanetaryData();
-            
-            // Set up intervals
-            setInterval(updateDateTime, 1000);
-            setInterval(fetchMarketData, 5000);
-            setInterval(fetchPlanetaryData, 30000);
-        }
-        
-        // Event listeners
-        window.addEventListener('click', function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        });
-        
-        // Start the app
-        document.addEventListener('DOMContentLoaded', initializeApp);
-    </script>
-</body>
-</html>
-'''
-
-# Routes
-@app.route('/')
-def index():
-    return render_template_string(HTML_TEMPLATE)
-
-@app.route('/api/market_data')
-def api_market_data():
-    try:
-        with update_lock:
-            return jsonify(market_data)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/planetary_data')
-def api_planetary_data():
-    try:
-        return jsonify(get_planetary_data())
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/market_content')
-def api_market_content():
-    try:
-        tab = request.args.get('tab', 'sectors')
-        
-        if tab == 'sectors':
-            html = '<div class="market-grid">'
-            sectors = [
-                ('Banking & Finance', 'bankNifty', 'HDFCBANK, ICICIBANK, SBIN'),
-                ('Information Technology', 'niftyIT', 'TCS, INFY, WIPRO'),
-                ('Pharmaceuticals', 'niftyPharma', 'SUNPHARMA, CIPLA, DRREDDY'),
-                ('Auto', 'niftyAuto', 'MARUTI, M&M, TATAMOTORS'),
-                ('FMCG', 'niftyFMCG', 'HUL, ITC, NESTLEIND'),
-                ('Metal', 'niftyMetal', 'TATASTEEL, HINDALCO, JSW')
-            ]
-            
-            for name, key, stocks in sectors:
-                data = market_data.get(key, market_data['nifty'])
-                sentiment = 'bullish' if data['changePercent'] > 0 else 'bearish' if data['changePercent'] < -0.5 else 'neutral'
-                html += f'''
-                <div class="sector-card {sentiment}">
-                    <h3>{name}</h3>
-                    <p>Index: {data['price']:.2f}</p>
-                    <p class="{'price-positive' if data['changePercent'] > 0 else 'price-negative'}">
-                        {'↑' if data['changePercent'] > 0 else '↓'} {abs(data['changePercent']):.2f}%
-                    </p>
-                    <p><strong>Key Stocks:</strong> {stocks}</p>
-                </div>
-                '''
-            html += '</div>'
-            return html
-            
-        elif tab == 'indices':
-            html = '<div class="market-grid">'
-            for key in ['nifty', 'bankNifty', 'sensex', 'cnx100', 'cnx500']:
-                data = market_data[key]
-                name = key.replace('nifty', 'NIFTY ').replace('bankNifty', 'BANK NIFTY').upper()
-                html += f'''
-                <div class="market-card">
-                    <h4>{name}</h4>
-                    <div class="market-price">{data['price']:.2f}</div>
-                    <div class="market-change {'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
-                        {'+' if data['changePercent'] >= 0 else ''}{data['change']:.2f} ({data['changePercent']:+.2f}%)
-                    </div>
-                </div>
-                '''
-            html += '</div>'
-            return html
-            
-        elif tab == 'global':
-            html = '<div class="market-grid">'
-            global_markets = [('Dow Jones', 'dowJones', '🇺🇸'), ('S&P 500', 'sp500', '🇺🇸'), ('NASDAQ', 'nasdaq', '🇺🇸'), ('FTSE 100', 'ftse', '🇬🇧')]
-            for name, key, flag in global_markets:
-                data = market_data[key]
-                html += f'''
-                <div class="market-card">
-                    <h4>{flag} {name}</h4>
-                    <div class="market-price">{data['price']:.2f}</div>
-                    <div class="market-change {'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
-                        {'+' if data['changePercent'] >= 0 else ''}{data['change']:.2f} ({data['changePercent']:+.2f}%)
-                    </div>
-                </div>
-                '''
-            html += '</div>'
-            return html
-            
-        elif tab == 'commodities':
-            html = '<div class="market-grid">'
-            commodities = [('Gold', 'gold', '$'), ('Silver', 'silver', '$'), ('Crude Oil', 'crudeOil', '$')]
-            for name, key, symbol in commodities:
-                data = market_data[key]
-                html += f'''
-                <div class="market-card">
-                    <h4>{name}</h4>
-                    <div class="market-price">{symbol}{data['price']:.2f}</div>
-                    <div class="market-change {'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
-                        {'+' if data['changePercent'] >= 0 else ''}{data['change']:.2f} ({data['changePercent']:+.2f}%)
-                    </div>
-                </div>
-                '''
-            html += '</div>'
-            return html
-            
-        return '<p>Content not found</p>'
-        
-    except Exception as e:
-        return f'<div class="error-message">Error loading content: {str(e)}</div>'
-
-@app.route('/api/live_content')
-def api_live_content():
-    try:
-        tab = request.args.get('tab', 'highlights')
-        
-        if tab == 'highlights':
-            html = '<h3>🔴 Live Market Highlights</h3><div class="market-grid">'
-            for key in ['nifty', 'bankNifty', 'sensex', 'gold']:
-                data = market_data[key]
+        for j, col in enumerate([col1, col2]):
+            if i + j < len(major_markets):
+                key = major_markets[i + j]
+                data = st.session_state.market_data[key]
                 name = key.replace('nifty', 'NIFTY 50').replace('bankNifty', 'BANK NIFTY').upper()
-                html += f'''
-                <div class="market-card">
-                    <h4>LIVE - {name}</h4>
-                    <div class="market-price">{data['price']:.2f}</div>
-                    <div class="market-change {'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
-                        {'▲' if data['changePercent'] >= 0 else '▼'} {'+' if data['changePercent'] >= 0 else ''}{data['change']:.2f} ({data['changePercent']:+.2f}%)
-                    </div>
-                </div>
-                '''
-            html += '</div>'
-            return html
-            
-        elif tab == 'indian':
-            html = '<h3>Indian Markets</h3><div class="market-grid">'
-            indian_keys = ['nifty', 'bankNifty', 'sensex', 'niftyIT', 'niftyPharma', 'niftyAuto']
-            for key in indian_keys:
-                data = market_data[key]
-                name = key.replace('nifty', 'NIFTY ').replace('bankNifty', 'BANK NIFTY').upper()
-                html += f'''
+                
+                color_class = "price-positive" if data['changePercent'] >= 0 else "price-negative"
+                arrow = "▲" if data['changePercent'] >= 0 else "▼"
+                
+                col.markdown(f"""
                 <div class="market-card">
                     <h4>{name}</h4>
-                    <div class="market-price">{data['price']:.2f}</div>
-                    <div class="market-change {'price-positive' if data['changePercent'] >= 0 else 'price-negative'}">
-                        {'+' if data['changePercent'] >= 0 else ''}{data['change']:.2f} ({data['changePercent']:+.2f}%)
-                    </div>
+                    <h2>{data['price']:.2f}</h2>
+                    <p class="{color_class}">
+                        {arrow} {abs(data['change']):.2f} ({data['changePercent']:+.2f}%)
+                    </p>
+                    <small>High: {data['high']:.2f} | Low: {data['low']:.2f}</small>
                 </div>
-                '''
-            html += '</div>'
-            return html
+                """, unsafe_allow_html=True)
+    
+    # Market influences
+    st.markdown("""
+    <div class="info-box">
+        <h4>🌟 Current Market Influences</h4>
+        <p>🌙 <strong>Moon in Virgo:</strong> Technical analysis favored for IT stocks</p>
+        <p>♂️ <strong>Mars aspect:</strong> Banking sector showing strength</p>
+        <p>☿️ <strong>Mercury transit:</strong> Communication stocks volatile</p>
+        <p>♃ <strong>Jupiter favorable:</strong> Long-term investments positive</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# Main tabs for detailed analysis
+tab1, tab2, tab3, tab4 = st.tabs(["📈 Market Analysis", "🔴 Live Data", "🌌 Astro Analysis", "📊 Sector Overview"])
+
+with tab1:
+    st.subheader("📈 Comprehensive Market Analysis")
+    
+    analysis_tabs = st.tabs(["Indian Indices", "Global Markets", "Commodities", "Forex & Crypto"])
+    
+    with analysis_tabs[0]:
+        st.subheader("🇮🇳 Indian Market Indices")
+        
+        # Create market table
+        indian_indices = ['nifty', 'bankNifty', 'sensex', 'niftyIT', 'niftyPharma', 'niftyAuto', 'niftyFMCG']
+        table_data = []
+        
+        for key in indian_indices:
+            data = st.session_state.market_data[key]
+            name = key.replace('nifty', 'NIFTY ').replace('bankNifty', 'BANK NIFTY').upper()
+            table_data.append({
+                'Index': name,
+                'Price': f"{data['price']:.2f}",
+                'Change': f"{data['change']:+.2f}",
+                'Change %': f"{data['changePercent']:+.2f}%",
+                'High': f"{data['high']:.2f}",
+                'Low': f"{data['low']:.2f}",
+                'Status': "🟢 Bullish" if data['changePercent'] > 0 else "🔴 Bearish"
+            })
+        
+        df = pd.DataFrame(table_data)
+        st.dataframe(df, use_container_width=True)
+    
+    with analysis_tabs[1]:
+        st.subheader("🌍 Global Market Indices")
+        
+        global_indices = ['dowJones', 'sp500', 'nasdaq', 'ftse', 'dax', 'nikkei']
+        
+        for i in range(0, len(global_indices), 3):
+            cols = st.columns(3)
+            for j, col in enumerate(cols):
+                if i + j < len(global_indices):
+                    key = global_indices[i + j]
+                    data = st.session_state.market_data[key]
+                    
+                    flags = {'dowJones': '🇺🇸', 'sp500': '🇺🇸', 'nasdaq': '🇺🇸', 
+                            'ftse': '🇬🇧', 'dax': '🇩🇪', 'nikkei': '🇯🇵'}
+                    
+                    flag = flags.get(key, '🌍')
+                    name = key.replace('dowJones', 'Dow Jones').replace('sp500', 'S&P 500').upper()
+                    
+                    col.metric(
+                        f"{flag} {name}",
+                        f"{data['price']:.2f}",
+                        f"{data['changePercent']:+.2f}%"
+                    )
+    
+    with analysis_tabs[2]:
+        st.subheader("🏆 Commodities Market")
+        
+        commodities = ['gold', 'silver', 'crudeOil']
+        
+        for key in commodities:
+            data = st.session_state.market_data[key]
+            mcx_key = key + 'MCX'
             
-        return '<p>Content loading...</p>'
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                name = key.replace('crudeOil', 'Crude Oil').title()
+                symbol = '$' if key != 'crudeOil' else '$'
+                unit = '/oz' if key in ['gold', 'silver'] else '/bbl'
+                
+                st.metric(
+                    f"{name} (COMEX)",
+                    f"{symbol}{data['price']:.2f}{unit}",
+                    f"{data['changePercent']:+.2f}%"
+                )
+            
+            with col2:
+                if mcx_key in st.session_state.market_data:
+                    mcx_data = st.session_state.market_data[mcx_key]
+                    mcx_unit = '/10g' if key == 'gold' else '/kg' if key == 'silver' else '/bbl'
+                    
+                    st.metric(
+                        f"{name} (MCX)",
+                        f"₹{mcx_data['price']:.0f}{mcx_unit}",
+                        f"{mcx_data['changePercent']:+.2f}%"
+                    )
+    
+    with analysis_tabs[3]:
+        st.subheader("💱 Forex & Cryptocurrency")
         
-    except Exception as e:
-        return f'<div class="error-message">Error: {str(e)}</div>'
+        forex_crypto = ['usdinr', 'eurusd', 'bitcoin', 'ethereum']
+        
+        for i in range(0, len(forex_crypto), 2):
+            cols = st.columns(2)
+            for j, col in enumerate(cols):
+                if i + j < len(forex_crypto):
+                    key = forex_crypto[i + j]
+                    data = st.session_state.market_data[key]
+                    
+                    if key in ['bitcoin', 'ethereum']:
+                        name = key.title()
+                        prefix = '$'
+                        decimals = 2
+                    else:
+                        name = key.upper().replace('USDINR', 'USD/INR').replace('EURUSD', 'EUR/USD')
+                        prefix = ''
+                        decimals = 4
+                    
+                    col.metric(
+                        name,
+                        f"{prefix}{data['price']:.{decimals}f}",
+                        f"{data['changePercent']:+.2f}%"
+                    )
 
-@app.route('/api/astro_content')
-def api_astro_content():
-    try:
-        tab = request.args.get('tab', 'nifty')
-        
-        predictions = {
-            'nifty': {'trend': 'Bearish to Neutral', 'range': '24,700 - 24,850', 'advice': 'Wait for support test at 24,700'},
-            'banknifty': {'trend': 'Bullish', 'range': '52,300 - 52,600', 'advice': 'Buy on dips near 52,350'},
-            'gold': {'trend': 'Bullish', 'range': '$3,320 - $3,340', 'advice': 'Accumulate below $3,325'},
-            'bitcoin': {'trend': 'Volatile', 'range': '$96,000 - $99,000', 'advice': 'Use tight stops'}
+with tab2:
+    st.subheader("🔴 Live Market Data Stream")
+    
+    # Real-time highlights
+    st.markdown("### 📊 Market Highlights")
+    
+    highlight_col1, highlight_col2, highlight_col3, highlight_col4 = st.columns(4)
+    
+    with highlight_col1:
+        st.metric("Market Status", "OPEN", "Live Trading")
+    with highlight_col2:
+        advances = 1285
+        declines = 765
+        st.metric("Advances/Declines", f"{advances}/{declines}", f"Ratio: {advances/declines:.2f}")
+    with highlight_col3:
+        st.metric("FII Activity", "₹2,345 Cr", "Net Buy")
+    with highlight_col4:
+        st.metric("VIX", "14.25", "-3.45%")
+    
+    # Live market grid
+    st.markdown("### 📈 Live Price Updates")
+    
+    live_markets = ['nifty', 'bankNifty', 'sensex', 'gold', 'bitcoin', 'crudeOil']
+    
+    for i in range(0, len(live_markets), 3):
+        cols = st.columns(3)
+        for j, col in enumerate(cols):
+            if i + j < len(live_markets):
+                key = live_markets[i + j]
+                data = st.session_state.market_data[key]
+                name = key.replace('nifty', 'NIFTY 50').replace('bankNifty', 'BANK NIFTY').replace('crudeOil', 'CRUDE OIL').upper()
+                
+                color_class = "price-positive" if data['changePercent'] >= 0 else "price-negative"
+                
+                col.markdown(f"""
+                <div class="market-card">
+                    <h4>🔴 LIVE - {name}</h4>
+                    <h3>{data['price']:.2f}</h3>
+                    <p class="{color_class}">
+                        {'▲' if data['changePercent'] >= 0 else '▼'} {abs(data['change']):.2f} ({data['changePercent']:+.2f}%)
+                    </p>
+                    <small>H: {data['high']:.2f} | L: {data['low']:.2f}</small>
+                </div>
+                """, unsafe_allow_html=True)
+
+with tab3:
+    st.subheader("🌌 Astrological Market Analysis")
+    
+    astro_choice = st.selectbox("Select Market for Astrological Analysis", 
+                               ["NIFTY", "BANK NIFTY", "Gold", "Crude Oil", "Bitcoin"])
+    
+    predictions = {
+        'NIFTY': {
+            'trend': 'Bearish to Neutral',
+            'range': '24,700 - 24,850',
+            'advice': 'Avoid fresh long positions. Wait for 24,700 support test.',
+            'key_times': [
+                '09:15-09:45 AM: Bearish opening (Moon in 6th house)',
+                '10:30-11:30 AM: Recovery expected (Jupiter aspect)',
+                '02:00-03:00 PM: Volatile (Mercury influence)',
+                '03:15-03:30 PM: Day\'s decision time'
+            ]
+        },
+        'BANK NIFTY': {
+            'trend': 'Bullish',
+            'range': '52,300 - 52,600',
+            'advice': 'Buy on dips near 52,350. Target 52,550.',
+            'key_times': [
+                '09:15-10:00 AM: Positive opening expected',
+                '11:00-12:00 PM: Strong momentum (Jupiter favorable)',
+                '01:30-02:30 PM: Profit booking zone',
+                '03:00-03:30 PM: EOD positioning'
+            ]
+        },
+        'Gold': {
+            'trend': 'Bullish',
+            'range': '$3,320 - $3,340',
+            'advice': 'Accumulate on dips below $3,325. Venus favorable for precious metals.',
+            'key_times': [
+                '09:00 AM: Asian session positive',
+                '01:30 PM: European session momentum',
+                '07:00 PM: US session volatility',
+                '11:30 PM: Fed speakers impact'
+            ]
+        },
+        'Crude Oil': {
+            'trend': 'Bearish',
+            'range': '$81.50 - $83.00',
+            'advice': 'Sell on rise near $82.80. Mars indicates energy sector weakness.',
+            'key_times': [
+                '09:30 AM: API data impact',
+                '11:00 AM: EIA inventory report',
+                '02:30 PM: OPEC news sensitivity',
+                '04:00 PM: US market close effect'
+            ]
+        },
+        'Bitcoin': {
+            'trend': 'Volatile Bullish',
+            'range': '$96,500 - $99,000',
+            'advice': 'Uranus aspect brings sudden moves. Use tight stops near $96,000.',
+            'key_times': [
+                '24/7 Market: High volatility periods',
+                'US Morning: Institutional buying',
+                'Asian Evening: Retail activity',
+                'Weekend: Lower liquidity risks'
+            ]
         }
+    }
+    
+    pred = predictions.get(astro_choice, predictions['NIFTY'])
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        trend_color = "🟢" if "Bullish" in pred['trend'] else "🔴" if "Bearish" in pred['trend'] else "🟡"
         
-        pred = predictions.get(tab, predictions['nifty'])
-        
-        html = f'''
-        <h3>🌌 {tab.upper()} - Astrological Analysis</h3>
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
-            <h4>Prediction: <span style="color: {'#28a745' if 'Bullish' in pred['trend'] else '#dc3545'}">{pred['trend']}</span></h4>
+        st.markdown(f"""
+        <div class="info-box">
+            <h4>🔮 {astro_choice} Prediction</h4>
+            <p><strong>Trend:</strong> {trend_color} {pred['trend']}</p>
             <p><strong>Expected Range:</strong> {pred['range']}</p>
-            <p><strong>Advice:</strong> {pred['advice']}</p>
+            <p><strong>Astrological Advice:</strong> {pred['advice']}</p>
         </div>
-        <h4>Key Time Zones:</h4>
-        <div style="background: white; padding: 15px; border-radius: 10px;">
-            <p>🕘 09:15-10:00 AM: Opening volatility (Moon influence)</p>
-            <p>🕚 10:30-11:30 AM: Trend formation (Jupiter aspect)</p>
-            <p>🕐 02:00-03:00 PM: Reversal zone (Mercury)</p>
-            <p>🕞 03:15-03:30 PM: Closing positions (Venus)</p>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div class="info-box">
+            <h4>🪐 Current Planetary Influences</h4>
+            <p>☽ <strong>Moon in Virgo (6th house):</strong> Technical analysis favored</p>
+            <p>♃ <strong>Jupiter in Gemini (3rd house):</strong> Communication sector volatility</p>
+            <p>☿ <strong>Mercury in Cancer (4th house):</strong> Domestic market focus</p>
+            <p>♂ <strong>Mars in Virgo (6th house):</strong> Healthcare sector active</p>
         </div>
-        '''
-        
-        return html
-        
-    except Exception as e:
-        return f'<div class="error-message">Error: {str(e)}</div>'
+        """, unsafe_allow_html=True)
+    
+    st.markdown("### ⏰ Key Time Zones & Planetary Windows")
+    
+    for time_info in pred['key_times']:
+        st.markdown(f"""
+        <div class="transit-item">
+            {time_info}
+        </div>
+        """, unsafe_allow_html=True)
 
-# Initialize and start
-if __name__ == '__main__':
-    initialize_market_data()
-    start_background_updater()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+with tab4:
+    st.subheader("📊 Sector Performance Overview")
+    
+    sectors = [
+        ('Banking & Finance', 'bankNifty', 'HDFCBANK, ICICIBANK, SBIN, KOTAKBANK'),
+        ('Information Technology', 'niftyIT', 'TCS, INFY, WIPRO, HCLTECH'),
+        ('Pharmaceuticals', 'niftyPharma', 'SUNPHARMA, CIPLA, DRREDDY, DIVISLAB'),
+        ('FMCG', 'niftyFMCG', 'HUL, ITC, NESTLEIND, BRITANNIA'),
+        ('Auto', 'niftyAuto', 'MARUTI, M&M, TATAMOTORS, BAJAJ-AUTO'),
+        ('Metal', 'niftyMetal', 'TATASTEEL, HINDALCO, JSW, VEDL'),
+        ('Realty', 'niftyRealty', 'DLF, GODREJPROP, BRIGADE, PRESTIGE'),
+        ('Energy', 'niftyEnergy', 'RELIANCE, ONGC, IOC, BPCL'),
+        ('PSU Bank', 'niftyPSUBank', 'SBIN, BANKBARODA, PNB, CANBK'),
+    ]
+    
+    for name, key, stocks in sectors:
+        if key in st.session_state.market_data:
+            data = st.session_state.market_data[key]
+            sentiment = 'bullish' if data['changePercent'] > 0 else 'bearish' if data['changePercent'] < -0.5 else 'neutral'
+            
+            st.markdown(f"""
+            <div class="sector-card sector-{sentiment}">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3>{name}</h3>
+                    <span style="color: {'#28a745' if data['changePercent'] > 0 else '#dc3545'}; font-size: 24px; font-weight: bold;">
+                        {'↑' if data['changePercent'] > 0 else '↓'} {abs(data['changePercent']):.2f}%
+                    </span>
+                </div>
+                <p><strong>Index Value:</strong> {data['price']:.2f}</p>
+                <p><strong>Key Stocks:</strong> {stocks}</p>
+                <p><strong>Market Sentiment:</strong> {sentiment.title()}</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+# Footer
+st.markdown("---")
+footer_col1, footer_col2, footer_col3 = st.columns(3)
+
+with footer_col1:
+    st.caption(f"🕐 Last Updated: {st.session_state.last_update.strftime('%H:%M:%S')}")
+with footer_col2:
+    st.caption("📊 Data simulated for demonstration purposes")
+with footer_col3:
+    st.caption("🕉️ Vedic Market Intelligence - Ancient Wisdom, Modern Markets")
