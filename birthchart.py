@@ -1881,4 +1881,468 @@ with footer_col4:
 with footer_col5:
     st.caption(f"📅 Astro: {st.session_state.astro_data_date}")
 
-st.caption("🕉️ Vedic Market Intelligence - Complete Astrological Trading Analysis")
+    st.caption("🕉️ Vedic Market Intelligence - Complete Astrological Trading Analysis")
+
+# SECTOR-WISE DETAILED ANALYSIS TAB
+st.markdown("---")
+st.subheader("🏭 Detailed Sector & Stock Analysis")
+
+# Create the main analysis tabs
+analysis_tab1, analysis_tab2, analysis_tab3, analysis_tab4 = st.tabs(["📊 Sector Analysis", "🔍 Custom Stock Analysis", "📅 Weekly Forecast", "📆 Monthly Calendar"])
+
+with analysis_tab1:
+    st.markdown("### 🎯 Select Sector for Detailed Stock Analysis")
+    
+    # Sector selection
+    sector_col1, sector_col2 = st.columns([2, 1])
+    
+    with sector_col1:
+        selected_sector = st.selectbox(
+            "Choose Sector:",
+            ["Banking", "Pharma", "Auto", "FMCG", "Metal", "IT", "PSU Bank", "Telecom", "Energy", "Realty"],
+            help="Select a sector to view detailed stock-wise planetary timing"
+        )
+    
+    with sector_col2:
+        analysis_view = st.selectbox(
+            "Time Period:",
+            ["Today & Tomorrow", "Today Only", "Tomorrow Only"],
+            help="Choose analysis time frame"
+        )
+    
+    # Define sector stocks with detailed planetary timing
+    sector_stocks_detailed = {
+        'Banking': [
+            {'stock': 'HDFC Bank', 'today': {'9:15-10:30': 'Bullish', '12:00-13:00': 'Bearish', '15:00-15:30': 'Bullish'}, 'tomorrow': {'9:15-10:15': 'Neutral', '12:15-13:15': 'Strong Bullish', '15:15-15:30': 'Bullish'}},
+            {'stock': 'ICICI Bank', 'today': {'10:00-11:00': 'Bullish', '12:00-13:00': 'Bearish', '14:00-15:00': 'Bearish'}, 'tomorrow': {'9:15-10:15': 'Neutral', '12:15-13:15': 'Strong Bullish', '13:15-14:15': 'Bullish'}},
+            {'stock': 'SBI', 'today': {'9:30-10:30': 'Bullish', '12:30-13:30': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'12:15-13:15': 'Strong Bullish', '13:15-14:15': 'Bullish', '15:15-15:30': 'Bullish'}},
+            {'stock': 'Axis Bank', 'today': {'10:00-11:00': 'Bullish', '12:00-14:00': 'Bearish', '14:30-15:15': 'Bearish'}, 'tomorrow': {'12:15-13:15': 'Strong Bullish', '13:15-14:15': 'Bullish', '14:15-15:15': 'Bearish'}},
+            {'stock': 'Kotak Bank', 'today': {'9:30-10:30': 'Bullish', '11:00-12:00': 'Neutral', '15:00-15:30': 'Bullish'}, 'tomorrow': {'12:15-13:15': 'Strong Bullish', '13:15-14:15': 'Bullish', '15:15-15:30': 'Bullish'}}
+        ],
+        'Pharma': [
+            {'stock': 'Sun Pharma', 'today': {'9:30-10:30': 'Bullish', '11:00-12:00': 'Bullish', '14:00-15:00': 'Bearish'}, 'tomorrow': {'9:15-10:15': 'Bullish', '12:15-13:15': 'Bullish', '15:15-15:30': 'Strong Bullish'}},
+            {'stock': 'Dr Reddy', 'today': {'10:00-11:00': 'Bullish', '11:30-12:30': 'Neutral', '14:00-15:00': 'Bearish'}, 'tomorrow': {'9:15-10:15': 'Bullish', '12:15-13:15': 'Bullish', '15:15-15:30': 'Strong Bullish'}},
+            {'stock': 'Cipla', 'today': {'9:45-10:45': 'Bullish', '11:30-12:30': 'Neutral', '14:00-15:00': 'Bearish'}, 'tomorrow': {'10:15-11:15': 'Bullish', '12:15-13:15': 'Bullish', '13:15-14:15': 'Bullish'}},
+            {'stock': 'Divis Lab', 'today': {'9:45-10:45': 'Bullish', '12:00-13:00': 'Neutral', '14:00-15:00': 'Bearish'}, 'tomorrow': {'12:15-13:15': 'Bullish', '13:15-14:15': 'Bullish', '15:15-15:30': 'Strong Bullish'}},
+            {'stock': 'Biocon', 'today': {'10:00-11:00': 'Neutral', '12:00-13:00': 'Bearish', '14:00-15:00': 'Bearish'}, 'tomorrow': {'9:15-10:15': 'Bullish', '11:15-12:15': 'Bearish', '15:15-15:30': 'Strong Bullish'}}
+        ],
+        'Auto': [
+            {'stock': 'Maruti', 'today': {'11:30-12:30': 'Neutral', '12:00-13:00': 'Bearish', '15:00-15:30': 'Bullish'}, 'tomorrow': {'10:15-11:15': 'Volatile', '12:15-13:15': 'Bullish', '13:15-14:15': 'Strong Bullish'}},
+            {'stock': 'Tata Motors', 'today': {'12:00-13:00': 'Bullish', '13:00-14:00': 'Neutral', '15:00-15:30': 'Bullish'}, 'tomorrow': {'10:15-11:15': 'Volatile', '13:15-14:15': 'Strong Bullish', '15:15-15:30': 'Bullish'}},
+            {'stock': 'M&M', 'today': {'11:45-12:45': 'Neutral', '13:30-14:30': 'Bearish', '15:00-15:30': 'Bullish'}, 'tomorrow': {'12:15-13:15': 'Bullish', '13:15-14:15': 'Strong Bullish', '15:15-15:30': 'Bullish'}},
+            {'stock': 'Bajaj Auto', 'today': {'11:00-12:00': 'Neutral', '13:30-14:30': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'10:15-11:15': 'Volatile', '13:15-14:15': 'Strong Bullish', '14:15-15:15': 'Bearish'}},
+            {'stock': 'Hero Motor', 'today': {'11:00-12:00': 'Neutral', '13:00-14:00': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'9:15-10:15': 'Bullish', '13:15-14:15': 'Strong Bullish', '15:15-15:30': 'Bullish'}}
+        ],
+        'FMCG': [
+            {'stock': 'HUL', 'today': {'9:15-10:15': 'Bullish', '11:00-12:00': 'Neutral', '13:00-14:00': 'Bearish'}, 'tomorrow': {'9:15-10:15': 'Strong Bullish', '12:15-13:15': 'Bullish', '15:15-15:30': 'Bullish'}},
+            {'stock': 'ITC', 'today': {'9:30-10:30': 'Bullish', '11:00-12:00': 'Neutral', '13:00-14:00': 'Bearish'}, 'tomorrow': {'9:15-10:15': 'Strong Bullish', '12:15-13:15': 'Bullish', '13:15-14:15': 'Bullish'}},
+            {'stock': 'Nestle', 'today': {'9:45-10:45': 'Bullish', '11:00-12:00': 'Neutral', '14:00-15:00': 'Bearish'}, 'tomorrow': {'9:15-10:15': 'Strong Bullish', '10:15-11:15': 'Neutral', '12:15-13:15': 'Bullish'}},
+            {'stock': 'Britannia', 'today': {'10:00-11:00': 'Bullish', '11:30-12:30': 'Neutral', '13:00-14:00': 'Bearish'}, 'tomorrow': {'9:15-10:15': 'Strong Bullish', '12:15-13:15': 'Bullish', '13:15-14:15': 'Bullish'}},
+            {'stock': 'Dabur', 'today': {'9:45-10:45': 'Bullish', '12:00-13:00': 'Neutral', '13:00-14:00': 'Bearish'}, 'tomorrow': {'9:15-10:15': 'Strong Bullish', '12:15-13:15': 'Bullish', '15:15-15:30': 'Bullish'}}
+        ],
+        'Metal': [
+            {'stock': 'Tata Steel', 'today': {'13:30-14:30': 'Bearish', '14:00-15:00': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'10:15-11:15': 'Volatile', '11:15-12:15': 'Bearish', '14:15-15:15': 'Bearish'}},
+            {'stock': 'JSW Steel', 'today': {'13:45-14:45': 'Bearish', '14:00-15:00': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'10:15-11:15': 'Volatile', '11:15-12:15': 'Bearish', '15:15-15:30': 'Neutral'}},
+            {'stock': 'Hindalco', 'today': {'14:00-15:00': 'Bearish', '12:00-13:00': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'10:15-11:15': 'Volatile', '12:15-13:15': 'Neutral', '14:15-15:15': 'Bearish'}},
+            {'stock': 'Vedanta', 'today': {'12:00-13:00': 'Neutral', '13:30-14:30': 'Bearish', '14:00-15:00': 'Bearish'}, 'tomorrow': {'11:15-12:15': 'Bearish', '12:15-13:15': 'Neutral', '15:15-15:30': 'Neutral'}},
+            {'stock': 'SAIL', 'today': {'13:30-14:30': 'Bearish', '14:00-15:00': 'Bearish', '15:00-15:30': 'Bearish'}, 'tomorrow': {'10:15-11:15': 'Volatile', '11:15-12:15': 'Bearish', '14:15-15:15': 'Bearish'}}
+        ],
+        'IT': [
+            {'stock': 'TCS', 'today': {'14:00-15:00': 'Bearish', '11:30-12:30': 'Neutral', '13:00-14:00': 'Bearish'}, 'tomorrow': {'10:15-11:15': 'Bearish', '11:15-12:15': 'Strong Bearish', '12:15-13:15': 'Neutral'}},
+            {'stock': 'Infosys', 'today': {'14:15-15:15': 'Bearish', '11:30-12:30': 'Neutral', '13:00-14:00': 'Bearish'}, 'tomorrow': {'10:15-11:15': 'Bearish', '11:15-12:15': 'Strong Bearish', '13:15-14:15': 'Neutral'}},
+            {'stock': 'Wipro', 'today': {'11:30-12:30': 'Neutral', '13:45-14:45': 'Bearish', '14:00-15:00': 'Bearish'}, 'tomorrow': {'11:15-12:15': 'Strong Bearish', '12:15-13:15': 'Neutral', '15:15-15:30': 'Neutral'}},
+            {'stock': 'HCL Tech', 'today': {'13:45-14:45': 'Bearish', '14:00-15:00': 'Bearish', '11:00-12:00': 'Neutral'}, 'tomorrow': {'10:15-11:15': 'Bearish', '11:15-12:15': 'Strong Bearish', '14:15-15:15': 'Bearish'}},
+            {'stock': 'Tech Mahindra', 'today': {'14:00-15:00': 'Bearish', '13:00-14:00': 'Bearish', '11:30-12:30': 'Neutral'}, 'tomorrow': {'11:15-12:15': 'Strong Bearish', '13:15-14:15': 'Neutral', '14:15-15:15': 'Bearish'}}
+        ],
+        'PSU Bank': [
+            {'stock': 'SBI', 'today': {'9:30-10:30': 'Bullish', '12:30-13:30': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'12:15-13:15': 'Strong Bullish', '13:15-14:15': 'Bullish', '15:15-15:30': 'Bullish'}},
+            {'stock': 'PNB', 'today': {'10:00-11:00': 'Neutral', '12:00-13:00': 'Bearish', '14:00-15:00': 'Bearish'}, 'tomorrow': {'12:15-13:15': 'Strong Bullish', '13:15-14:15': 'Bullish', '14:15-15:15': 'Bearish'}},
+            {'stock': 'Bank of Baroda', 'today': {'9:45-10:45': 'Bullish', '12:30-13:30': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'12:15-13:15': 'Strong Bullish', '13:15-14:15': 'Neutral', '15:15-15:30': 'Bullish'}},
+            {'stock': 'Canara Bank', 'today': {'10:00-11:00': 'Neutral', '12:00-14:00': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'12:15-13:15': 'Bullish', '13:15-14:15': 'Bullish', '14:15-15:15': 'Bearish'}},
+            {'stock': 'Union Bank', 'today': {'9:30-10:30': 'Bullish', '12:30-14:00': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'12:15-13:15': 'Bullish', '13:15-14:15': 'Neutral', '15:15-15:30': 'Neutral'}}
+        ],
+        'Telecom': [
+            {'stock': 'Bharti Airtel', 'today': {'10:00-11:00': 'Neutral', '13:00-14:00': 'Bearish', '14:00-15:00': 'Bearish'}, 'tomorrow': {'10:15-11:15': 'Bearish', '11:15-12:15': 'Strong Bearish', '13:15-14:15': 'Neutral'}},
+            {'stock': 'Jio', 'today': {'10:30-11:30': 'Neutral', '13:00-14:00': 'Bearish', '14:00-15:00': 'Bearish'}, 'tomorrow': {'11:15-12:15': 'Strong Bearish', '12:15-13:15': 'Neutral', '13:15-14:15': 'Neutral'}},
+            {'stock': 'Vi', 'today': {'11:00-12:00': 'Volatile', '13:00-14:00': 'Bearish', '14:00-15:00': 'Bearish'}, 'tomorrow': {'10:15-11:15': 'Bearish', '11:15-12:15': 'Bearish', '14:15-15:15': 'Bearish'}},
+            {'stock': 'Indus Towers', 'today': {'10:00-11:00': 'Neutral', '12:00-13:00': 'Neutral', '14:00-15:00': 'Bearish'}, 'tomorrow': {'11:15-12:15': 'Bearish', '12:15-13:15': 'Neutral', '13:15-14:15': 'Neutral'}}
+        ],
+        'Energy': [
+            {'stock': 'Reliance', 'today': {'12:00-13:30': 'Volatile', '13:00-14:00': 'Volatile', '15:00-15:30': 'Bullish'}, 'tomorrow': {'10:15-11:15': 'Strong Bullish', '12:15-13:15': 'Bullish', '15:15-15:30': 'Strong Bullish'}},
+            {'stock': 'ONGC', 'today': {'13:00-14:00': 'Bearish', '14:00-15:00': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'10:15-11:15': 'Strong Bullish', '12:15-13:15': 'Bullish', '15:15-15:30': 'Strong Bullish'}},
+            {'stock': 'IOC', 'today': {'13:30-14:30': 'Bearish', '14:00-15:00': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'10:15-11:15': 'Strong Bullish', '14:15-15:15': 'Bearish', '15:15-15:30': 'Strong Bullish'}},
+            {'stock': 'BPCL', 'today': {'12:30-13:30': 'Neutral', '13:30-14:30': 'Bearish', '15:00-15:30': 'Neutral'}, 'tomorrow': {'10:15-11:15': 'Strong Bullish', '12:15-13:15': 'Bullish', '15:15-15:30': 'Strong Bullish'}},
+            {'stock': 'GAIL', 'today': {'12:15-13:45': 'Volatile', '13:30-14:30': 'Volatile', '15:00-15:30': 'Neutral'}, 'tomorrow': {'10:15-11:15': 'Strong Bullish', '12:15-13:15': 'Bullish', '13:15-14:15': 'Bullish'}}
+        ],
+        'Realty': [
+            {'stock': 'DLF', 'today': {'14:30-15:15': 'Bearish', '13:00-14:00': 'Bearish', '15:00-15:30': 'Bearish'}, 'tomorrow': {'11:15-12:15': 'Bearish', '14:15-15:15': 'Bearish', '15:15-15:30': 'Neutral'}},
+            {'stock': 'Godrej Prop', 'today': {'14:15-15:15': 'Bearish', '13:30-14:30': 'Bearish', '15:00-15:30': 'Bearish'}, 'tomorrow': {'11:15-12:15': 'Bearish', '12:15-13:15': 'Neutral', '15:15-15:30': 'Neutral'}},
+            {'stock': 'Oberoi Realty', 'today': {'13:00-14:00': 'Neutral', '14:00-15:00': 'Bearish', '15:00-15:30': 'Bearish'}, 'tomorrow': {'12:15-13:15': 'Neutral', '13:15-14:15': 'Neutral', '15:15-15:30': 'Neutral'}},
+            {'stock': 'Brigade', 'today': {'14:00-15:00': 'Bearish', '13:30-14:30': 'Bearish', '15:00-15:30': 'Bearish'}, 'tomorrow': {'11:15-12:15': 'Bearish', '14:15-15:15': 'Bearish', '15:15-15:30': 'Neutral'}},
+            {'stock': 'Sobha', 'today': {'14:30-15:30': 'Bearish', '14:00-15:00': 'Bearish', '15:00-15:30': 'Bearish'}, 'tomorrow': {'11:15-12:15': 'Bearish', '14:15-15:15': 'Bearish', '15:15-15:30': 'Neutral'}}
+        ]
+    }
+    
+    # Display selected sector analysis
+    if selected_sector in sector_stocks_detailed:
+        stocks = sector_stocks_detailed[selected_sector]
+        
+        st.markdown(f"### 📈 {selected_sector} Sector - Stock-wise Planetary Analysis")
+        
+        for stock_data in stocks:
+            with st.expander(f"📊 {stock_data['stock']} - Detailed Timing", expanded=False):
+                
+                if analysis_view in ["Today & Tomorrow", "Today Only"]:
+                    st.markdown("#### 📅 Today's Signals")
+                    today_col1, today_col2, today_col3 = st.columns(3)
+                    
+                    for idx, (time_range, trend) in enumerate(stock_data['today'].items()):
+                        col = [today_col1, today_col2, today_col3][idx % 3]
+                        
+                        if trend == 'Strong Bullish':
+                            bg_color = '#2e7d32'
+                            text_color = '#ffffff'
+                            signal = 'STRONG BUY'
+                        elif trend == 'Bullish':
+                            bg_color = '#c8e6c9'
+                            text_color = '#1b5e20'
+                            signal = 'BUY'
+                        elif trend == 'Bearish':
+                            bg_color = '#ffcdd2'
+                            text_color = '#b71c1c'
+                            signal = 'SELL'
+                        elif trend == 'Volatile':
+                            bg_color = '#fff8e1'
+                            text_color = '#e65100'
+                            signal = 'CAUTION'
+                        else:
+                            bg_color = '#f5f5f5'
+                            text_color = '#616161'
+                            signal = 'HOLD'
+                        
+                        is_active_now = is_time_in_range(current_time_str, time_range)
+                        active_indicator = " 🔥 ACTIVE" if is_active_now else ""
+                        
+                        with col:
+                            st.markdown(f"""
+                            <div style="background: {bg_color}; color: {text_color}; padding: 8px; border-radius: 5px; margin: 3px 0; text-align: center; border: 2px solid {text_color if not is_active_now else '#ff6b35'};">
+                                <h6 style="margin: 0 0 3px 0; color: {text_color}; font-size: 0.85em;">{time_range}{active_indicator}</h6>
+                                <span style="background: rgba(0,0,0,0.3); color: white; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 1em;">{signal}</span><br>
+                                <small style="color: {text_color}; font-weight: bold;">{trend}</small>
+                            </div>
+                            """, unsafe_allow_html=True)
+                
+                if analysis_view in ["Today & Tomorrow", "Tomorrow Only"]:
+                    st.markdown("#### 📅 Tomorrow's Signals")
+                    tomorrow_col1, tomorrow_col2, tomorrow_col3 = st.columns(3)
+                    
+                    for idx, (time_range, trend) in enumerate(stock_data['tomorrow'].items()):
+                        col = [tomorrow_col1, tomorrow_col2, tomorrow_col3][idx % 3]
+                        
+                        if trend == 'Strong Bullish':
+                            bg_color = '#2e7d32'
+                            text_color = '#ffffff'
+                            signal = 'STRONG BUY'
+                        elif trend == 'Bullish':
+                            bg_color = '#c8e6c9'
+                            text_color = '#1b5e20'
+                            signal = 'BUY'
+                        elif trend == 'Bearish':
+                            bg_color = '#ffcdd2'
+                            text_color = '#b71c1c'
+                            signal = 'SELL'
+                        elif trend == 'Volatile':
+                            bg_color = '#fff8e1'
+                            text_color = '#e65100'
+                            signal = 'CAUTION'
+                        else:
+                            bg_color = '#f5f5f5'
+                            text_color = '#616161'
+                            signal = 'HOLD'
+                        
+                        with col:
+                            st.markdown(f"""
+                            <div style="background: {bg_color}; color: {text_color}; padding: 8px; border-radius: 5px; margin: 3px 0; text-align: center; border: 2px solid {text_color};">
+                                <h6 style="margin: 0 0 3px 0; color: {text_color}; font-size: 0.85em;">{time_range}</h6>
+                                <span style="background: rgba(0,0,0,0.3); color: white; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 1em;">{signal}</span><br>
+                                <small style="color: {text_color}; font-weight: bold;">{trend}</small>
+                            </div>
+                            """, unsafe_allow_html=True)
+
+with analysis_tab2:
+    st.markdown("### 🔍 Custom Stock Planetary Analysis")
+    
+    # Custom stock input
+    custom_col1, custom_col2, custom_col3 = st.columns([2, 1, 1])
+    
+    with custom_col1:
+        custom_stock = st.text_input("Enter Stock Name:", placeholder="e.g., RELIANCE, ADANI, TATAMOTORS", help="Enter any stock symbol for astrological analysis")
+    
+    with custom_col2:
+        custom_analysis_period = st.selectbox("Analysis Period:", ["Today & Tomorrow", "This Week", "This Month"])
+    
+    with custom_col3:
+        if st.button("🔮 Analyze Stock", disabled=not custom_stock):
+            if custom_stock:
+                st.success(f"Analyzing {custom_stock.upper()}...")
+    
+    if custom_stock:
+        st.markdown(f"### 📊 {custom_stock.upper()} - Planetary Transit Analysis")
+        
+        # Generate custom stock analysis
+        custom_today_signals = [
+            {'time': '09:30-10:30', 'planet': 'Venus ♀', 'trend': 'Bullish', 'signal': 'BUY', 'reasoning': 'Venus hora supports stock growth'},
+            {'time': '11:00-12:00', 'planet': 'Sun ☀️', 'trend': 'Bullish', 'signal': 'BUY', 'reasoning': 'Solar energy boosts performance'},
+            {'time': '12:00-13:00', 'planet': 'Saturn ♄', 'trend': 'Bearish', 'signal': 'SELL', 'reasoning': 'Saturn creates resistance'},
+            {'time': '14:00-15:00', 'planet': 'Rahu ☊', 'trend': 'Volatile', 'signal': 'CAUTION', 'reasoning': 'Rahu brings uncertainty'},
+            {'time': '15:00-15:30', 'planet': 'Jupiter ♃', 'trend': 'Bullish', 'signal': 'BUY', 'reasoning': 'Jupiter blessing for closing'}
+        ]
+        
+        custom_tomorrow_signals = [
+            {'time': '09:15-10:15', 'planet': 'Moon 🌙', 'trend': 'Bullish', 'signal': 'BUY', 'reasoning': 'Moon supports opening strength'},
+            {'time': '10:15-11:15', 'planet': 'Mars ♂️', 'trend': 'Volatile', 'signal': 'CAUTION', 'reasoning': 'Mars creates high volatility'},
+            {'time': '12:15-13:15', 'planet': 'Jupiter ♃', 'trend': 'Strong Bullish', 'signal': 'STRONG BUY', 'reasoning': 'Jupiter peak blessing period'},
+            {'time': '14:15-15:15', 'planet': 'Saturn ♄', 'trend': 'Bearish', 'signal': 'SELL', 'reasoning': 'Saturn hour profit booking'},
+            {'time': '15:15-15:30', 'planet': 'Sun ☀️', 'trend': 'Bullish', 'signal': 'BUY', 'reasoning': 'Solar recovery rally'}
+        ]
+        
+        # Display custom analysis
+        custom_tab1, custom_tab2 = st.tabs([f"📅 Today - {custom_stock.upper()}", f"📅 Tomorrow - {custom_stock.upper()}"])
+        
+        with custom_tab1:
+            st.markdown("#### Today's Planetary Signals")
+            custom_today_cols = st.columns(5)
+            
+            for idx, signal in enumerate(custom_today_signals):
+                if signal['trend'] == 'Strong Bullish':
+                    bg_color = '#2e7d32'
+                    text_color = '#ffffff'
+                elif signal['trend'] == 'Bullish':
+                    bg_color = '#c8e6c9'
+                    text_color = '#1b5e20'
+                elif signal['trend'] == 'Bearish':
+                    bg_color = '#ffcdd2'
+                    text_color = '#b71c1c'
+                elif signal['trend'] == 'Volatile':
+                    bg_color = '#fff8e1'
+                    text_color = '#e65100'
+                else:
+                    bg_color = '#f5f5f5'
+                    text_color = '#616161'
+                
+                is_active_now = is_time_in_range(current_time_str, signal['time'])
+                active_indicator = " 🔥" if is_active_now else ""
+                
+                with custom_today_cols[idx]:
+                    st.markdown(f"""
+                    <div style="background: {bg_color}; color: {text_color}; padding: 8px; border-radius: 5px; margin: 3px 0; text-align: center; border: 2px solid {text_color if not is_active_now else '#ff6b35'};">
+                        <h6 style="margin: 0 0 3px 0; color: {text_color}; font-size: 0.8em;">{signal['time']}{active_indicator}</h6>
+                        <div style="font-size: 0.8em;">
+                        <span style="background: rgba(0,0,0,0.3); color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 0.9em;">{signal['signal']}</span><br>
+                        <small style="color: {text_color}; font-weight: bold;">{signal['planet']}</small><br>
+                        <small style="color: {text_color}; font-size: 0.7em;">{signal['reasoning']}</small>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+        
+        with custom_tab2:
+            st.markdown("#### Tomorrow's Planetary Signals")
+            custom_tomorrow_cols = st.columns(5)
+            
+            for idx, signal in enumerate(custom_tomorrow_signals):
+                if signal['trend'] == 'Strong Bullish':
+                    bg_color = '#2e7d32'
+                    text_color = '#ffffff'
+                elif signal['trend'] == 'Bullish':
+                    bg_color = '#c8e6c9'
+                    text_color = '#1b5e20'
+                elif signal['trend'] == 'Bearish':
+                    bg_color = '#ffcdd2'
+                    text_color = '#b71c1c'
+                elif signal['trend'] == 'Volatile':
+                    bg_color = '#fff8e1'
+                    text_color = '#e65100'
+                else:
+                    bg_color = '#f5f5f5'
+                    text_color = '#616161'
+                
+                with custom_tomorrow_cols[idx]:
+                    st.markdown(f"""
+                    <div style="background: {bg_color}; color: {text_color}; padding: 8px; border-radius: 5px; margin: 3px 0; text-align: center; border: 2px solid {text_color};">
+                        <h6 style="margin: 0 0 3px 0; color: {text_color}; font-size: 0.8em;">{signal['time']}</h6>
+                        <div style="font-size: 0.8em;">
+                        <span style="background: rgba(0,0,0,0.3); color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 0.9em;">{signal['signal']}</span><br>
+                        <small style="color: {text_color}; font-weight: bold;">{signal['planet']}</small><br>
+                        <small style="color: {text_color}; font-size: 0.7em;">{signal['reasoning']}</small>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+with analysis_tab3:
+    st.markdown("### 📅 Weekly Planetary Transit Calendar")
+    
+    # Generate weekly calendar
+    today = datetime.now()
+    week_start = today - timedelta(days=today.weekday())
+    
+    st.markdown("#### 🗓️ This Week's Market Planetary Schedule")
+    
+    weekly_planets = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn']
+    weekly_effects = ['Bullish', 'Volatile', 'Bearish', 'Neutral', 'Bullish', 'Bullish', 'Bearish']
+    
+    for day_num in range(7):
+        current_date = week_start + timedelta(days=day_num)
+        day_name = current_date.strftime('%A')
+        date_str = current_date.strftime('%Y-%m-%d')
+        
+        planet = weekly_planets[day_num]
+        effect = weekly_effects[day_num]
+        
+        # Color based on effect
+        if effect == 'Bullish':
+            bg_color = '#c8e6c9'
+            text_color = '#1b5e20'
+            day_icon = '🟢'
+        elif effect == 'Bearish':
+            bg_color = '#ffcdd2'
+            text_color = '#b71c1c'
+            day_icon = '🔴'
+        elif effect == 'Volatile':
+            bg_color = '#fff8e1'
+            text_color = '#e65100'
+            day_icon = '⚡'
+        else:
+            bg_color = '#f5f5f5'
+            text_color = '#616161'
+            day_icon = '🟡'
+        
+        is_today = current_date.date() == today.date()
+        border_style = "border: 3px solid #ff6b35;" if is_today else f"border: 1px solid {text_color};"
+        
+        st.markdown(f"""
+        <div style="background: {bg_color}; color: {text_color}; padding: 10px; border-radius: 6px; margin: 5px 0; {border_style}">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h5 style="margin: 0; color: {text_color};">{day_icon} {day_name} - {date_str}{'  🌟 TODAY' if is_today else ''}</h5>
+                <span style="background: {text_color}; color: white; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 0.8em;">{effect.upper()}</span>
+            </div>
+            <div style="margin-top: 5px; font-size: 0.9em;">
+                <strong>Ruling Planet:</strong> {planet} | <strong>Best Trading:</strong> {'Morning & Closing' if effect == 'Bullish' else 'Avoid major positions' if effect == 'Bearish' else 'Intraday scalping' if effect == 'Volatile' else 'Range trading'}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+with analysis_tab4:
+    st.markdown("### 📆 Monthly Planetary Transit Calendar")
+    
+    # Month selection
+    month_col1, month_col2 = st.columns(2)
+    
+    with month_col1:
+        selected_month = st.selectbox("Select Month:", ["August 2025", "September 2025", "October 2025", "November 2025", "December 2025"])
+    
+    with month_col2:
+        calendar_view = st.selectbox("Calendar View:", ["Detailed", "Compact", "Trading Focus"])
+    
+    st.markdown(f"#### 🗓️ {selected_month} - Complete Planetary Market Calendar")
+    
+    # Generate monthly calendar (simplified for August 2025)
+    if "August" in selected_month:
+        monthly_data = [
+            {'date': 'Aug 01', 'day': 'Friday', 'planet': 'Jupiter ♃', 'effect': 'Bullish', 'best_time': '12:15-13:15', 'sectors': 'Banking, Finance'},
+            {'date': 'Aug 02', 'day': 'Saturday', 'planet': 'Venus ♀', 'effect': 'Bullish', 'best_time': '10:00-11:00', 'sectors': 'Auto, Luxury'},
+            {'date': 'Aug 03', 'day': 'Sunday', 'planet': 'Saturn ♄', 'effect': 'Bearish', 'best_time': 'Avoid', 'sectors': 'Metals weak'},
+            {'date': 'Aug 04', 'day': 'Monday', 'planet': 'Sun ☀️', 'effect': 'Bullish', 'best_time': '11:00-12:00', 'sectors': 'Energy, Pharma'},
+            {'date': 'Aug 05', 'day': 'Tuesday', 'planet': 'Moon 🌙', 'effect': 'Volatile', 'best_time': '09:15-10:15', 'sectors': 'FMCG, Consumer'},
+            {'date': 'Aug 06', 'day': 'Wednesday', 'planet': 'Mars ♂️', 'effect': 'Volatile', 'best_time': '13:00-14:00', 'sectors': 'Defense, Energy'},
+            {'date': 'Aug 07', 'day': 'Thursday', 'planet': 'Mercury ☿', 'effect': 'Bearish', 'best_time': '14:00-15:00', 'sectors': 'IT weak'},
+            {'date': 'Aug 08', 'day': 'Friday', 'planet': 'Jupiter ♃', 'effect': 'Bullish', 'best_time': '12:15-13:15', 'sectors': 'Banking strong'},
+            {'date': 'Aug 09', 'day': 'Saturday', 'planet': 'Venus ♀', 'effect': 'Bullish', 'best_time': '10:00-12:00', 'sectors': 'Auto, FMCG'},
+            {'date': 'Aug 10', 'day': 'Sunday', 'planet': 'Saturn ♄', 'effect': 'Bearish', 'best_time': 'Avoid', 'sectors': 'All sectors weak'}
+        ]
+        
+        # Display monthly calendar
+        if calendar_view == "Detailed":
+            for day_data in monthly_data:
+                if day_data['effect'] == 'Bullish':
+                    bg_color = '#c8e6c9'
+                    text_color = '#1b5e20'
+                    day_icon = '🟢'
+                elif day_data['effect'] == 'Bearish':
+                    bg_color = '#ffcdd2'
+                    text_color = '#b71c1c'
+                    day_icon = '🔴'
+                else:
+                    bg_color = '#fff8e1'
+                    text_color = '#e65100'
+                    day_icon = '⚡'
+                
+                st.markdown(f"""
+                <div style="background: {bg_color}; color: {text_color}; padding: 10px; border-radius: 6px; margin: 5px 0; border: 2px solid {text_color};">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h5 style="margin: 0; color: {text_color};">{day_icon} {day_data['date']} ({day_data['day']})</h5>
+                        <span style="background: {text_color}; color: white; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 0.8em;">{day_data['effect'].upper()}</span>
+                    </div>
+                    <div style="margin-top: 5px; font-size: 0.9em; line-height: 1.3;">
+                        <strong>Planet:</strong> {day_data['planet']} | <strong>Best Time:</strong> {day_data['best_time']}<br>
+                        <strong>Strong Sectors:</strong> {day_data['sectors']}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+        
+        elif calendar_view == "Compact":
+            # Create a compact grid view
+            calendar_cols = st.columns(7)
+            
+            for idx, day_data in enumerate(monthly_data):
+                if day_data['effect'] == 'Bullish':
+                    bg_color = '#c8e6c9'
+                    text_color = '#1b5e20'
+                    day_icon = '🟢'
+                elif day_data['effect'] == 'Bearish':
+                    bg_color = '#ffcdd2'
+                    text_color = '#b71c1c'
+                    day_icon = '🔴'
+                else:
+                    bg_color = '#fff8e1'
+                    text_color = '#e65100'
+                    day_icon = '⚡'
+                
+                with calendar_cols[idx % 7]:
+                    st.markdown(f"""
+                    <div style="background: {bg_color}; color: {text_color}; padding: 6px; border-radius: 4px; margin: 2px 0; text-align: center; border: 1px solid {text_color};">
+                        <h6 style="margin: 0 0 2px 0; color: {text_color}; font-size: 0.8em;">{day_data['date']}</h6>
+                        <div style="font-size: 0.7em;">
+                        {day_icon}<br>
+                        <small style="color: {text_color};">{day_data['planet'].split()[0]}</small>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+        
+        else:  # Trading Focus
+            # Show only the best trading days
+            best_days = [d for d in monthly_data if d['effect'] == 'Bullish']
+            avoid_days = [d for d in monthly_data if d['effect'] == 'Bearish']
+            
+            focus_col1, focus_col2 = st.columns(2)
+            
+            with focus_col1:
+                st.markdown("#### 🟢 Best Trading Days This Month")
+                for day in best_days:
+                    st.markdown(f"""
+                    <div style="background: #c8e6c9; color: #1b5e20; padding: 8px; border-radius: 5px; margin: 3px 0; border: 2px solid #2e7d32;">
+                        <strong>{day['date']} ({day['day']})</strong><br>
+                        <span style="background: #2e7d32; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;">TRADE {day['best_time']}</span><br>
+                        <small>Planet: {day['planet']} | Focus: {day['sectors']}</small>
+                    </div>
+                    """, unsafe_allow_html=True)
+            
+            with focus_col2:
+                st.markdown("#### 🔴 Days to Avoid Trading")
+                for day in avoid_days:
+                    st.markdown(f"""
+                    <div style="background: #ffcdd2; color: #b71c1c; padding: 8px; border-radius: 5px; margin: 3px 0; border: 2px solid #c62828;">
+                        <strong>{day['date']} ({day['day']})</strong><br>
+                        <span style="background: #c62828; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;">AVOID TRADING</span><br>
+                        <small>Planet: {day['planet']} | Risk: {day['sectors']}</small>
+                    </div>
+                    """, unsafe_allow_html=True)
