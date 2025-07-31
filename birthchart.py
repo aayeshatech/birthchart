@@ -202,49 +202,57 @@ try:
     
     # Enhanced astrological predictions with detailed timing
     if 'astro_predictions' not in st.session_state:
-        st.session_state.astro_predictions = {
-            'nifty_banknifty': {
-                'NIFTY': {
-                    'hourly_signals': [
-                        {'time': '09:15-10:00', 'trend': 'Bullish', 'planet': 'Venus ♀', 'signal': 'LONG', 'target': '+0.8%', 'sl': '-0.3%'},
-                        {'time': '10:00-11:00', 'trend': 'Neutral', 'planet': 'Mercury ☿', 'signal': 'WAIT', 'target': '±0.2%', 'sl': ''},
-                        {'time': '11:00-12:00', 'trend': 'Bullish', 'planet': 'Sun ☀️', 'signal': 'LONG', 'target': '+1.2%', 'sl': '-0.4%'},
-                        {'time': '12:00-13:00', 'trend': 'Bearish', 'planet': 'Saturn ♄', 'signal': 'SHORT', 'target': '-0.9%', 'sl': '+0.3%'},
-                        {'time': '13:00-14:00', 'trend': 'Volatile', 'planet': 'Mars ♂️', 'signal': 'CAUTION', 'target': '±1.5%', 'sl': '±0.5%'},
-                        {'time': '14:00-15:00', 'trend': 'Bearish', 'planet': 'Rahu ☊', 'signal': 'SHORT', 'target': '-1.1%', 'sl': '+0.4%'},
-                        {'time': '15:00-15:30', 'trend': 'Bullish', 'planet': 'Jupiter ♃', 'signal': 'LONG', 'target': '+0.6%', 'sl': '-0.2%'}
-                    ]
-                },
-                'BANKNIFTY': {
-                    'hourly_signals': [
-                        {'time': '09:15-10:00', 'trend': 'Bullish', 'planet': 'Jupiter ♃', 'signal': 'LONG', 'target': '+1.5%', 'sl': '-0.5%'},
-                        {'time': '10:00-11:00', 'trend': 'Bullish', 'planet': 'Sun ☀️', 'signal': 'LONG', 'target': '+1.8%', 'sl': '-0.6%'},
-                        {'time': '11:00-12:00', 'trend': 'Neutral', 'planet': 'Mercury ☿', 'signal': 'HOLD', 'target': '±0.4%', 'sl': ''},
-                        {'time': '12:00-13:00', 'trend': 'Bearish', 'planet': 'Saturn ♄', 'signal': 'SHORT', 'target': '-1.3%', 'sl': '+0.4%'},
-                        {'time': '13:00-14:00', 'trend': 'Bearish', 'planet': 'Mars ♂️', 'signal': 'SHORT', 'target': '-1.6%', 'sl': '+0.5%'},
-                        {'time': '14:00-15:00', 'trend': 'Volatile', 'planet': 'Rahu ☊', 'signal': 'CAUTION', 'target': '±2.0%', 'sl': '±0.7%'},
-                        {'time': '15:00-15:30', 'trend': 'Bullish', 'planet': 'Venus ♀', 'signal': 'LONG', 'target': '+1.0%', 'sl': '-0.3%'}
-                    ]
-                }
+        st.session_state.astro_predictions = {}
+    
+    # Initialize NIFTY and BANKNIFTY signals
+    if 'nifty_banknifty' not in st.session_state.astro_predictions:
+        st.session_state.astro_predictions['nifty_banknifty'] = {
+            'NIFTY': {
+                'hourly_signals': [
+                    {'time': '09:15-10:00', 'trend': 'Bullish', 'planet': 'Venus ♀', 'signal': 'LONG', 'target': '+0.8%', 'sl': '-0.3%'},
+                    {'time': '10:00-11:00', 'trend': 'Neutral', 'planet': 'Mercury ☿', 'signal': 'WAIT', 'target': '±0.2%', 'sl': ''},
+                    {'time': '11:00-12:00', 'trend': 'Bullish', 'planet': 'Sun ☀️', 'signal': 'LONG', 'target': '+1.2%', 'sl': '-0.4%'},
+                    {'time': '12:00-13:00', 'trend': 'Bearish', 'planet': 'Saturn ♄', 'signal': 'SHORT', 'target': '-0.9%', 'sl': '+0.3%'},
+                    {'time': '13:00-14:00', 'trend': 'Volatile', 'planet': 'Mars ♂️', 'signal': 'CAUTION', 'target': '±1.5%', 'sl': '±0.5%'},
+                    {'time': '14:00-15:00', 'trend': 'Bearish', 'planet': 'Rahu ☊', 'signal': 'SHORT', 'target': '-1.1%', 'sl': '+0.4%'},
+                    {'time': '15:00-15:30', 'trend': 'Bullish', 'planet': 'Jupiter ♃', 'signal': 'LONG', 'target': '+0.6%', 'sl': '-0.2%'}
+                ]
             },
-            'planetary_transits': [
-                {'time': '09:15-10:15', 'planet': 'Venus ♀', 'effect': 'Positive', 'influence': 'Banking, Auto sectors strong', 'markets': 'NIFTY +, BANKNIFTY ++'},
-                {'time': '10:15-11:15', 'planet': 'Sun ☀️', 'effect': 'Positive', 'influence': 'Energy, Pharma boost', 'markets': 'Both indices bullish'},
-                {'time': '11:15-12:15', 'planet': 'Mercury ☿', 'effect': 'Neutral', 'influence': 'IT sector mixed signals', 'markets': 'Consolidation phase'},
-                {'time': '12:15-13:15', 'planet': 'Saturn ♄', 'effect': 'Negative', 'influence': 'Metals, Mining weak', 'markets': 'Profit booking expected'},
-                {'time': '13:15-14:15', 'planet': 'Mars ♂️', 'effect': 'Volatile', 'influence': 'Defense up, Energy volatile', 'markets': 'High volatility'},
-                {'time': '14:15-15:15', 'planet': 'Rahu ☊', 'effect': 'Negative', 'influence': 'Tech stocks under pressure', 'markets': 'Final hour weakness'},
-                {'time': '15:15-15:30', 'planet': 'Jupiter ♃', 'effect': 'Positive', 'influence': 'Financial close strong', 'markets': 'Recovery rally'}
-            ],
-            'sector_timeline': {
-                '09:15-10:00': {'Banking': 'Bullish', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Bullish', 'Metal': 'Bearish', 'FMCG': 'Bullish', 'Energy': 'Neutral', 'Realty': 'Bearish'},
-                '10:00-11:00': {'Banking': 'Bullish', 'IT': 'Bearish', 'Pharma': 'Bullish', 'Auto': 'Neutral', 'Metal': 'Bearish', 'FMCG': 'Bullish', 'Energy': 'Bullish', 'Realty': 'Bearish'},
-                '11:00-12:00': {'Banking': 'Neutral', 'IT': 'Bearish', 'Pharma': 'Bullish', 'Auto': 'Bullish', 'Metal': 'Neutral', 'FMCG': 'Neutral', 'Energy': 'Bullish', 'Realty': 'Bearish'},
-                '12:00-13:00': {'Banking': 'Bearish', 'IT': 'Neutral', 'Pharma': 'Neutral', 'Auto': 'Bearish', 'Metal': 'Bearish', 'FMCG': 'Neutral', 'Energy': 'Volatile', 'Realty': 'Bearish'},
-                '13:00-14:00': {'Banking': 'Bearish', 'IT': 'Bearish', 'Pharma': 'Bearish', 'Auto': 'Neutral', 'Metal': 'Bearish', 'FMCG': 'Bearish', 'Energy': 'Volatile', 'Realty': 'Bearish'},
-                '14:00-15:00': {'Banking': 'Volatile', 'IT': 'Bearish', 'Pharma': 'Bearish', 'Auto': 'Bearish', 'Metal': 'Bearish', 'FMCG': 'Bearish', 'Energy': 'Bearish', 'Realty': 'Bearish'},
-                '15:00-15:30': {'Banking': 'Bullish', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Bullish', 'Metal': 'Neutral', 'FMCG': 'Bullish', 'Energy': 'Bullish', 'Realty': 'Neutral'}
+            'BANKNIFTY': {
+                'hourly_signals': [
+                    {'time': '09:15-10:00', 'trend': 'Bullish', 'planet': 'Jupiter ♃', 'signal': 'LONG', 'target': '+1.5%', 'sl': '-0.5%'},
+                    {'time': '10:00-11:00', 'trend': 'Bullish', 'planet': 'Sun ☀️', 'signal': 'LONG', 'target': '+1.8%', 'sl': '-0.6%'},
+                    {'time': '11:00-12:00', 'trend': 'Neutral', 'planet': 'Mercury ☿', 'signal': 'HOLD', 'target': '±0.4%', 'sl': ''},
+                    {'time': '12:00-13:00', 'trend': 'Bearish', 'planet': 'Saturn ♄', 'signal': 'SHORT', 'target': '-1.3%', 'sl': '+0.4%'},
+                    {'time': '13:00-14:00', 'trend': 'Bearish', 'planet': 'Mars ♂️', 'signal': 'SHORT', 'target': '-1.6%', 'sl': '+0.5%'},
+                    {'time': '14:00-15:00', 'trend': 'Volatile', 'planet': 'Rahu ☊', 'signal': 'CAUTION', 'target': '±2.0%', 'sl': '±0.7%'},
+                    {'time': '15:00-15:30', 'trend': 'Bullish', 'planet': 'Venus ♀', 'signal': 'LONG', 'target': '+1.0%', 'sl': '-0.3%'}
+                ]
             }
+        }
+    
+    # Initialize planetary transits
+    if 'planetary_transits' not in st.session_state.astro_predictions:
+        st.session_state.astro_predictions['planetary_transits'] = [
+            {'time': '09:15-10:15', 'planet': 'Venus ♀', 'effect': 'Positive', 'influence': 'Banking, Auto sectors strong', 'markets': 'NIFTY +, BANKNIFTY ++'},
+            {'time': '10:15-11:15', 'planet': 'Sun ☀️', 'effect': 'Positive', 'influence': 'Energy, Pharma boost', 'markets': 'Both indices bullish'},
+            {'time': '11:15-12:15', 'planet': 'Mercury ☿', 'effect': 'Neutral', 'influence': 'IT sector mixed signals', 'markets': 'Consolidation phase'},
+            {'time': '12:15-13:15', 'planet': 'Saturn ♄', 'effect': 'Negative', 'influence': 'Metals, Mining weak', 'markets': 'Profit booking expected'},
+            {'time': '13:15-14:15', 'planet': 'Mars ♂️', 'effect': 'Volatile', 'influence': 'Defense up, Energy volatile', 'markets': 'High volatility'},
+            {'time': '14:15-15:15', 'planet': 'Rahu ☊', 'effect': 'Negative', 'influence': 'Tech stocks under pressure', 'markets': 'Final hour weakness'},
+            {'time': '15:15-15:30', 'planet': 'Jupiter ♃', 'effect': 'Positive', 'influence': 'Financial close strong', 'markets': 'Recovery rally'}
+        ]
+    
+    # Initialize sector timeline
+    if 'sector_timeline' not in st.session_state.astro_predictions:
+        st.session_state.astro_predictions['sector_timeline'] = {
+            '09:15-10:00': {'Banking': 'Bullish', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Bullish', 'Metal': 'Bearish', 'FMCG': 'Bullish', 'Energy': 'Neutral', 'Realty': 'Bearish'},
+            '10:00-11:00': {'Banking': 'Bullish', 'IT': 'Bearish', 'Pharma': 'Bullish', 'Auto': 'Neutral', 'Metal': 'Bearish', 'FMCG': 'Bullish', 'Energy': 'Bullish', 'Realty': 'Bearish'},
+            '11:00-12:00': {'Banking': 'Neutral', 'IT': 'Bearish', 'Pharma': 'Bullish', 'Auto': 'Bullish', 'Metal': 'Neutral', 'FMCG': 'Neutral', 'Energy': 'Bullish', 'Realty': 'Bearish'},
+            '12:00-13:00': {'Banking': 'Bearish', 'IT': 'Neutral', 'Pharma': 'Neutral', 'Auto': 'Bearish', 'Metal': 'Bearish', 'FMCG': 'Neutral', 'Energy': 'Volatile', 'Realty': 'Bearish'},
+            '13:00-14:00': {'Banking': 'Bearish', 'IT': 'Bearish', 'Pharma': 'Bearish', 'Auto': 'Neutral', 'Metal': 'Bearish', 'FMCG': 'Bearish', 'Energy': 'Volatile', 'Realty': 'Bearish'},
+            '14:00-15:00': {'Banking': 'Volatile', 'IT': 'Bearish', 'Pharma': 'Bearish', 'Auto': 'Bearish', 'Metal': 'Bearish', 'FMCG': 'Bearish', 'Energy': 'Bearish', 'Realty': 'Bearish'},
+            '15:00-15:30': {'Banking': 'Bullish', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Bullish', 'Metal': 'Neutral', 'FMCG': 'Bullish', 'Energy': 'Bullish', 'Realty': 'Neutral'}
         }
 
 except Exception as e:
@@ -415,7 +423,11 @@ nifty_banknifty_col1, nifty_banknifty_col2 = st.columns(2)
 
 with nifty_banknifty_col1:
     st.markdown("### 🎯 NIFTY Signals")
-    nifty_signals = st.session_state.astro_predictions['nifty_banknifty']['NIFTY']['hourly_signals']
+    try:
+        nifty_signals = st.session_state.astro_predictions['nifty_banknifty']['NIFTY']['hourly_signals']
+    except KeyError:
+        st.error("NIFTY signals data not available")
+        nifty_signals = []
     
     for signal in nifty_signals:
         is_active = is_time_in_range(current_time_str, signal['time'])
@@ -445,7 +457,11 @@ with nifty_banknifty_col1:
 
 with nifty_banknifty_col2:
     st.markdown("### 🏦 BANKNIFTY Signals")
-    banknifty_signals = st.session_state.astro_predictions['nifty_banknifty']['BANKNIFTY']['hourly_signals']
+    try:
+        banknifty_signals = st.session_state.astro_predictions['nifty_banknifty']['BANKNIFTY']['hourly_signals']
+    except KeyError:
+        st.error("BANKNIFTY signals data not available")
+        banknifty_signals = []
     
     for signal in banknifty_signals:
         is_active = is_time_in_range(current_time_str, signal['time'])
@@ -480,7 +496,11 @@ transit_col1, transit_col2 = st.columns([1, 1])
 
 with transit_col1:
     st.markdown("### ⏰ Hourly Planetary Transits")
-    transits = st.session_state.astro_predictions['planetary_transits']
+    try:
+        transits = st.session_state.astro_predictions['planetary_transits']
+    except KeyError:
+        st.error("Transit data not available")
+        transits = []
     
     for transit in transits:
         is_active = is_time_in_range(current_time_str, transit['time'])
@@ -510,6 +530,15 @@ with transit_col2:
     st.markdown("### 🎯 Current Active Signals")
     
     # Find current active signals
+    try:
+        nifty_signals = st.session_state.astro_predictions['nifty_banknifty']['NIFTY']['hourly_signals']
+        banknifty_signals = st.session_state.astro_predictions['nifty_banknifty']['BANKNIFTY']['hourly_signals']
+        transits = st.session_state.astro_predictions['planetary_transits']
+    except KeyError:
+        nifty_signals = []
+        banknifty_signals = []
+        transits = []
+    
     active_nifty = [s for s in nifty_signals if is_time_in_range(current_time_str, s['time'])]
     active_banknifty = [s for s in banknifty_signals if is_time_in_range(current_time_str, s['time'])]
     active_transits = [t for t in transits if is_time_in_range(current_time_str, t['time'])]
@@ -551,78 +580,95 @@ with transit_col2:
 st.subheader("🏭 Sector-wise Hourly Timeline (9:15 AM - 3:30 PM)")
 
 sectors = ['Banking', 'IT', 'Pharma', 'Auto', 'Metal', 'FMCG', 'Energy', 'Realty']
-time_slots = list(st.session_state.astro_predictions['sector_timeline'].keys())
 
-# Create sector timeline table
-st.markdown("### 📈 Complete Sector Timeline")
+try:
+    time_slots = list(st.session_state.astro_predictions['sector_timeline'].keys())
+    sector_data_available = True
+except KeyError:
+    st.error("Sector timeline data not available")
+    time_slots = []
+    sector_data_available = False
 
-# Header
-col_header = st.columns([2] + [1] * len(time_slots))
-col_header[0].markdown("**Sector**")
-for i, time_slot in enumerate(time_slots):
-    col_header[i+1].markdown(f"**{time_slot}**")
+if sector_data_available:
 
-# Sector rows
-for sector in sectors:
-    cols = st.columns([2] + [1] * len(time_slots))
-    cols[0].markdown(f"**{sector}**")
-    
+    # Create sector timeline table
+    st.markdown("### 📈 Complete Sector Timeline")
+
+    # Header
+    col_header = st.columns([2] + [1] * len(time_slots))
+    col_header[0].markdown("**Sector**")
     for i, time_slot in enumerate(time_slots):
-        trend = st.session_state.astro_predictions['sector_timeline'][time_slot][sector]
-        is_active = is_time_in_range(current_time_str, time_slot)
+        col_header[i+1].markdown(f"**{time_slot}**")
+
+    # Sector rows
+    for sector in sectors:
+        cols = st.columns([2] + [1] * len(time_slots))
+        cols[0].markdown(f"**{sector}**")
         
-        if trend == 'Bullish':
-            if is_active:
-                cols[i+1].markdown('<div class="live-signal">🟢 BULL</div>', unsafe_allow_html=True)
-            else:
-                cols[i+1].markdown('<span class="bullish-text">🟢 Bull</span>', unsafe_allow_html=True)
-        elif trend == 'Bearish':
-            if is_active:
-                cols[i+1].markdown('<div class="warning-signal">🔴 BEAR</div>', unsafe_allow_html=True)
-            else:
-                cols[i+1].markdown('<span class="bearish-text">🔴 Bear</span>', unsafe_allow_html=True)
-        elif trend == 'Volatile':
-            if is_active:
-                cols[i+1].markdown('<div class="warning-signal">⚡ VOL</div>', unsafe_allow_html=True)
-            else:
-                cols[i+1].markdown('<span class="volatile-text">⚡ Vol</span>', unsafe_allow_html=True)
-        else:
-            cols[i+1].markdown('<span class="neutral-text">🟡 Neut</span>', unsafe_allow_html=True)
+        for i, time_slot in enumerate(time_slots):
+            try:
+                trend = st.session_state.astro_predictions['sector_timeline'][time_slot][sector]
+                is_active = is_time_in_range(current_time_str, time_slot)
+                
+                if trend == 'Bullish':
+                    if is_active:
+                        cols[i+1].markdown('<div class="live-signal">🟢 BULL</div>', unsafe_allow_html=True)
+                    else:
+                        cols[i+1].markdown('<span class="bullish-text">🟢 Bull</span>', unsafe_allow_html=True)
+                elif trend == 'Bearish':
+                    if is_active:
+                        cols[i+1].markdown('<div class="warning-signal">🔴 BEAR</div>', unsafe_allow_html=True)
+                    else:
+                        cols[i+1].markdown('<span class="bearish-text">🔴 Bear</span>', unsafe_allow_html=True)
+                elif trend == 'Volatile':
+                    if is_active:
+                        cols[i+1].markdown('<div class="warning-signal">⚡ VOL</div>', unsafe_allow_html=True)
+                    else:
+                        cols[i+1].markdown('<span class="volatile-text">⚡ Vol</span>', unsafe_allow_html=True)
+                else:
+                    cols[i+1].markdown('<span class="neutral-text">🟡 Neut</span>', unsafe_allow_html=True)
+            except KeyError:
+                cols[i+1].markdown('<span class="neutral-text">N/A</span>', unsafe_allow_html=True)
 
-# Current sector status
-st.markdown("### 🔥 Currently Active Sectors")
-current_sectors = []
-for time_slot, sectors_data in st.session_state.astro_predictions['sector_timeline'].items():
-    if is_time_in_range(current_time_str, time_slot):
-        for sector, trend in sectors_data.items():
-            if trend in ['Bullish', 'Bearish', 'Volatile']:
-                current_sectors.append(f"{sector}: {trend}")
+    # Current sector status
+    st.markdown("### 🔥 Currently Active Sectors")
+    current_sectors = []
+    try:
+        for time_slot, sectors_data in st.session_state.astro_predictions['sector_timeline'].items():
+            if is_time_in_range(current_time_str, time_slot):
+                for sector, trend in sectors_data.items():
+                    if trend in ['Bullish', 'Bearish', 'Volatile']:
+                        current_sectors.append(f"{sector}: {trend}")
+    except KeyError:
+        pass
 
-if current_sectors:
-    active_col1, active_col2, active_col3 = st.columns(3)
-    
-    with active_col1:
-        bullish_sectors = [s for s in current_sectors if 'Bullish' in s]
-        if bullish_sectors:
-            st.markdown("**🟢 Bullish Now:**")
-            for sector in bullish_sectors:
-                st.markdown(f'<span class="bullish-text">• {sector.split(":")[0]}</span>', unsafe_allow_html=True)
-    
-    with active_col2:
-        bearish_sectors = [s for s in current_sectors if 'Bearish' in s]
-        if bearish_sectors:
-            st.markdown("**🔴 Bearish Now:**")
-            for sector in bearish_sectors:
-                st.markdown(f'<span class="bearish-text">• {sector.split(":")[0]}</span>', unsafe_allow_html=True)
-    
-    with active_col3:
-        volatile_sectors = [s for s in current_sectors if 'Volatile' in s]
-        if volatile_sectors:
-            st.markdown("**⚡ Volatile Now:**")
-            for sector in volatile_sectors:
-                st.markdown(f'<span class="volatile-text">• {sector.split(":")[0]}</span>', unsafe_allow_html=True)
+    if current_sectors:
+        active_col1, active_col2, active_col3 = st.columns(3)
+        
+        with active_col1:
+            bullish_sectors = [s for s in current_sectors if 'Bullish' in s]
+            if bullish_sectors:
+                st.markdown("**🟢 Bullish Now:**")
+                for sector in bullish_sectors:
+                    st.markdown(f'<span class="bullish-text">• {sector.split(":")[0]}</span>', unsafe_allow_html=True)
+        
+        with active_col2:
+            bearish_sectors = [s for s in current_sectors if 'Bearish' in s]
+            if bearish_sectors:
+                st.markdown("**🔴 Bearish Now:**")
+                for sector in bearish_sectors:
+                    st.markdown(f'<span class="bearish-text">• {sector.split(":")[0]}</span>', unsafe_allow_html=True)
+        
+        with active_col3:
+            volatile_sectors = [s for s in current_sectors if 'Volatile' in s]
+            if volatile_sectors:
+                st.markdown("**⚡ Volatile Now:**")
+                for sector in volatile_sectors:
+                    st.markdown(f'<span class="volatile-text">• {sector.split(":")[0]}</span>', unsafe_allow_html=True)
+    else:
+        st.info("🕐 Market transitioning between planetary hours")
 else:
-    st.info("🕐 Market transitioning between planetary hours")
+    st.info("Sector timeline data is being initialized...")
 
 # Summary & Recommendations
 st.subheader("💡 Today's Trading Recommendations")
@@ -682,15 +728,22 @@ with footer_col2:
     st.caption(f"{current_symbol} Current Planet: {current_planet}")
 
 with footer_col3:
-    bullish_count = sum(1 for s in nifty_signals + banknifty_signals if s['trend'] == 'Bullish')
-    bearish_count = sum(1 for s in nifty_signals + banknifty_signals if s['trend'] == 'Bearish')
-    
-    if bullish_count > bearish_count:
-        st.caption("📈 Overall: BULLISH")
-    elif bearish_count > bullish_count:
-        st.caption("📉 Overall: BEARISH")
-    else:
-        st.caption("➡️ Overall: MIXED")
+    try:
+        # Get signals data for overall sentiment calculation
+        nifty_signals = st.session_state.astro_predictions['nifty_banknifty']['NIFTY']['hourly_signals']
+        banknifty_signals = st.session_state.astro_predictions['nifty_banknifty']['BANKNIFTY']['hourly_signals']
+        
+        bullish_count = sum(1 for s in nifty_signals + banknifty_signals if s['trend'] == 'Bullish')
+        bearish_count = sum(1 for s in nifty_signals + banknifty_signals if s['trend'] == 'Bearish')
+        
+        if bullish_count > bearish_count:
+            st.caption("📈 Overall: BULLISH")
+        elif bearish_count > bullish_count:
+            st.caption("📉 Overall: BEARISH")
+        else:
+            st.caption("➡️ Overall: MIXED")
+    except KeyError:
+        st.caption("📊 Overall: LOADING...")
 
 with footer_col4:
     st.caption("🕉️ Vedic Market Intelligence")
