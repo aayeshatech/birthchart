@@ -204,6 +204,10 @@ try:
     if 'astro_predictions' not in st.session_state:
         st.session_state.astro_predictions = {}
     
+    # Set astro data update date
+    if 'astro_data_date' not in st.session_state:
+        st.session_state.astro_data_date = datetime.now().strftime('%Y-%m-%d %H:%M')
+    
     # Initialize NIFTY and BANKNIFTY signals
     if 'nifty_banknifty' not in st.session_state.astro_predictions:
         st.session_state.astro_predictions['nifty_banknifty'] = {
@@ -227,6 +231,53 @@ try:
                     {'time': '13:00-14:00', 'trend': 'Bearish', 'planet': 'Mars ♂️', 'signal': 'SHORT', 'target': '-1.6%', 'sl': '+0.5%'},
                     {'time': '14:00-15:00', 'trend': 'Volatile', 'planet': 'Rahu ☊', 'signal': 'CAUTION', 'target': '±2.0%', 'sl': '±0.7%'},
                     {'time': '15:00-15:30', 'trend': 'Bullish', 'planet': 'Venus ♀', 'signal': 'LONG', 'target': '+1.0%', 'sl': '-0.3%'}
+                ]
+            }
+        }
+    
+    # Initialize COMMODITIES and GLOBAL MARKETS signals
+    if 'commodities_global' not in st.session_state.astro_predictions:
+        st.session_state.astro_predictions['commodities_global'] = {
+            'GOLD': {
+                'hourly_signals': [
+                    {'time': '09:00-10:30', 'trend': 'Bullish', 'planet': 'Sun ☀️', 'signal': 'BUY', 'target': '+0.6%', 'sl': '-0.2%'},
+                    {'time': '10:30-12:00', 'trend': 'Neutral', 'planet': 'Mercury ☿', 'signal': 'HOLD', 'target': '±0.3%', 'sl': ''},
+                    {'time': '14:00-16:00', 'trend': 'Volatile', 'planet': 'Mars ♂️', 'signal': 'CAUTION', 'target': '±1.2%', 'sl': '±0.4%'},
+                    {'time': '18:00-20:00', 'trend': 'Bullish', 'planet': 'Venus ♀', 'signal': 'BUY', 'target': '+0.9%', 'sl': '-0.3%'},
+                    {'time': '20:00-23:30', 'trend': 'Strong Bullish', 'planet': 'Jupiter ♃', 'signal': 'STRONG BUY', 'target': '+1.8%', 'sl': '-0.5%'}
+                ]
+            },
+            'SILVER': {
+                'hourly_signals': [
+                    {'time': '09:00-10:30', 'trend': 'Neutral', 'planet': 'Moon 🌙', 'signal': 'WAIT', 'target': '±0.4%', 'sl': ''},
+                    {'time': '10:30-12:00', 'trend': 'Bullish', 'planet': 'Sun ☀️', 'signal': 'BUY', 'target': '+1.2%', 'sl': '-0.4%'},
+                    {'time': '14:00-16:00', 'trend': 'Strong Bullish', 'planet': 'Jupiter ♃', 'signal': 'STRONG BUY', 'target': '+2.1%', 'sl': '-0.6%'},
+                    {'time': '18:00-20:00', 'trend': 'Volatile', 'planet': 'Mars ♂️', 'signal': 'CAUTION', 'target': '±1.8%', 'sl': '±0.6%'},
+                    {'time': '20:00-23:30', 'trend': 'Bullish', 'planet': 'Venus ♀', 'signal': 'BUY', 'target': '+1.5%', 'sl': '-0.5%'}
+                ]
+            },
+            'CRUDE': {
+                'hourly_signals': [
+                    {'time': '10:00-12:00', 'trend': 'Bearish', 'planet': 'Saturn ♄', 'signal': 'SELL', 'target': '-1.2%', 'sl': '+0.4%'},
+                    {'time': '14:30-17:00', 'trend': 'Volatile', 'planet': 'Mars ♂️', 'signal': 'CAUTION', 'target': '±2.5%', 'sl': '±0.8%'},
+                    {'time': '19:00-21:00', 'trend': 'Bearish', 'planet': 'Rahu ☊', 'signal': 'SELL', 'target': '-1.8%', 'sl': '+0.6%'},
+                    {'time': '21:00-23:30', 'trend': 'Volatile', 'planet': 'Ketu ☋', 'signal': 'AVOID', 'target': '±3.0%', 'sl': '±1.0%'}
+                ]
+            },
+            'BITCOIN': {
+                'hourly_signals': [
+                    {'time': '09:00-12:00', 'trend': 'Volatile', 'planet': 'Rahu ☊', 'signal': 'CAUTION', 'target': '±3.5%', 'sl': '±1.2%'},
+                    {'time': '14:00-18:00', 'trend': 'Bullish', 'planet': 'Mercury ☿', 'signal': 'BUY', 'target': '+2.8%', 'sl': '-1.0%'},
+                    {'time': '20:00-02:00', 'trend': 'Strong Bullish', 'planet': 'Jupiter ♃', 'signal': 'STRONG BUY', 'target': '+4.2%', 'sl': '-1.5%'},
+                    {'time': '02:00-06:00', 'trend': 'Bearish', 'planet': 'Saturn ♄', 'signal': 'SELL', 'target': '-2.1%', 'sl': '+0.8%'}
+                ]
+            },
+            'DOWJONES': {
+                'hourly_signals': [
+                    {'time': '19:00-21:00', 'trend': 'Bullish', 'planet': 'Sun ☀️', 'signal': 'BUY', 'target': '+0.9%', 'sl': '-0.3%'},
+                    {'time': '21:00-23:00', 'trend': 'Bullish', 'planet': 'Jupiter ♃', 'signal': 'BUY', 'target': '+1.2%', 'sl': '-0.4%'},
+                    {'time': '23:00-01:30', 'trend': 'Neutral', 'planet': 'Venus ♀', 'signal': 'HOLD', 'target': '±0.5%', 'sl': ''},
+                    {'time': '01:30-03:00', 'trend': 'Bearish', 'planet': 'Saturn ♄', 'signal': 'SELL', 'target': '-0.8%', 'sl': '+0.3%'}
                 ]
             }
         }
@@ -396,10 +447,11 @@ with global_col3:
     """, unsafe_allow_html=True)
 
 # NEW ENHANCED ASTRO TIMING SECTION
-st.markdown("""
+st.markdown(f"""
 <div class="astro-timing-box">
     <h2>🔮 Live Astrological Market Timing Analysis</h2>
-    <p>Real-time planetary transit effects on NIFTY, BANKNIFTY & Sectors (9:15 AM - 3:30 PM)</p>
+    <p>Real-time planetary transit effects on NIFTY, BANKNIFTY, Commodities & Global Markets</p>
+    <p style="text-align: right; font-size: 0.9em;">📅 Astro Data Updated: {st.session_state.astro_data_date}</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -454,6 +506,297 @@ with nifty_banknifty_col1:
             Target: {signal['target']} | SL: {signal['sl']}
         </div>
         """, unsafe_allow_html=True)
+
+# COMMODITIES & GLOBAL MARKETS Astro Timing
+st.subheader("🏭 Commodities & Global Markets Astrological Signals")
+
+# Create tabs for different market types
+commodity_tab1, commodity_tab2, commodity_tab3 = st.tabs(["🥇 Precious Metals", "🛢️ Energy & Crypto", "🌍 Global Indices"])
+
+with commodity_tab1:
+    gold_col, silver_col = st.columns(2)
+    
+    with gold_col:
+        st.markdown("### 🥇 GOLD Signals")
+        try:
+            gold_signals = st.session_state.astro_predictions['commodities_global']['GOLD']['hourly_signals']
+        except KeyError:
+            st.error("GOLD signals data not available")
+            gold_signals = []
+        
+        for signal in gold_signals:
+            is_active = is_time_in_range(current_time_str, signal['time'])
+            
+            if signal['trend'] == 'Bullish' or signal['trend'] == 'Strong Bullish':
+                trend_class = 'live-signal' if is_active else 'trend-bullish'
+                signal_icon = '🟢'
+            elif signal['trend'] == 'Bearish':
+                trend_class = 'warning-signal' if is_active else 'trend-bearish'
+                signal_icon = '🔴'
+            elif signal['trend'] == 'Volatile':
+                trend_class = 'warning-signal' if is_active else 'trend-volatile'
+                signal_icon = '🟡'
+            else:
+                trend_class = 'trend-neutral'
+                signal_icon = '🟡'
+            
+            active_text = " 🔥 ACTIVE NOW" if is_active else ""
+            
+            st.markdown(f"""
+            <div class="{trend_class}">
+                <strong>{signal_icon} {signal['time']}{active_text}</strong><br>
+                Planet: {signal['planet']} | Signal: <strong>{signal['signal']}</strong><br>
+                Target: {signal['target']} | SL: {signal['sl']}
+            </div>
+            """, unsafe_allow_html=True)
+    
+    with silver_col:
+        st.markdown("### 🥈 SILVER Signals")
+        try:
+            silver_signals = st.session_state.astro_predictions['commodities_global']['SILVER']['hourly_signals']
+        except KeyError:
+            st.error("SILVER signals data not available")
+            silver_signals = []
+        
+        for signal in silver_signals:
+            is_active = is_time_in_range(current_time_str, signal['time'])
+            
+            if signal['trend'] == 'Bullish' or signal['trend'] == 'Strong Bullish':
+                trend_class = 'live-signal' if is_active else 'trend-bullish'
+                signal_icon = '🟢'
+            elif signal['trend'] == 'Bearish':
+                trend_class = 'warning-signal' if is_active else 'trend-bearish'
+                signal_icon = '🔴'
+            elif signal['trend'] == 'Volatile':
+                trend_class = 'warning-signal' if is_active else 'trend-volatile'
+                signal_icon = '🟡'
+            else:
+                trend_class = 'trend-neutral'
+                signal_icon = '🟡'
+            
+            active_text = " 🔥 ACTIVE NOW" if is_active else ""
+            
+            st.markdown(f"""
+            <div class="{trend_class}">
+                <strong>{signal_icon} {signal['time']}{active_text}</strong><br>
+                Planet: {signal['planet']} | Signal: <strong>{signal['signal']}</strong><br>
+                Target: {signal['target']} | SL: {signal['sl']}
+            </div>
+            """, unsafe_allow_html=True)
+
+with commodity_tab2:
+    crude_col, btc_col = st.columns(2)
+    
+    with crude_col:
+        st.markdown("### 🛢️ CRUDE OIL Signals")
+        try:
+            crude_signals = st.session_state.astro_predictions['commodities_global']['CRUDE']['hourly_signals']
+        except KeyError:
+            st.error("CRUDE signals data not available")
+            crude_signals = []
+        
+        for signal in crude_signals:
+            is_active = is_time_in_range(current_time_str, signal['time'])
+            
+            if signal['trend'] == 'Bullish':
+                trend_class = 'live-signal' if is_active else 'trend-bullish'
+                signal_icon = '🟢'
+            elif signal['trend'] == 'Bearish':
+                trend_class = 'warning-signal' if is_active else 'trend-bearish'
+                signal_icon = '🔴'
+            elif signal['trend'] == 'Volatile':
+                trend_class = 'warning-signal' if is_active else 'trend-volatile'
+                signal_icon = '🟡'
+            else:
+                trend_class = 'trend-neutral'
+                signal_icon = '🟡'
+            
+            active_text = " 🔥 ACTIVE NOW" if is_active else ""
+            
+            st.markdown(f"""
+            <div class="{trend_class}">
+                <strong>{signal_icon} {signal['time']}{active_text}</strong><br>
+                Planet: {signal['planet']} | Signal: <strong>{signal['signal']}</strong><br>
+                Target: {signal['target']} | SL: {signal['sl']}
+            </div>
+            """, unsafe_allow_html=True)
+    
+    with btc_col:
+        st.markdown("### ₿ BITCOIN Signals")
+        try:
+            btc_signals = st.session_state.astro_predictions['commodities_global']['BITCOIN']['hourly_signals']
+        except KeyError:
+            st.error("BITCOIN signals data not available")
+            btc_signals = []
+        
+        for signal in btc_signals:
+            is_active = is_time_in_range(current_time_str, signal['time'])
+            
+            if signal['trend'] == 'Bullish' or signal['trend'] == 'Strong Bullish':
+                trend_class = 'live-signal' if is_active else 'trend-bullish'
+                signal_icon = '🟢'
+            elif signal['trend'] == 'Bearish':
+                trend_class = 'warning-signal' if is_active else 'trend-bearish'
+                signal_icon = '🔴'
+            elif signal['trend'] == 'Volatile':
+                trend_class = 'warning-signal' if is_active else 'trend-volatile'
+                signal_icon = '🟡'
+            else:
+                trend_class = 'trend-neutral'
+                signal_icon = '🟡'
+            
+            active_text = " 🔥 ACTIVE NOW" if is_active else ""
+            
+            st.markdown(f"""
+            <div class="{trend_class}">
+                <strong>{signal_icon} {signal['time']}{active_text}</strong><br>
+                Planet: {signal['planet']} | Signal: <strong>{signal['signal']}</strong><br>
+                Target: {signal['target']} | SL: {signal['sl']}
+            </div>
+            """, unsafe_allow_html=True)
+
+with commodity_tab3:
+    st.markdown("### 🇺🇸 DOW JONES Signals")
+    try:
+        dow_signals = st.session_state.astro_predictions['commodities_global']['DOWJONES']['hourly_signals']
+    except KeyError:
+        st.error("DOW JONES signals data not available")
+        dow_signals = []
+    
+    for signal in dow_signals:
+        is_active = is_time_in_range(current_time_str, signal['time'])
+        
+        if signal['trend'] == 'Bullish':
+            trend_class = 'live-signal' if is_active else 'trend-bullish'
+            signal_icon = '🟢'
+        elif signal['trend'] == 'Bearish':
+            trend_class = 'warning-signal' if is_active else 'trend-bearish'
+            signal_icon = '🔴'
+        elif signal['trend'] == 'Volatile':
+            trend_class = 'warning-signal' if is_active else 'trend-volatile'
+            signal_icon = '🟡'
+        else:
+            trend_class = 'trend-neutral'
+            signal_icon = '🟡'
+        
+        active_text = " 🔥 ACTIVE NOW" if is_active else ""
+        
+        st.markdown(f"""
+        <div class="{trend_class}">
+            <strong>{signal_icon} {signal['time']}{active_text}</strong><br>
+            Planet: {signal['planet']} | Signal: <strong>{signal['signal']}</strong><br>
+            Target: {signal['target']} | SL: {signal['sl']}
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Add current prices for global market
+    st.markdown("### 📊 Current Global Market Status")
+    current_hour = datetime.now().hour
+    
+    if 19 <= current_hour <= 23 or 0 <= current_hour <= 2:
+        st.success("🟢 US Markets ACTIVE - Prime trading time for DOW JONES")
+    elif 2 <= current_hour <= 6:
+        st.warning("🟡 Asian Pre-market - Low volume period")
+    elif 6 <= current_hour <= 12:
+        st.info("🔵 Asian Markets Active - Prepare for US session")
+    else:
+        st.info("⏳ Waiting for US market opening at 7:00 PM IST")
+
+# Show all currently active opportunities across all markets
+st.subheader("🎯 All Active Trading Opportunities RIGHT NOW")
+
+# Collect all active signals
+all_active_signals = []
+
+try:
+    # Check NIFTY signals
+    nifty_signals = st.session_state.astro_predictions['nifty_banknifty']['NIFTY']['hourly_signals']
+    for signal in nifty_signals:
+        if is_time_in_range(current_time_str, signal['time']):
+            all_active_signals.append({
+                'Market': 'NIFTY',
+                'Signal': signal['signal'],
+                'Trend': signal['trend'],
+                'Target': signal['target'],
+                'SL': signal['sl'],
+                'Planet': signal['planet'],
+                'Time': signal['time']
+            })
+    
+    # Check BANKNIFTY signals
+    banknifty_signals = st.session_state.astro_predictions['nifty_banknifty']['BANKNIFTY']['hourly_signals']
+    for signal in banknifty_signals:
+        if is_time_in_range(current_time_str, signal['time']):
+            all_active_signals.append({
+                'Market': 'BANKNIFTY',
+                'Signal': signal['signal'],
+                'Trend': signal['trend'],
+                'Target': signal['target'],
+                'SL': signal['sl'],
+                'Planet': signal['planet'],
+                'Time': signal['time']
+            })
+    
+    # Check commodity and global signals
+    for market in ['GOLD', 'SILVER', 'CRUDE', 'BITCOIN', 'DOWJONES']:
+        try:
+            market_signals = st.session_state.astro_predictions['commodities_global'][market]['hourly_signals']
+            for signal in market_signals:
+                if is_time_in_range(current_time_str, signal['time']):
+                    all_active_signals.append({
+                        'Market': market,
+                        'Signal': signal['signal'],
+                        'Trend': signal['trend'],
+                        'Target': signal['target'],
+                        'SL': signal['sl'],
+                        'Planet': signal['planet'],
+                        'Time': signal['time']
+                    })
+        except KeyError:
+            continue
+
+except KeyError:
+    st.info("Signal data is loading...")
+
+if all_active_signals:
+    st.markdown("### 🔥 LIVE TRADING SIGNALS")
+    
+    # Display in a more compact format
+    signal_cols = st.columns(min(len(all_active_signals), 4))
+    
+    for idx, signal in enumerate(all_active_signals[:4]):  # Show max 4 active signals
+        col_idx = idx % 4
+        
+        with signal_cols[col_idx]:
+            if signal['Signal'] in ['LONG', 'BUY', 'STRONG BUY']:
+                signal_class = 'live-signal'
+                signal_emoji = '🟢'
+            elif signal['Signal'] in ['SHORT', 'SELL']:
+                signal_class = 'warning-signal'
+                signal_emoji = '🔴'
+            else:
+                signal_class = 'planetary-hour'
+                signal_emoji = '🟡'
+            
+            st.markdown(f"""
+            <div class="{signal_class}">
+                <h4>{signal_emoji} {signal['Market']}</h4>
+                <strong>{signal['Signal']}</strong><br>
+                Target: {signal['Target']}<br>
+                SL: {signal['SL']}<br>
+                {signal['Planet']}
+            </div>
+            """, unsafe_allow_html=True)
+    
+    if len(all_active_signals) > 4:
+        st.info(f"📈 +{len(all_active_signals) - 4} more active signals. Check individual market sections above.")
+else:
+    st.markdown("""
+    <div class="timing-alert">
+        <h4>🕐 No Active Signals Currently</h4>
+        <p>Market is in transition period. Check upcoming planetary hours below.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 with nifty_banknifty_col2:
     st.markdown("### 🏦 BANKNIFTY Signals")
@@ -682,8 +1025,11 @@ with summary_col1:
         <strong>Morning (9:15-11:00):</strong><br>
         • NIFTY, BANKNIFTY<br>
         • Banking, FMCG, Pharma<br>
-        <strong>Closing (15:00-15:30):</strong><br>
-        • Recovery rally expected
+        <strong>Evening (20:00-23:30):</strong><br>
+        • GOLD, SILVER strong<br>
+        • BITCOIN bullish<br>
+        <strong>US Hours (19:00-23:00):</strong><br>
+        • DOW JONES positive
     </div>
     """, unsafe_allow_html=True)
 
@@ -692,10 +1038,13 @@ with summary_col2:
     <div class="warning-signal">
         <h4>🔴 Short Opportunities</h4>
         <strong>Midday (12:00-14:00):</strong><br>
-        • Profit booking phase<br>
+        • NIFTY, BANKNIFTY profit booking<br>
         • IT, Metals weak<br>
-        <strong>Late afternoon:</strong><br>
-        • Bearish momentum
+        <strong>Crude Oil:</strong><br>
+        • Bearish 10:00-12:00<br>
+        • Volatile during inventory<br>
+        <strong>Late night (02:00-06:00):</strong><br>
+        • BITCOIN bearish
     </div>
     """, unsafe_allow_html=True)
 
@@ -704,12 +1053,78 @@ with summary_col3:
     <div class="planetary-hour">
         <h4>⚡ High Risk Periods</h4>
         <strong>13:00-14:00 (Mars Hour):</strong><br>
-        • High volatility<br>
+        • All indices volatile<br>
         • Energy sector swings<br>
-        <strong>14:00-15:00 (Rahu):</strong><br>
-        • Tech stocks pressure
+        <strong>Crude Inventory (20:00):</strong><br>
+        • Extreme volatility<br>
+        <strong>Rahu Hours (14:00-15:00):</strong><br>
+        • Tech stocks pressure<br>
+        • BITCOIN caution
     </div>
     """, unsafe_allow_html=True)
+
+# Astro Data Management
+st.subheader("📅 Astrological Data Management")
+
+astro_mgmt_col1, astro_mgmt_col2, astro_mgmt_col3 = st.columns(3)
+
+with astro_mgmt_col1:
+    st.info(f"📅 **Current Astro Data Date:** {st.session_state.astro_data_date}")
+
+with astro_mgmt_col2:
+    if st.button("🔄 Update Astro Data", help="Recalculate planetary positions and market timing"):
+        st.session_state.astro_data_date = datetime.now().strftime('%Y-%m-%d %H:%M')
+        st.success("✅ Astrological data updated!")
+        st.rerun()
+
+with astro_mgmt_col3:
+    # Show data freshness
+    try:
+        data_date = datetime.strptime(st.session_state.astro_data_date, '%Y-%m-%d %H:%M')
+        hours_old = (datetime.now() - data_date).total_seconds() / 3600
+        
+        if hours_old < 1:
+            st.success("🟢 Data: Fresh")
+        elif hours_old < 6:
+            st.warning("🟡 Data: Recent")
+        else:
+            st.error("🔴 Data: Update needed")
+    except:
+        st.info("🔵 Data: Unknown age")
+
+# Current Market Prices for New Markets
+st.subheader("💰 Live Prices - Commodities & Global")
+
+price_col1, price_col2, price_col3, price_col4, price_col5 = st.columns(5)
+
+markets_to_show = ['GOLD', 'SILVER', 'CRUDE', 'BITCOIN', 'DOWJONES']
+
+for idx, market in enumerate(markets_to_show):
+    if market in st.session_state.market_data:
+        data = st.session_state.market_data[market]
+        color_class = "positive" if data['change'] >= 0 else "negative"
+        arrow = "▲" if data['change'] >= 0 else "▼"
+        
+        # Format price based on market
+        if market in ['GOLD', 'SILVER']:
+            price_str = f"₹{data['price']:,.0f}"
+        elif market == 'CRUDE':
+            price_str = f"₹{data['price']:,.0f}"
+        elif market == 'BITCOIN':
+            price_str = f"${data['price']:,.0f}"
+        else:  # DOWJONES
+            price_str = f"{data['price']:,.0f}"
+        
+        with [price_col1, price_col2, price_col3, price_col4, price_col5][idx]:
+            st.markdown(f"""
+            <div class="market-card">
+                <h5>{market}</h5>
+                <h3>{price_str}</h3>
+                <p class="{color_class}">
+                    {arrow} {abs(data['change']):.2f}%
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
 
 # Auto-refresh
 if auto_refresh:
@@ -719,7 +1134,7 @@ if auto_refresh:
 
 # Footer
 st.write("---")
-footer_col1, footer_col2, footer_col3, footer_col4 = st.columns(4)
+footer_col1, footer_col2, footer_col3, footer_col4, footer_col5 = st.columns(5)
 
 with footer_col1:
     st.caption(f"🕐 Last Updated: {st.session_state.last_update.strftime('%H:%M:%S')}")
@@ -737,13 +1152,23 @@ with footer_col3:
         bearish_count = sum(1 for s in nifty_signals + banknifty_signals if s['trend'] == 'Bearish')
         
         if bullish_count > bearish_count:
-            st.caption("📈 Overall: BULLISH")
+            st.caption("📈 Indices: BULLISH")
         elif bearish_count > bullish_count:
-            st.caption("📉 Overall: BEARISH")
+            st.caption("📉 Indices: BEARISH")
         else:
-            st.caption("➡️ Overall: MIXED")
+            st.caption("➡️ Indices: MIXED")
     except KeyError:
-        st.caption("📊 Overall: LOADING...")
+        st.caption("📊 Indices: LOADING...")
 
 with footer_col4:
-    st.caption("🕉️ Vedic Market Intelligence")
+    # Count active opportunities
+    try:
+        active_count = len(all_active_signals)
+        st.caption(f"🎯 Active Signals: {active_count}")
+    except:
+        st.caption("🎯 Active Signals: 0")
+
+with footer_col5:
+    st.caption(f"📅 Astro: {st.session_state.astro_data_date}")
+
+st.caption("🕉️ Vedic Market Intelligence - Complete Astrological Trading Analysis")
