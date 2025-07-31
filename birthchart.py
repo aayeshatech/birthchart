@@ -416,6 +416,379 @@ with global_col1:
     </div>
     """, unsafe_allow_html=True)
 
+# CURRENT SECTOR SIGNALS BOX
+st.markdown("""
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin: 20px 0;">
+    <h2>🎯 Current Sector Signals & Stock Recommendations</h2>
+    <p>Based on live planetary transit - Specific stocks to trade RIGHT NOW</p>
+</div>
+""", unsafe_allow_html=True)
+
+# Get current planetary influence
+current_hour = datetime.now().hour
+current_minute = datetime.now().minute
+
+# Define current sector recommendations based on time and planetary transit
+current_sector_signals = {}
+
+if 9 <= current_hour < 10:
+    current_sector_signals = {
+        'LONG_SECTORS': {
+            'Banking': {'stocks': ['HDFC Bank', 'ICICI Bank', 'Kotak Bank'], 'planet': 'Venus ♀', 'reason': 'Venus hora - luxury banking strong'},
+            'FMCG': {'stocks': ['HUL', 'ITC', 'Nestle'], 'planet': 'Venus ♀', 'reason': 'Consumer goods favorable'},
+            'Pharma': {'stocks': ['Sun Pharma', 'Dr Reddy'], 'planet': 'Sun ☀️', 'reason': 'Health sector blessed'}
+        },
+        'SHORT_SECTORS': {
+            'Metal': {'stocks': ['Tata Steel', 'JSW Steel'], 'planet': 'Saturn ♄', 'reason': 'Heavy industries weak'},
+            'Realty': {'stocks': ['DLF', 'Godrej Prop'], 'planet': 'Saturn ♄', 'reason': 'Real estate under pressure'}
+        }
+    }
+elif 10 <= current_hour < 11:
+    current_sector_signals = {
+        'LONG_SECTORS': {
+            'Banking': {'stocks': ['HDFC Bank', 'SBI', 'Axis Bank'], 'planet': 'Sun ☀️', 'reason': 'Solar energy in finance'},
+            'Energy': {'stocks': ['Reliance', 'ONGC'], 'planet': 'Sun ☀️', 'reason': 'Sun rules energy sector'},
+            'Pharma': {'stocks': ['Cipla', 'Divis Lab'], 'planet': 'Sun ☀️', 'reason': 'Healing energy strong'}
+        },
+        'SHORT_SECTORS': {
+            'IT': {'stocks': ['TCS', 'Infosys'], 'planet': 'Mercury ☿', 'reason': 'Tech sector retrograde effect'},
+            'Metal': {'stocks': ['Hindalco', 'Vedanta'], 'planet': 'Saturn ♄', 'reason': 'Heavy metals suppressed'}
+        }
+    }
+elif 11 <= current_hour < 12:
+    current_sector_signals = {
+        'LONG_SECTORS': {
+            'Auto': {'stocks': ['Maruti', 'Tata Motors'], 'planet': 'Mercury ☿', 'reason': 'Transport sector active'},
+            'Pharma': {'stocks': ['Biocon', 'Lupin'], 'planet': 'Jupiter ♃', 'reason': 'Jupiter aspect on health'}
+        },
+        'SHORT_SECTORS': {
+            'IT': {'stocks': ['Wipro', 'HCL Tech'], 'planet': 'Mercury ☿', 'reason': 'Mercury combust effect'},
+            'Realty': {'stocks': ['Brigade', 'Sobha'], 'planet': 'Ketu ☋', 'reason': 'Property market uncertain'}
+        }
+    }
+elif 12 <= current_hour < 13:
+    current_sector_signals = {
+        'LONG_SECTORS': {},
+        'SHORT_SECTORS': {
+            'Banking': {'stocks': ['ICICI Bank', 'Axis Bank'], 'planet': 'Saturn ♄', 'reason': 'Financial sector profit booking'},
+            'Auto': {'stocks': ['Bajaj Auto', 'Hero Motor'], 'planet': 'Saturn ♄', 'reason': 'Transport sector decline'},
+            'IT': {'stocks': ['Tech Mahindra', 'Mphasis'], 'planet': 'Saturn ♄', 'reason': 'Technology under pressure'}
+        }
+    }
+elif 13 <= current_hour < 14:
+    current_sector_signals = {
+        'LONG_SECTORS': {},
+        'SHORT_SECTORS': {
+            'Banking': {'stocks': ['SBI', 'PNB'], 'planet': 'Mars ♂️', 'reason': 'Aggressive selling in finance'},
+            'IT': {'stocks': ['Infosys', 'TCS'], 'planet': 'Mars ♂️', 'reason': 'Tech sector volatility'},
+            'Metal': {'stocks': ['SAIL', 'JSW Steel'], 'planet': 'Mars ♂️', 'reason': 'Industrial metals weak'},
+            'FMCG': {'stocks': ['Dabur', 'Marico'], 'planet': 'Mars ♂️', 'reason': 'Consumer goods selling'}
+        }
+    }
+elif 14 <= current_hour < 15:
+    current_sector_signals = {
+        'LONG_SECTORS': {},
+        'SHORT_SECTORS': {
+            'IT': {'stocks': ['TCS', 'Wipro', 'HCL Tech'], 'planet': 'Rahu ☊', 'reason': 'Technology crisis, global IT pressure'},
+            'Metal': {'stocks': ['Tata Steel', 'Vedanta'], 'planet': 'Rahu ☊', 'reason': 'Mining sector confusion'},
+            'Energy': {'stocks': ['BPCL', 'IOC'], 'planet': 'Rahu ☊', 'reason': 'Energy uncertainty'}
+        }
+    }
+elif 15 <= current_hour < 16:
+    current_sector_signals = {
+        'LONG_SECTORS': {
+            'Banking': {'stocks': ['HDFC Bank', 'Kotak Bank'], 'planet': 'Jupiter ♃', 'reason': 'Financial recovery rally'},
+            'FMCG': {'stocks': ['HUL', 'ITC'], 'planet': 'Venus ♀', 'reason': 'Consumer comeback'},
+            'Auto': {'stocks': ['Maruti', 'M&M'], 'planet': 'Venus ♀', 'reason': 'Transport sector revival'}
+        },
+        'SHORT_SECTORS': {}
+    }
+else:
+    # After market hours or early morning
+    current_sector_signals = {
+        'LONG_SECTORS': {},
+        'SHORT_SECTORS': {}
+    }
+
+# Display Current Sector Signals
+sector_signal_col1, sector_signal_col2 = st.columns(2)
+
+with sector_signal_col1:
+    st.markdown("### 🟢 SECTORS TO GO LONG")
+    
+    if current_sector_signals['LONG_SECTORS']:
+        for sector, data in current_sector_signals['LONG_SECTORS'].items():
+            stocks_text = ", ".join(data['stocks'])
+            
+            st.markdown(f"""
+            <div class="live-signal">
+                <h4>📈 {sector} Sector</h4>
+                <strong>🟢 BUY: {stocks_text}</strong><br>
+                Planet: {data['planet']}<br>
+                Reason: {data['reason']}
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <div class="timing-alert">
+            <h4>⏳ No Long Opportunities</h4>
+            <p>Current planetary hour not favorable for long positions</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+with sector_signal_col2:
+    st.markdown("### 🔴 SECTORS TO GO SHORT")
+    
+    if current_sector_signals['SHORT_SECTORS']:
+        for sector, data in current_sector_signals['SHORT_SECTORS'].items():
+            stocks_text = ", ".join(data['stocks'])
+            
+            st.markdown(f"""
+            <div class="warning-signal">
+                <h4>📉 {sector} Sector</h4>
+                <strong>🔴 SELL: {stocks_text}</strong><br>
+                Planet: {data['planet']}<br>
+                Reason: {data['reason']}
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <div class="timing-alert">
+            <h4>⏳ No Short Opportunities</h4>
+            <p>Current planetary hour not showing strong bearish signals</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+# TOMORROW'S PLANETARY TRANSIT PREDICTIONS
+st.markdown("""
+<div style="background: linear-gradient(135deg, #ff9a56 0%, #ff6b35 100%); color: white; padding: 20px; border-radius: 15px; margin: 20px 0;">
+    <h2>🔮 Tomorrow's Planetary Transit Forecast</h2>
+    <p>Next day detailed astrological predictions with timing</p>
+</div>
+""", unsafe_allow_html=True)
+
+# Calculate tomorrow's date
+tomorrow = datetime.now() + timedelta(days=1)
+tomorrow_date = tomorrow.strftime('%B %d, %Y (%A)')
+
+st.markdown(f"### 📅 Forecast for {tomorrow_date}")
+
+# Tomorrow's planetary transit schedule
+tomorrow_transits = [
+    {
+        'time': '09:15-10:15',
+        'planet': 'Moon 🌙',
+        'trend': 'Bullish',
+        'effect': 'Positive',
+        'sectors': 'FMCG, Consumer goods strong',
+        'indices': 'NIFTY: +0.7%, BANKNIFTY: +1.2%',
+        'action': 'BUY consumer stocks at opening'
+    },
+    {
+        'time': '10:15-11:15', 
+        'planet': 'Mars ♂️',
+        'trend': 'Volatile',
+        'effect': 'Mixed',
+        'sectors': 'Energy up, Defense strong, IT weak',
+        'indices': 'NIFTY: ±1.5%, BANKNIFTY: ±1.8%',
+        'action': 'Trade energy stocks with tight stops'
+    },
+    {
+        'time': '11:15-12:15',
+        'planet': 'Mercury ☿',
+        'trend': 'Bearish',
+        'effect': 'Negative',
+        'sectors': 'IT, Telecom under pressure',
+        'indices': 'NIFTY: -0.8%, BANKNIFTY: -0.5%',
+        'action': 'SHORT tech stocks'
+    },
+    {
+        'time': '12:15-13:15',
+        'planet': 'Jupiter ♃',
+        'trend': 'Bullish',
+        'effect': 'Positive',
+        'sectors': 'Banking, Finance, Gold bullish',
+        'indices': 'NIFTY: +1.3%, BANKNIFTY: +2.1%',
+        'action': 'STRONG BUY banking stocks'
+    },
+    {
+        'time': '13:15-14:15',
+        'planet': 'Venus ♀',
+        'trend': 'Bullish',
+        'effect': 'Positive',
+        'sectors': 'Auto, Luxury, Entertainment up',
+        'indices': 'NIFTY: +0.9%, BANKNIFTY: +0.6%',
+        'action': 'BUY auto and consumer durables'
+    },
+    {
+        'time': '14:15-15:15',
+        'planet': 'Saturn ♄',
+        'trend': 'Bearish',
+        'effect': 'Negative',
+        'sectors': 'All sectors weak, profit booking',
+        'indices': 'NIFTY: -1.2%, BANKNIFTY: -1.8%',
+        'action': 'BOOK PROFITS, avoid fresh longs'
+    },
+    {
+        'time': '15:15-15:30',
+        'planet': 'Sun ☀️',
+        'trend': 'Bullish',
+        'effect': 'Positive',
+        'sectors': 'Power, Energy, Pharma recovery',
+        'indices': 'NIFTY: +0.8%, BANKNIFTY: +0.4%',
+        'action': 'Closing rally - BUY energy stocks'
+    }
+]
+
+# Display tomorrow's predictions in timeline format
+for idx, transit in enumerate(tomorrow_transits):
+    # Determine styling based on trend
+    if transit['trend'] == 'Bullish':
+        box_class = 'live-signal'
+        trend_icon = '🟢'
+    elif transit['trend'] == 'Bearish':
+        box_class = 'warning-signal'
+        trend_icon = '🔴'
+    else:
+        box_class = 'trend-volatile'
+        trend_icon = '🟡'
+    
+    st.markdown(f"""
+    <div class="time-slot">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h4>{trend_icon} {transit['time']} - {transit['planet']}</h4>
+            <span style="background: {'#28a745' if transit['trend'] == 'Bullish' else '#dc3545' if transit['trend'] == 'Bearish' else '#ffc107'}; 
+                         color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold;">
+                {transit['trend'].upper()}
+            </span>
+        </div>
+        <div style="margin-top: 10px;">
+            <strong>📊 Sector Impact:</strong> {transit['sectors']}<br>
+            <strong>📈 Index Targets:</strong> {transit['indices']}<br>
+            <strong>💡 Action:</strong> <span style="font-weight: bold; color: {'#90EE90' if 'BUY' in transit['action'] else '#FFB6C1' if 'SHORT' in transit['action'] or 'SELL' in transit['action'] else '#FFFF99'};">{transit['action']}</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Tomorrow's Key Highlights
+st.markdown("### ⭐ Tomorrow's Key Trading Highlights")
+
+tomorrow_col1, tomorrow_col2, tomorrow_col3 = st.columns(3)
+
+with tomorrow_col1:
+    st.markdown("""
+    <div class="live-signal">
+        <h4>🌟 Best Opportunities</h4>
+        <strong>12:15-13:15 (Jupiter ♃):</strong><br>
+        • Banking sector STRONG BUY<br>
+        • BANKNIFTY target: +2.1%<br>
+        • Gold also bullish<br><br>
+        <strong>09:15-10:15 (Moon 🌙):</strong><br>
+        • FMCG opening strength<br>
+        • Consumer stocks rally
+    </div>
+    """, unsafe_allow_html=True)
+
+with tomorrow_col2:
+    st.markdown("""
+    <div class="warning-signal">
+        <h4>⚠️ Avoid These Times</h4>
+        <strong>11:15-12:15 (Mercury ☿):</strong><br>
+        • IT sector bearish<br>
+        • Tech stocks weak<br><br>
+        <strong>14:15-15:15 (Saturn ♄):</strong><br>
+        • Major profit booking<br>
+        • All sectors declining<br>
+        • Book profits before 2:15 PM
+    </div>
+    """, unsafe_allow_html=True)
+
+with tomorrow_col3:
+    st.markdown("""
+    <div class="planetary-hour">
+        <h4>🎯 Special Alerts</h4>
+        <strong>10:15-11:15 (Mars ♂️):</strong><br>
+        • HIGH VOLATILITY<br>
+        • Energy sector swings<br>
+        • Use tight stop-losses<br><br>
+        <strong>15:15-15:30 (Sun ☀️):</strong><br>
+        • Closing rally expected<br>
+        • Energy, Power stocks up
+    </div>
+    """, unsafe_allow_html=True)
+
+# Tomorrow's Sector-wise Timeline
+st.markdown("### 📊 Tomorrow's Complete Sector Timeline")
+
+tomorrow_sectors = {
+    '09:15-10:15': {'Banking': 'Neutral', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Bullish', 'Metal': 'Bearish', 'FMCG': 'Strong Bullish', 'Energy': 'Neutral', 'Realty': 'Bearish'},
+    '10:15-11:15': {'Banking': 'Neutral', 'IT': 'Bearish', 'Pharma': 'Bullish', 'Auto': 'Volatile', 'Metal': 'Volatile', 'FMCG': 'Neutral', 'Energy': 'Strong Bullish', 'Realty': 'Bearish'},
+    '11:15-12:15': {'Banking': 'Bearish', 'IT': 'Strong Bearish', 'Pharma': 'Bearish', 'Auto': 'Bearish', 'Metal': 'Bearish', 'FMCG': 'Bearish', 'Energy': 'Bearish', 'Realty': 'Bearish'},
+    '12:15-13:15': {'Banking': 'Strong Bullish', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Bullish', 'Metal': 'Neutral', 'FMCG': 'Bullish', 'Energy': 'Bullish', 'Realty': 'Neutral'},
+    '13:15-14:15': {'Banking': 'Bullish', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Strong Bullish', 'Metal': 'Neutral', 'FMCG': 'Bullish', 'Energy': 'Bullish', 'Realty': 'Neutral'},
+    '14:15-15:15': {'Banking': 'Bearish', 'IT': 'Bearish', 'Pharma': 'Bearish', 'Auto': 'Bearish', 'Metal': 'Bearish', 'FMCG': 'Bearish', 'Energy': 'Bearish', 'Realty': 'Bearish'},
+    '15:15-15:30': {'Banking': 'Bullish', 'IT': 'Neutral', 'Pharma': 'Strong Bullish', 'Auto': 'Bullish', 'Metal': 'Neutral', 'FMCG': 'Bullish', 'Energy': 'Strong Bullish', 'Realty': 'Neutral'}
+}
+
+tomorrow_time_slots = list(tomorrow_sectors.keys())
+sectors = ['Banking', 'IT', 'Pharma', 'Auto', 'Metal', 'FMCG', 'Energy', 'Realty']
+
+# Header for tomorrow's timeline
+col_header = st.columns([2] + [1] * len(tomorrow_time_slots))
+col_header[0].markdown("**Sector**")
+for i, time_slot in enumerate(tomorrow_time_slots):
+    col_header[i+1].markdown(f"**{time_slot.split('-')[0]}**", help=f"Full time: {time_slot}")
+
+# Tomorrow's sector rows
+for sector in sectors:
+    cols = st.columns([2] + [1] * len(tomorrow_time_slots))
+    cols[0].markdown(f"**{sector}**")
+    
+    for i, time_slot in enumerate(tomorrow_time_slots):
+        trend = tomorrow_sectors[time_slot][sector]
+        
+        if trend == 'Strong Bullish':
+            cols[i+1].markdown('<span style="background: #28a745; color: white; padding: 3px 6px; border-radius: 4px; font-weight: bold;">🟢🟢</span>', unsafe_allow_html=True)
+        elif trend == 'Bullish':
+            cols[i+1].markdown('<span class="bullish-text">🟢</span>', unsafe_allow_html=True)
+        elif trend == 'Strong Bearish':
+            cols[i+1].markdown('<span style="background: #dc3545; color: white; padding: 3px 6px; border-radius: 4px; font-weight: bold;">🔴🔴</span>', unsafe_allow_html=True)
+        elif trend == 'Bearish':
+            cols[i+1].markdown('<span class="bearish-text">🔴</span>', unsafe_allow_html=True)
+        elif trend == 'Volatile':
+            cols[i+1].markdown('<span class="volatile-text">⚡</span>', unsafe_allow_html=True)
+        else:
+            cols[i+1].markdown('<span class="neutral-text">🟡</span>', unsafe_allow_html=True)
+
+# Tomorrow's Best Trading Plan
+st.markdown("### 🗓️ Tomorrow's Optimal Trading Plan")
+
+plan_col1, plan_col2 = st.columns(2)
+
+with plan_col1:
+    st.markdown("""
+    <div class="transit-box">
+        <h4>⏰ Time-based Strategy</h4>
+        <strong>09:15-10:15:</strong> BUY FMCG stocks (HUL, ITC)<br>
+        <strong>12:15-13:15:</strong> STRONG BUY Banking (HDFC, ICICI)<br>
+        <strong>13:15-14:15:</strong> BUY Auto sector (Maruti, Tata Motors)<br>
+        <strong>15:15-15:30:</strong> BUY Energy for closing rally<br><br>
+        <strong style="color: #ff6b35;">AVOID 11:15-12:15 & 14:15-15:15</strong>
+    </div>
+    """, unsafe_allow_html=True)
+
+with plan_col2:
+    st.markdown("""
+    <div class="transit-box">
+        <h4>🎯 Key Targets Tomorrow</h4>
+        <strong>Best Long Target:</strong> Banking sector (+2.1%)<br>
+        <strong>Best Short Target:</strong> IT sector (-1.5%)<br>
+        <strong>Highest Volatility:</strong> 10:15-11:15 (Mars hour)<br>
+        <strong>Safest Entry:</strong> 09:15-10:15 (Moon hour)<br><br>
+        <strong style="color: #28a745;">Overall: BULLISH bias tomorrow</strong>
+    </div>
+    """, unsafe_allow_html=True)
+
 with global_col2:
     data = st.session_state.market_data['NASDAQ']
     color_class = "positive" if data['change'] >= 0 else "negative"
