@@ -17,17 +17,17 @@ st.markdown("""
 .main-header {
     background: linear-gradient(45deg, #ff6b35, #f7931e);
     color: white;
-    padding: 20px;
+    padding: 15px;
     text-align: center;
     border-radius: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 .market-card {
     background: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
+    padding: 12px;
+    border-radius: 8px;
     text-align: center;
-    margin: 10px 0;
+    margin: 8px 0;
     border: 2px solid #dee2e6;
 }
 .positive { color: #28a745; font-weight: bold; }
@@ -35,130 +35,146 @@ st.markdown("""
 .ticker-box {
     background: #000;
     color: #00ff00;
-    padding: 10px;
+    padding: 8px;
     font-family: monospace;
     border-radius: 5px;
-    margin: 10px 0;
+    margin: 8px 0;
 }
 .chart-box {
     background: white;
-    padding: 20px;
-    border-radius: 10px;
+    padding: 15px;
+    border-radius: 8px;
     border: 2px solid #ddd;
-    margin: 10px 0;
+    margin: 8px 0;
 }
 .planet-info {
     background: #e3f2fd;
-    padding: 10px;
+    color: #1565c0;
+    padding: 8px;
     border-radius: 5px;
     margin: 5px 0;
     border-left: 3px solid #2196f3;
+    font-weight: 500;
 }
 .transit-box {
     background: #f0f8ff;
-    padding: 15px;
-    border-radius: 8px;
-    margin: 10px 0;
+    color: #1e3a8a;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 8px 0;
     border: 1px solid #87ceeb;
+    font-weight: 500;
 }
 .timing-alert {
     background: #fff3cd;
-    padding: 10px;
+    color: #856404;
+    padding: 8px;
     border-radius: 5px;
     margin: 5px 0;
     border-left: 4px solid #ffc107;
+    font-weight: 500;
 }
 .bullish-text {
-    color: #28a745;
+    color: #155724;
     font-weight: bold;
 }
 .bearish-text {
-    color: #dc3545;
+    color: #721c24;
     font-weight: bold;
 }
 .neutral-text {
-    color: #ffc107;
+    color: #856404;
     font-weight: bold;
 }
 .volatile-text {
-    color: #ff6b35;
+    color: #d84315;
     font-weight: bold;
 }
 .trend-bullish {
     background-color: #d4edda;
     color: #155724;
-    padding: 4px 8px;
+    padding: 3px 6px;
     border-radius: 4px;
     font-weight: bold;
+    font-size: 0.9em;
 }
 .trend-bearish {
     background-color: #f8d7da;
     color: #721c24;
-    padding: 4px 8px;
+    padding: 3px 6px;
     border-radius: 4px;
     font-weight: bold;
+    font-size: 0.9em;
 }
 .trend-neutral {
     background-color: #fff3cd;
     color: #856404;
-    padding: 4px 8px;
+    padding: 3px 6px;
     border-radius: 4px;
     font-weight: bold;
+    font-size: 0.9em;
 }
 .trend-volatile {
     background-color: #ffe5d4;
-    color: #a04000;
-    padding: 4px 8px;
+    color: #d84315;
+    padding: 3px 6px;
     border-radius: 4px;
     font-weight: bold;
+    font-size: 0.9em;
 }
 .astro-timing-box {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 20px;
-    border-radius: 15px;
-    margin: 20px 0;
+    color: #ffffff;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 .time-slot {
-    background: rgba(255,255,255,0.1);
-    padding: 12px;
-    border-radius: 8px;
-    margin: 8px 0;
+    background: rgba(255,255,255,0.95);
+    color: #212529;
+    padding: 10px;
+    border-radius: 6px;
+    margin: 5px 0;
     border-left: 4px solid #ffd700;
+    font-weight: 500;
 }
 .planetary-hour {
     background: linear-gradient(45deg, #ff9a56, #ff6b35);
-    color: white;
-    padding: 15px;
-    border-radius: 10px;
-    margin: 10px 0;
+    color: #ffffff;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 8px 0;
     text-align: center;
+    font-weight: bold;
 }
 .sector-timeline {
     background: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
-    margin: 10px 0;
+    color: #212529;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 8px 0;
     border: 1px solid #dee2e6;
 }
 .live-signal {
     background: linear-gradient(45deg, #11998e, #38ef7d);
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    margin: 8px 0;
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 6px;
+    margin: 5px 0;
     text-align: center;
     font-weight: bold;
+    font-size: 0.95em;
 }
 .warning-signal {
     background: linear-gradient(45deg, #ff416c, #ff4b2b);
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    margin: 8px 0;
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 6px;
+    margin: 5px 0;
     text-align: center;
     font-weight: bold;
+    font-size: 0.95em;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -366,8 +382,8 @@ def update_market_data():
 # Header
 st.markdown("""
 <div class="main-header">
-    <h1>🕉️ Vedic Market Intelligence Dashboard</h1>
-    <p>Live Astrological Market Analysis with Planetary Transit Timing</p>
+    <h1 style="margin: 0 0 5px 0;">🕉️ Vedic Market Intelligence Dashboard</h1>
+    <p style="margin: 0;">Live Astrological Market Analysis with Planetary Transit Timing</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -418,9 +434,9 @@ with global_col1:
 
 # CURRENT SECTOR SIGNALS BOX
 st.markdown("""
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin: 20px 0;">
-    <h2>🎯 Current Sector Signals & Stock Recommendations</h2>
-    <p>Based on live planetary transit - Specific stocks to trade RIGHT NOW</p>
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 15px; border-radius: 10px; margin: 15px 0;">
+    <h2 style="margin: 0 0 5px 0; color: #ffffff;">🎯 Current Sector Signals & Stock Recommendations</h2>
+    <p style="margin: 0; color: #ffffff; opacity: 0.9;">Based on live planetary transit - Specific stocks to trade RIGHT NOW</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -521,18 +537,19 @@ with sector_signal_col1:
             stocks_text = ", ".join(data['stocks'])
             
             st.markdown(f"""
-            <div class="live-signal">
-                <h4>📈 {sector} Sector</h4>
-                <strong>🟢 BUY: {stocks_text}</strong><br>
-                Planet: {data['planet']}<br>
-                Reason: {data['reason']}
+            <div style="background: #c8e6c9; color: #1b5e20; padding: 10px; border-radius: 6px; margin: 3px 0; text-align: center; font-weight: bold; border: 2px solid #388e3c;">
+                <h5 style="margin: 0 0 5px 0; color: #1b5e20;">📈 {sector} Sector</h5>
+                <div style="color: #1b5e20; font-size: 0.9em;">
+                <span style="background: #2e7d32; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 1.1em;">🟢 BUY: {stocks_text}</span><br>
+                <small>Planet: {data['planet']} | {data['reason']}</small>
+                </div>
             </div>
             """, unsafe_allow_html=True)
     else:
         st.markdown("""
-        <div class="timing-alert">
-            <h4>⏳ No Long Opportunities</h4>
-            <p>Current planetary hour not favorable for long positions</p>
+        <div style="background: #fff8e1; color: #e65100; padding: 10px; border-radius: 6px; margin: 3px 0; border: 2px solid #f57c00;">
+            <h5 style="margin: 0 0 5px 0; color: #e65100;">⏳ No Long Opportunities</h5>
+            <p style="margin: 0; color: #e65100; font-size: 0.85em;">Current planetary hour not favorable for long positions</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -544,26 +561,27 @@ with sector_signal_col2:
             stocks_text = ", ".join(data['stocks'])
             
             st.markdown(f"""
-            <div class="warning-signal">
-                <h4>📉 {sector} Sector</h4>
-                <strong>🔴 SELL: {stocks_text}</strong><br>
-                Planet: {data['planet']}<br>
-                Reason: {data['reason']}
+            <div style="background: #ffcdd2; color: #b71c1c; padding: 10px; border-radius: 6px; margin: 3px 0; text-align: center; font-weight: bold; border: 2px solid #d32f2f;">
+                <h5 style="margin: 0 0 5px 0; color: #b71c1c;">📉 {sector} Sector</h5>
+                <div style="color: #b71c1c; font-size: 0.9em;">
+                <span style="background: #c62828; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 1.1em;">🔴 SELL: {stocks_text}</span><br>
+                <small>Planet: {data['planet']} | {data['reason']}</small>
+                </div>
             </div>
             """, unsafe_allow_html=True)
     else:
         st.markdown("""
-        <div class="timing-alert">
-            <h4>⏳ No Short Opportunities</h4>
-            <p>Current planetary hour not showing strong bearish signals</p>
+        <div style="background: #fff8e1; color: #e65100; padding: 10px; border-radius: 6px; margin: 3px 0; border: 2px solid #f57c00;">
+            <h5 style="margin: 0 0 5px 0; color: #e65100;">⏳ No Short Opportunities</h5>
+            <p style="margin: 0; color: #e65100; font-size: 0.85em;">Current planetary hour not showing strong bearish signals</p>
         </div>
         """, unsafe_allow_html=True)
 
 # TOMORROW'S PLANETARY TRANSIT PREDICTIONS
 st.markdown("""
-<div style="background: linear-gradient(135deg, #ff9a56 0%, #ff6b35 100%); color: white; padding: 20px; border-radius: 15px; margin: 20px 0;">
-    <h2>🔮 Tomorrow's Planetary Transit Forecast</h2>
-    <p>Next day detailed astrological predictions with timing</p>
+<div style="background: linear-gradient(135deg, #ff9a56 0%, #ff6b35 100%); color: #ffffff; padding: 15px; border-radius: 10px; margin: 15px 0;">
+    <h2 style="margin: 0 0 5px 0; color: #ffffff;">🔮 Tomorrow's Planetary Transit Forecast</h2>
+    <p style="margin: 0; color: #ffffff; opacity: 0.9;">Next day detailed astrological predictions with timing</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -640,152 +658,179 @@ tomorrow_transits = [
     }
 ]
 
-# Display tomorrow's predictions in timeline format
+# Display tomorrow's predictions in compact timeline format
+forecast_col1, forecast_col2 = st.columns(2)
+
 for idx, transit in enumerate(tomorrow_transits):
-    # Determine styling based on trend
-    if transit['trend'] == 'Bullish':
-        box_class = 'live-signal'
-        trend_icon = '🟢'
-    elif transit['trend'] == 'Bearish':
-        box_class = 'warning-signal'
-        trend_icon = '🔴'
-    else:
-        box_class = 'trend-volatile'
-        trend_icon = '🟡'
+    col = forecast_col1 if idx % 2 == 0 else forecast_col2
     
-    st.markdown(f"""
-    <div class="time-slot">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h4>{trend_icon} {transit['time']} - {transit['planet']}</h4>
-            <span style="background: {'#28a745' if transit['trend'] == 'Bullish' else '#dc3545' if transit['trend'] == 'Bearish' else '#ffc107'}; 
-                         color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold;">
-                {transit['trend'].upper()}
-            </span>
+    # Determine styling based on trend with darker colors
+    if transit['trend'] == 'Bullish':
+        bg_color = '#c8e6c9'
+        text_color = '#1b5e20'
+        trend_icon = '🟢'
+        badge_color = '#2e7d32'
+    elif transit['trend'] == 'Bearish':
+        bg_color = '#ffcdd2'
+        text_color = '#b71c1c'
+        trend_icon = '🔴'
+        badge_color = '#c62828'
+    else:
+        bg_color = '#fff8e1'
+        text_color = '#e65100'
+        trend_icon = '🟡'
+        badge_color = '#f57c00'
+    
+    with col:
+        st.markdown(f"""
+        <div style="background: {bg_color}; color: {text_color}; padding: 8px; border-radius: 6px; margin: 3px 0; border-left: 4px solid {badge_color};">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <h5 style="margin: 0; color: {text_color}; font-size: 0.95em;">{trend_icon} {transit['time']} - {transit['planet']}</h5>
+                <span style="background: {badge_color}; color: white; padding: 2px 6px; border-radius: 8px; font-weight: bold; font-size: 0.7em;">
+                    {transit['trend'].upper()}
+                </span>
+            </div>
+            <div style="line-height: 1.2; font-size: 0.8em;">
+                <strong style="color: {text_color};">📊</strong> {transit['sectors']}<br>
+                <strong style="color: {text_color};">📈</strong> {transit['indices']}<br>
+                <strong style="color: {text_color}; font-size: 1.1em;">💡 ACTION:</strong> <span style="font-weight: bold; color: {badge_color}; font-size: 1.1em; background: rgba(255,255,255,0.8); padding: 2px 4px; border-radius: 4px;">{transit['action']}</span>
+            </div>
         </div>
-        <div style="margin-top: 10px;">
-            <strong>📊 Sector Impact:</strong> {transit['sectors']}<br>
-            <strong>📈 Index Targets:</strong> {transit['indices']}<br>
-            <strong>💡 Action:</strong> <span style="font-weight: bold; color: {'#90EE90' if 'BUY' in transit['action'] else '#FFB6C1' if 'SHORT' in transit['action'] or 'SELL' in transit['action'] else '#FFFF99'};">{transit['action']}</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-# Tomorrow's Key Highlights
-st.markdown("### ⭐ Tomorrow's Key Trading Highlights")
-
+# Tomorrow's Key Highlights - More Compact
 tomorrow_col1, tomorrow_col2, tomorrow_col3 = st.columns(3)
 
 with tomorrow_col1:
     st.markdown("""
-    <div class="live-signal">
-        <h4>🌟 Best Opportunities</h4>
+    <div style="background: #c8e6c9; color: #1b5e20; padding: 10px; border-radius: 6px; margin: 3px 0; font-weight: 600; border: 2px solid #388e3c;">
+        <h5 style="margin: 0 0 5px 0; color: #1b5e20;">🌟 Best Opportunities</h5>
+        <div style="font-size: 0.85em; line-height: 1.3; color: #1b5e20;">
         <strong>12:15-13:15 (Jupiter ♃):</strong><br>
-        • Banking sector STRONG BUY<br>
-        • BANKNIFTY target: +2.1%<br>
-        • Gold also bullish<br><br>
+        <span style="background: #2e7d32; color: white; padding: 2px 4px; border-radius: 4px; font-weight: bold; font-size: 0.9em;">STRONG BUY Banking</span><br>
+        BANKNIFTY: +2.1%<br><br>
         <strong>09:15-10:15 (Moon 🌙):</strong><br>
-        • FMCG opening strength<br>
-        • Consumer stocks rally
+        <span style="background: #388e3c; color: white; padding: 2px 4px; border-radius: 4px; font-weight: bold; font-size: 0.9em;">BUY FMCG</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
 with tomorrow_col2:
     st.markdown("""
-    <div class="warning-signal">
-        <h4>⚠️ Avoid These Times</h4>
+    <div style="background: #ffcdd2; color: #b71c1c; padding: 10px; border-radius: 6px; margin: 3px 0; font-weight: 600; border: 2px solid #d32f2f;">
+        <h5 style="margin: 0 0 5px 0; color: #b71c1c;">⚠️ Avoid These Times</h5>
+        <div style="font-size: 0.85em; line-height: 1.3; color: #b71c1c;">
         <strong>11:15-12:15 (Mercury ☿):</strong><br>
-        • IT sector bearish<br>
-        • Tech stocks weak<br><br>
+        <span style="background: #c62828; color: white; padding: 2px 4px; border-radius: 4px; font-weight: bold; font-size: 0.9em;">SHORT IT Stocks</span><br><br>
         <strong>14:15-15:15 (Saturn ♄):</strong><br>
-        • Major profit booking<br>
-        • All sectors declining<br>
-        • Book profits before 2:15 PM
+        <span style="background: #d32f2f; color: white; padding: 2px 4px; border-radius: 4px; font-weight: bold; font-size: 0.9em;">BOOK PROFITS</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
 with tomorrow_col3:
     st.markdown("""
-    <div class="planetary-hour">
-        <h4>🎯 Special Alerts</h4>
+    <div style="background: #fff8e1; color: #e65100; padding: 10px; border-radius: 6px; margin: 3px 0; font-weight: 600; border: 2px solid #f57c00;">
+        <h5 style="margin: 0 0 5px 0; color: #e65100;">🎯 Special Alerts</h5>
+        <div style="font-size: 0.85em; line-height: 1.3; color: #e65100;">
         <strong>10:15-11:15 (Mars ♂️):</strong><br>
-        • HIGH VOLATILITY<br>
-        • Energy sector swings<br>
-        • Use tight stop-losses<br><br>
+        <span style="background: #ef6c00; color: white; padding: 2px 4px; border-radius: 4px; font-weight: bold; font-size: 0.9em;">HIGH VOLATILITY</span><br><br>
         <strong>15:15-15:30 (Sun ☀️):</strong><br>
-        • Closing rally expected<br>
-        • Energy, Power stocks up
+        <span style="background: #f57c00; color: white; padding: 2px 4px; border-radius: 4px; font-weight: bold; font-size: 0.9em;">BUY Energy Rally</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-# Tomorrow's Sector-wise Timeline
-st.markdown("### 📊 Tomorrow's Complete Sector Timeline")
+# Tomorrow's Sector-wise Timeline - Compact
+st.markdown("### 📊 Tomorrow's Sector Timeline (Compact View)")
 
 tomorrow_sectors = {
-    '09:15-10:15': {'Banking': 'Neutral', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Bullish', 'Metal': 'Bearish', 'FMCG': 'Strong Bullish', 'Energy': 'Neutral', 'Realty': 'Bearish'},
-    '10:15-11:15': {'Banking': 'Neutral', 'IT': 'Bearish', 'Pharma': 'Bullish', 'Auto': 'Volatile', 'Metal': 'Volatile', 'FMCG': 'Neutral', 'Energy': 'Strong Bullish', 'Realty': 'Bearish'},
-    '11:15-12:15': {'Banking': 'Bearish', 'IT': 'Strong Bearish', 'Pharma': 'Bearish', 'Auto': 'Bearish', 'Metal': 'Bearish', 'FMCG': 'Bearish', 'Energy': 'Bearish', 'Realty': 'Bearish'},
-    '12:15-13:15': {'Banking': 'Strong Bullish', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Bullish', 'Metal': 'Neutral', 'FMCG': 'Bullish', 'Energy': 'Bullish', 'Realty': 'Neutral'},
-    '13:15-14:15': {'Banking': 'Bullish', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Strong Bullish', 'Metal': 'Neutral', 'FMCG': 'Bullish', 'Energy': 'Bullish', 'Realty': 'Neutral'},
-    '14:15-15:15': {'Banking': 'Bearish', 'IT': 'Bearish', 'Pharma': 'Bearish', 'Auto': 'Bearish', 'Metal': 'Bearish', 'FMCG': 'Bearish', 'Energy': 'Bearish', 'Realty': 'Bearish'},
-    '15:15-15:30': {'Banking': 'Bullish', 'IT': 'Neutral', 'Pharma': 'Strong Bullish', 'Auto': 'Bullish', 'Metal': 'Neutral', 'FMCG': 'Bullish', 'Energy': 'Strong Bullish', 'Realty': 'Neutral'}
+    '09:15': {'Banking': 'Neutral', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Bullish', 'Metal': 'Bearish', 'FMCG': 'Strong Bullish', 'Energy': 'Neutral', 'Realty': 'Bearish'},
+    '10:15': {'Banking': 'Neutral', 'IT': 'Bearish', 'Pharma': 'Bullish', 'Auto': 'Volatile', 'Metal': 'Volatile', 'FMCG': 'Neutral', 'Energy': 'Strong Bullish', 'Realty': 'Bearish'},
+    '11:15': {'Banking': 'Bearish', 'IT': 'Strong Bearish', 'Pharma': 'Bearish', 'Auto': 'Bearish', 'Metal': 'Bearish', 'FMCG': 'Bearish', 'Energy': 'Bearish', 'Realty': 'Bearish'},
+    '12:15': {'Banking': 'Strong Bullish', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Bullish', 'Metal': 'Neutral', 'FMCG': 'Bullish', 'Energy': 'Bullish', 'Realty': 'Neutral'},
+    '13:15': {'Banking': 'Bullish', 'IT': 'Neutral', 'Pharma': 'Bullish', 'Auto': 'Strong Bullish', 'Metal': 'Neutral', 'FMCG': 'Bullish', 'Energy': 'Bullish', 'Realty': 'Neutral'},
+    '14:15': {'Banking': 'Bearish', 'IT': 'Bearish', 'Pharma': 'Bearish', 'Auto': 'Bearish', 'Metal': 'Bearish', 'FMCG': 'Bearish', 'Energy': 'Bearish', 'Realty': 'Bearish'},
+    '15:15': {'Banking': 'Bullish', 'IT': 'Neutral', 'Pharma': 'Strong Bullish', 'Auto': 'Bullish', 'Metal': 'Neutral', 'FMCG': 'Bullish', 'Energy': 'Strong Bullish', 'Realty': 'Neutral'}
 }
 
 tomorrow_time_slots = list(tomorrow_sectors.keys())
 sectors = ['Banking', 'IT', 'Pharma', 'Auto', 'Metal', 'FMCG', 'Energy', 'Realty']
 
-# Header for tomorrow's timeline
-col_header = st.columns([2] + [1] * len(tomorrow_time_slots))
-col_header[0].markdown("**Sector**")
-for i, time_slot in enumerate(tomorrow_time_slots):
-    col_header[i+1].markdown(f"**{time_slot.split('-')[0]}**", help=f"Full time: {time_slot}")
+# Create a more compact grid
+sector_grid_html = """
+<div style="background: white; padding: 8px; border-radius: 6px; border: 1px solid #dee2e6; overflow-x: auto;">
+<table style="width: 100%; font-size: 0.8em; border-collapse: collapse;">
+<tr style="background: #f8f9fa;">
+<th style="padding: 4px; border: 1px solid #dee2e6; color: #495057; font-weight: bold;">Sector</th>
+"""
 
-# Tomorrow's sector rows
+for time_slot in tomorrow_time_slots:
+    sector_grid_html += f'<th style="padding: 4px; border: 1px solid #dee2e6; color: #495057; font-weight: bold; font-size: 0.75em;">{time_slot}</th>'
+
+sector_grid_html += "</tr>"
+
 for sector in sectors:
-    cols = st.columns([2] + [1] * len(tomorrow_time_slots))
-    cols[0].markdown(f"**{sector}**")
+    sector_grid_html += f'<tr><td style="padding: 4px; border: 1px solid #dee2e6; font-weight: bold; color: #212529;">{sector}</td>'
     
-    for i, time_slot in enumerate(tomorrow_time_slots):
+    for time_slot in tomorrow_time_slots:
         trend = tomorrow_sectors[time_slot][sector]
         
         if trend == 'Strong Bullish':
-            cols[i+1].markdown('<span style="background: #28a745; color: white; padding: 3px 6px; border-radius: 4px; font-weight: bold;">🟢🟢</span>', unsafe_allow_html=True)
+            cell_style = 'background: #2e7d32; color: white; font-weight: bold;'
+            cell_text = '🟢🟢'
         elif trend == 'Bullish':
-            cols[i+1].markdown('<span class="bullish-text">🟢</span>', unsafe_allow_html=True)
+            cell_style = 'background: #c8e6c9; color: #1b5e20; font-weight: bold;'
+            cell_text = '🟢'
         elif trend == 'Strong Bearish':
-            cols[i+1].markdown('<span style="background: #dc3545; color: white; padding: 3px 6px; border-radius: 4px; font-weight: bold;">🔴🔴</span>', unsafe_allow_html=True)
+            cell_style = 'background: #c62828; color: white; font-weight: bold;'
+            cell_text = '🔴🔴'
         elif trend == 'Bearish':
-            cols[i+1].markdown('<span class="bearish-text">🔴</span>', unsafe_allow_html=True)
+            cell_style = 'background: #ffcdd2; color: #b71c1c; font-weight: bold;'
+            cell_text = '🔴'
         elif trend == 'Volatile':
-            cols[i+1].markdown('<span class="volatile-text">⚡</span>', unsafe_allow_html=True)
+            cell_style = 'background: #fff8e1; color: #e65100; font-weight: bold;'
+            cell_text = '⚡'
         else:
-            cols[i+1].markdown('<span class="neutral-text">🟡</span>', unsafe_allow_html=True)
+            cell_style = 'background: #f5f5f5; color: #616161; font-weight: bold;'
+            cell_text = '🟡'
+        
+        sector_grid_html += f'<td style="padding: 4px; border: 1px solid #dee2e6; text-align: center; {cell_style}">{cell_text}</td>'
+    
+    sector_grid_html += '</tr>'
 
-# Tomorrow's Best Trading Plan
-st.markdown("### 🗓️ Tomorrow's Optimal Trading Plan")
+sector_grid_html += '</table></div>'
 
+st.markdown(sector_grid_html, unsafe_allow_html=True)
+
+# Tomorrow's Best Trading Plan - Compact
 plan_col1, plan_col2 = st.columns(2)
 
 with plan_col1:
     st.markdown("""
-    <div class="transit-box">
-        <h4>⏰ Time-based Strategy</h4>
-        <strong>09:15-10:15:</strong> BUY FMCG stocks (HUL, ITC)<br>
-        <strong>12:15-13:15:</strong> STRONG BUY Banking (HDFC, ICICI)<br>
-        <strong>13:15-14:15:</strong> BUY Auto sector (Maruti, Tata Motors)<br>
-        <strong>15:15-15:30:</strong> BUY Energy for closing rally<br><br>
-        <strong style="color: #ff6b35;">AVOID 11:15-12:15 & 14:15-15:15</strong>
+    <div style="background: #e1f5fe; color: #0277bd; padding: 10px; border-radius: 6px; margin: 3px 0; border: 2px solid #0288d1;">
+        <h5 style="margin: 0 0 5px 0; color: #01579b;">⏰ Time-based Strategy</h5>
+        <div style="font-size: 0.85em; line-height: 1.3; color: #0277bd;">
+        <strong>09:15-10:15:</strong> <span style="background: #2e7d32; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">BUY FMCG</span><br>
+        <strong>12:15-13:15:</strong> <span style="background: #1b5e20; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">STRONG BUY Banking</span><br>
+        <strong>13:15-14:15:</strong> <span style="background: #388e3c; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">BUY Auto</span><br>
+        <strong>15:15-15:30:</strong> <span style="background: #43a047; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">BUY Energy</span><br><br>
+        <span style="background: #c62828; color: white; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 0.9em;">⚠️ AVOID 11:15-12:15 & 14:15-15:15</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
 with plan_col2:
     st.markdown("""
-    <div class="transit-box">
-        <h4>🎯 Key Targets Tomorrow</h4>
-        <strong>Best Long Target:</strong> Banking sector (+2.1%)<br>
-        <strong>Best Short Target:</strong> IT sector (-1.5%)<br>
-        <strong>Highest Volatility:</strong> 10:15-11:15 (Mars hour)<br>
-        <strong>Safest Entry:</strong> 09:15-10:15 (Moon hour)<br><br>
-        <strong style="color: #28a745;">Overall: BULLISH bias tomorrow</strong>
+    <div style="background: #e8f5e8; color: #1b5e20; padding: 10px; border-radius: 6px; margin: 3px 0; border: 2px solid #2e7d32;">
+        <h5 style="margin: 0 0 5px 0; color: #1b5e20;">🎯 Key Targets Tomorrow</h5>
+        <div style="font-size: 0.85em; line-height: 1.3; color: #1b5e20;">
+        <strong>Best Long:</strong> <span style="background: #2e7d32; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">Banking +2.1%</span><br>
+        <strong>Best Short:</strong> <span style="background: #c62828; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">IT -1.5%</span><br>
+        <strong>Highest Vol:</strong> 10:15-11:15 (Mars)<br>
+        <strong>Safest Entry:</strong> 09:15-10:15 (Moon)<br><br>
+        <span style="background: #1b5e20; color: white; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 0.9em;">📈 Overall: BULLISH BIAS</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -821,10 +866,10 @@ with global_col3:
 
 # NEW ENHANCED ASTRO TIMING SECTION
 st.markdown(f"""
-<div class="astro-timing-box">
-    <h2>🔮 Live Astrological Market Timing Analysis</h2>
-    <p>Real-time planetary transit effects on NIFTY, BANKNIFTY, Commodities & Global Markets</p>
-    <p style="text-align: right; font-size: 0.9em;">📅 Astro Data Updated: {st.session_state.astro_data_date}</p>
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 15px; border-radius: 10px; margin: 15px 0;">
+    <h2 style="margin: 0 0 5px 0; color: #ffffff;">🔮 Live Astrological Market Timing Analysis</h2>
+    <p style="margin: 0 0 5px 0; color: #ffffff; opacity: 0.9;">Real-time planetary transit effects on NIFTY, BANKNIFTY, Commodities & Global Markets</p>
+    <p style="text-align: right; font-size: 0.85em; margin: 0; color: #ffffff; opacity: 0.8;">📅 Astro Data Updated: {st.session_state.astro_data_date}</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -834,10 +879,10 @@ current_planet, current_symbol, current_influence = get_planetary_influence(curr
 current_time_str = current_time.strftime('%H:%M')
 
 st.markdown(f"""
-<div class="planetary-hour">
-    <h3>{current_symbol} Current Planetary Hour: {current_planet}</h3>
-    <p>🌟 {current_influence}</p>
-    <p>⏰ Time: {current_time_str} | Market Effect: <strong>Active Now</strong></p>
+<div style="background: linear-gradient(45deg, #ff9a56, #ff6b35); color: #ffffff; padding: 12px; border-radius: 8px; margin: 8px 0; text-align: center;">
+    <h3 style="margin: 0 0 5px 0; color: #ffffff;">{current_symbol} Current Planetary Hour: {current_planet}</h3>
+    <p style="margin: 0 0 3px 0; color: #ffffff; font-weight: 500;">🌟 {current_influence}</p>
+    <p style="margin: 0; color: #ffffff; font-size: 0.9em;">⏰ Time: {current_time_str} | Market Effect: <strong>Active Now</strong></p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1142,22 +1187,29 @@ if all_active_signals:
         
         with signal_cols[col_idx]:
             if signal['Signal'] in ['LONG', 'BUY', 'STRONG BUY']:
-                signal_class = 'live-signal'
+                bg_color = '#c8e6c9'
+                text_color = '#1b5e20'
                 signal_emoji = '🟢'
+                action_bg = '#2e7d32'
             elif signal['Signal'] in ['SHORT', 'SELL']:
-                signal_class = 'warning-signal'
+                bg_color = '#ffcdd2'
+                text_color = '#b71c1c'
                 signal_emoji = '🔴'
+                action_bg = '#c62828'
             else:
-                signal_class = 'planetary-hour'
+                bg_color = '#fff8e1'
+                text_color = '#e65100'
                 signal_emoji = '🟡'
+                action_bg = '#f57c00'
             
             st.markdown(f"""
-            <div class="{signal_class}">
-                <h4>{signal_emoji} {signal['Market']}</h4>
-                <strong>{signal['Signal']}</strong><br>
-                Target: {signal['Target']}<br>
-                SL: {signal['SL']}<br>
-                {signal['Planet']}
+            <div style="background: {bg_color}; color: {text_color}; padding: 8px; border-radius: 6px; margin: 3px 0; text-align: center; font-weight: bold; border: 2px solid {action_bg};">
+                <h5 style="margin: 0 0 3px 0; color: {text_color};">{signal_emoji} {signal['Market']}</h5>
+                <div style="font-size: 0.85em; color: {text_color};">
+                <span style="background: {action_bg}; color: white; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 1.1em;">{signal['Signal']}</span><br>
+                <small>Target: {signal['Target']} | SL: {signal['SL']}</small><br>
+                <small>{signal['Planet']}</small>
+                </div>
             </div>
             """, unsafe_allow_html=True)
     
@@ -1165,9 +1217,9 @@ if all_active_signals:
         st.info(f"📈 +{len(all_active_signals) - 4} more active signals. Check individual market sections above.")
 else:
     st.markdown("""
-    <div class="timing-alert">
-        <h4>🕐 No Active Signals Currently</h4>
-        <p>Market is in transition period. Check upcoming planetary hours below.</p>
+    <div style="background: #fff8e1; color: #e65100; padding: 10px; border-radius: 6px; margin: 5px 0; border: 2px solid #f57c00;">
+        <h5 style="margin: 0 0 3px 0; color: #e65100;">🕐 No Active Signals Currently</h5>
+        <p style="margin: 0; color: #e65100; font-size: 0.85em;">Market is in transition period. Check upcoming planetary hours below.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1393,8 +1445,9 @@ summary_col1, summary_col2, summary_col3 = st.columns(3)
 
 with summary_col1:
     st.markdown("""
-    <div class="live-signal">
-        <h4>🟢 Best Long Opportunities</h4>
+    <div style="background: #d4edda; color: #155724; padding: 12px; border-radius: 8px; margin: 5px 0; text-align: center; font-weight: bold; border: 1px solid #c3e6cb;">
+        <h4 style="margin: 0 0 8px 0; color: #155724;">🟢 Best Long Opportunities</h4>
+        <div style="text-align: left; font-size: 0.9em; line-height: 1.4; color: #155724;">
         <strong>Morning (9:15-11:00):</strong><br>
         • NIFTY, BANKNIFTY<br>
         • Banking, FMCG, Pharma<br>
@@ -1403,13 +1456,15 @@ with summary_col1:
         • BITCOIN bullish<br>
         <strong>US Hours (19:00-23:00):</strong><br>
         • DOW JONES positive
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
 with summary_col2:
     st.markdown("""
-    <div class="warning-signal">
-        <h4>🔴 Short Opportunities</h4>
+    <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin: 5px 0; text-align: center; font-weight: bold; border: 1px solid #f5c6cb;">
+        <h4 style="margin: 0 0 8px 0; color: #721c24;">🔴 Short Opportunities</h4>
+        <div style="text-align: left; font-size: 0.9em; line-height: 1.4; color: #721c24;">
         <strong>Midday (12:00-14:00):</strong><br>
         • NIFTY, BANKNIFTY profit booking<br>
         • IT, Metals weak<br>
@@ -1418,21 +1473,55 @@ with summary_col2:
         • Volatile during inventory<br>
         <strong>Late night (02:00-06:00):</strong><br>
         • BITCOIN bearish
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Summary & Recommendations - Compact
+summary_col1, summary_col2, summary_col3 = st.columns(3)
+
+with summary_col1:
+    st.markdown("""
+    <div style="background: #c8e6c9; color: #1b5e20; padding: 10px; border-radius: 6px; margin: 3px 0; text-align: center; font-weight: bold; border: 2px solid #388e3c;">
+        <h5 style="margin: 0 0 5px 0; color: #1b5e20;">🟢 Best Long Opportunities</h5>
+        <div style="text-align: left; font-size: 0.85em; line-height: 1.3; color: #1b5e20;">
+        <strong>Morning (9:15-11:00):</strong><br>
+        <span style="background: #2e7d32; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 1em;">BUY NIFTY, BANKNIFTY</span><br>
+        <span style="background: #388e3c; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 1em;">BUY Banking, FMCG</span><br><br>
+        <strong>Evening (20:00-23:30):</strong><br>
+        <span style="background: #43a047; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 1em;">BUY GOLD, SILVER</span><br>
+        <span style="background: #4caf50; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 1em;">BUY BITCOIN</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with summary_col2:
+    st.markdown("""
+    <div style="background: #ffcdd2; color: #b71c1c; padding: 10px; border-radius: 6px; margin: 3px 0; text-align: center; font-weight: bold; border: 2px solid #d32f2f;">
+        <h5 style="margin: 0 0 5px 0; color: #b71c1c;">🔴 Short Opportunities</h5>
+        <div style="text-align: left; font-size: 0.85em; line-height: 1.3; color: #b71c1c;">
+        <strong>Midday (12:00-14:00):</strong><br>
+        <span style="background: #c62828; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 1em;">SELL NIFTY, BANKNIFTY</span><br>
+        <span style="background: #d32f2f; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 1em;">SHORT IT, Metals</span><br><br>
+        <strong>Crude Oil:</strong><br>
+        <span style="background: #f44336; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 1em;">SELL 10:00-12:00</span><br>
+        <span style="background: #e53935; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 1em;">SHORT BITCOIN 02:00-06:00</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
 with summary_col3:
     st.markdown("""
-    <div class="planetary-hour">
-        <h4>⚡ High Risk Periods</h4>
-        <strong>13:00-14:00 (Mars Hour):</strong><br>
-        • All indices volatile<br>
-        • Energy sector swings<br>
+    <div style="background: #fff8e1; color: #e65100; padding: 10px; border-radius: 6px; margin: 3px 0; text-align: center; font-weight: bold; border: 2px solid #f57c00;">
+        <h5 style="margin: 0 0 5px 0; color: #e65100;">⚡ High Risk Periods</h5>
+        <div style="text-align: left; font-size: 0.85em; line-height: 1.3; color: #e65100;">
+        <strong>13:00-14:00 (Mars):</strong><br>
+        <span style="background: #ef6c00; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 1em;">⚠️ ALL VOLATILE</span><br><br>
         <strong>Crude Inventory (20:00):</strong><br>
-        • Extreme volatility<br>
-        <strong>Rahu Hours (14:00-15:00):</strong><br>
-        • Tech stocks pressure<br>
-        • BITCOIN caution
+        <span style="background: #f57c00; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 1em;">AVOID TRADING</span><br><br>
+        <strong>Rahu (14:00-15:00):</strong><br>
+        <span style="background: #ff9800; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 1em;">TECH PRESSURE</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1442,7 +1531,12 @@ st.subheader("📅 Astrological Data Management")
 astro_mgmt_col1, astro_mgmt_col2, astro_mgmt_col3 = st.columns(3)
 
 with astro_mgmt_col1:
-    st.info(f"📅 **Current Astro Data Date:** {st.session_state.astro_data_date}")
+    st.markdown(f"""
+    <div style="background: #e3f2fd; color: #1565c0; padding: 10px; border-radius: 6px; border: 1px solid #2196f3;">
+        <strong style="color: #1565c0;">📅 Current Astro Data Date:</strong><br>
+        <span style="color: #0d47a1; font-weight: bold;">{st.session_state.astro_data_date}</span>
+    </div>
+    """, unsafe_allow_html=True)
 
 with astro_mgmt_col2:
     if st.button("🔄 Update Astro Data", help="Recalculate planetary positions and market timing"):
@@ -1457,13 +1551,13 @@ with astro_mgmt_col3:
         hours_old = (datetime.now() - data_date).total_seconds() / 3600
         
         if hours_old < 1:
-            st.success("🟢 Data: Fresh")
+            st.markdown('<div style="background: #d4edda; color: #155724; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold;">🟢 Data: Fresh</div>', unsafe_allow_html=True)
         elif hours_old < 6:
-            st.warning("🟡 Data: Recent")
+            st.markdown('<div style="background: #fff3cd; color: #856404; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold;">🟡 Data: Recent</div>', unsafe_allow_html=True)
         else:
-            st.error("🔴 Data: Update needed")
+            st.markdown('<div style="background: #f8d7da; color: #721c24; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold;">🔴 Data: Update needed</div>', unsafe_allow_html=True)
     except:
-        st.info("🔵 Data: Unknown age")
+        st.markdown('<div style="background: #e3f2fd; color: #1565c0; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold;">🔵 Data: Unknown age</div>', unsafe_allow_html=True)
 
 # Current Market Prices for New Markets
 st.subheader("💰 Live Prices - Commodities & Global")
@@ -1490,10 +1584,10 @@ for idx, market in enumerate(markets_to_show):
         
         with [price_col1, price_col2, price_col3, price_col4, price_col5][idx]:
             st.markdown(f"""
-            <div class="market-card">
-                <h5>{market}</h5>
-                <h3>{price_str}</h3>
-                <p class="{color_class}">
+            <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; text-align: center; margin: 5px 0; border: 1px solid #dee2e6;">
+                <h5 style="margin: 0 0 3px 0; color: #495057;">{market}</h5>
+                <h3 style="margin: 0 0 3px 0; color: #212529;">{price_str}</h3>
+                <p class="{color_class}" style="margin: 0; font-size: 0.9em;">
                     {arrow} {abs(data['change']):.2f}%
                 </p>
             </div>
