@@ -589,7 +589,20 @@ st.markdown("""
 tomorrow = datetime.now() + timedelta(days=1)
 tomorrow_date = tomorrow.strftime('%B %d, %Y (%A)')
 
-st.markdown(f"### 📅 Forecast for {tomorrow_date}")
+forecast_header_col1, forecast_header_col2 = st.columns([3, 1])
+
+with forecast_header_col1:
+    st.markdown(f"### 📅 Forecast for {tomorrow_date}")
+
+with forecast_header_col2:
+    if st.session_state.get('show_commodity_forecast', False):
+        if st.button("🏭 Hide Commodity Forecast", help="Hide commodity forecast section"):
+            st.session_state.show_commodity_forecast = False
+            st.rerun()
+    else:
+        if st.button("🏭 View Commodity Forecast", help="Jump to tomorrow's commodity-specific planetary forecast"):
+            st.session_state.show_commodity_forecast = True
+            st.rerun()
 
 # Tomorrow's planetary transit schedule
 tomorrow_transits = [
@@ -926,7 +939,17 @@ with nifty_banknifty_col1:
         """, unsafe_allow_html=True)
 
 # COMMODITIES & GLOBAL MARKETS Astro Timing
-st.subheader("🏭 Commodities & Global Markets Astrological Signals")
+commodity_header_col1, commodity_header_col2 = st.columns([3, 1])
+
+with commodity_header_col1:
+    st.subheader("🏭 Commodities & Global Markets Astrological Signals")
+
+with commodity_header_col2:
+    show_commodity_forecast = st.checkbox("📅 Tomorrow's Commodity Forecast", value=st.session_state.get('show_commodity_forecast', False), help="Show detailed commodity planetary transits for tomorrow")
+    if show_commodity_forecast:
+        st.session_state.show_commodity_forecast = True
+    else:
+        st.session_state.show_commodity_forecast = False
 
 # Create tabs for different market types
 commodity_tab1, commodity_tab2, commodity_tab3 = st.tabs(["🥇 Precious Metals", "🛢️ Energy & Crypto", "🌍 Global Indices"])
@@ -1119,6 +1142,226 @@ with commodity_tab3:
         st.info("🔵 Asian Markets Active - Prepare for US session")
     else:
         st.info("⏳ Waiting for US market opening at 7:00 PM IST")
+
+# TOMORROW'S COMMODITY FORECAST (Conditional Display)
+if st.session_state.get('show_commodity_forecast', False):
+    commodity_forecast_col1, commodity_forecast_col2 = st.columns([4, 1])
+    
+    with commodity_forecast_col1:
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: #ffffff; padding: 15px; border-radius: 10px; margin: 15px 0;">
+            <h3 style="margin: 0 0 5px 0; color: #ffffff;">🔮 Tomorrow's Commodity Planetary Forecast</h3>
+            <p style="margin: 0; color: #ffffff; opacity: 0.9;">Detailed commodity timing with planetary transits for next trading day</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with commodity_forecast_col2:
+        if st.button("❌ Close", help="Close commodity forecast"):
+            st.session_state.show_commodity_forecast = False
+            st.rerun()
+    
+    # Tomorrow's commodity predictions with enhanced planetary timing
+    tomorrow_commodity_forecast = [
+        {
+            'time': '06:00-09:00',
+            'planet': 'Saturn ♄',
+            'planetary_effect': 'Restrictive & Slow',
+            'commodities': {
+                'GOLD': {'trend': 'Neutral', 'signal': 'WAIT', 'target': '±0.3%', 'reasoning': 'Early morning consolidation'},
+                'SILVER': {'trend': 'Bearish', 'signal': 'AVOID', 'target': '-0.8%', 'reasoning': 'Industrial metal weakness'},
+                'CRUDE': {'trend': 'Volatile', 'signal': 'CAUTION', 'target': '±2.1%', 'reasoning': 'Asian pre-market uncertainty'},
+                'BITCOIN': {'trend': 'Bearish', 'signal': 'SELL', 'target': '-3.2%', 'reasoning': 'Crypto night session decline'}
+            },
+            'description': 'Pre-market Asian session - Saturn restricts growth, low liquidity'
+        },
+        {
+            'time': '09:00-12:00',
+            'planet': 'Moon 🌙',
+            'planetary_effect': 'Emotional & Nurturing',
+            'commodities': {
+                'GOLD': {'trend': 'Bullish', 'signal': 'BUY', 'target': '+1.2%', 'reasoning': 'Safe haven demand strong'},
+                'SILVER': {'trend': 'Strong Bullish', 'signal': 'STRONG BUY', 'target': '+2.5%', 'reasoning': 'Industrial + safe haven combo'},
+                'CRUDE': {'trend': 'Bearish', 'signal': 'SELL', 'target': '-1.8%', 'reasoning': 'Risk-off sentiment hurts energy'},
+                'BITCOIN': {'trend': 'Volatile', 'signal': 'CAUTION', 'target': '±4.5%', 'reasoning': 'Emotional trading in crypto'}
+            },
+            'description': 'Asian session - Moon favors precious metals, hurts risk assets'
+        },
+        {
+            'time': '12:00-15:00',
+            'planet': 'Mercury ☿',
+            'planetary_effect': 'Communicative & Technical',
+            'commodities': {
+                'GOLD': {'trend': 'Neutral', 'signal': 'HOLD', 'target': '±0.5%', 'reasoning': 'Technical consolidation'},
+                'SILVER': {'trend': 'Bullish', 'signal': 'BUY', 'target': '+1.8%', 'reasoning': 'Industrial demand recovery'},
+                'CRUDE': {'trend': 'Volatile', 'signal': 'SCALP', 'target': '±2.8%', 'reasoning': 'News-driven moves'},
+                'BITCOIN': {'trend': 'Bullish', 'signal': 'BUY', 'target': '+3.1%', 'reasoning': 'Tech adoption news positive'}
+            },
+            'description': 'Midday session - Mercury brings technical analysis focus'
+        },
+        {
+            'time': '15:00-18:00',
+            'planet': 'Venus ♀',
+            'planetary_effect': 'Harmonious & Luxurious',
+            'commodities': {
+                'GOLD': {'trend': 'Bullish', 'signal': 'BUY', 'target': '+1.0%', 'reasoning': 'Luxury demand increases'},
+                'SILVER': {'trend': 'Strong Bullish', 'signal': 'STRONG BUY', 'target': '+2.8%', 'reasoning': 'Jewelry & industrial demand'},
+                'CRUDE': {'trend': 'Bullish', 'signal': 'BUY', 'target': '+1.5%', 'reasoning': 'Economic activity pickup'},
+                'BITCOIN': {'trend': 'Bullish', 'signal': 'BUY', 'target': '+2.7%', 'reasoning': 'Digital luxury asset appeal'}
+            },
+            'description': 'European session - Venus harmonizes all commodity markets'
+        },
+        {
+            'time': '18:00-21:00',
+            'planet': 'Jupiter ♃',
+            'planetary_effect': 'Expansive & Prosperous',
+            'commodities': {
+                'GOLD': {'trend': 'Strong Bullish', 'signal': 'STRONG BUY', 'target': '+2.2%', 'reasoning': 'Jupiter expands precious metal value'},
+                'SILVER': {'trend': 'Strong Bullish', 'signal': 'STRONG BUY', 'target': '+3.5%', 'reasoning': 'Peak prosperity phase'},
+                'CRUDE': {'trend': 'Volatile', 'signal': 'CAUTION', 'target': '±3.0%', 'reasoning': 'Expansion vs inventory concerns'},
+                'BITCOIN': {'trend': 'Strong Bullish', 'signal': 'STRONG BUY', 'target': '+5.2%', 'reasoning': 'Jupiter rules digital expansion'}
+            },
+            'description': '🌟 PRIME TIME - Jupiter\'s expansion benefits all stores of value'
+        },
+        {
+            'time': '21:00-00:00',
+            'planet': 'Mars ♂️',
+            'planetary_effect': 'Aggressive & Volatile',
+            'commodities': {
+                'GOLD': {'trend': 'Bullish', 'signal': 'BUY', 'target': '+1.5%', 'reasoning': 'Safe haven in volatile times'},
+                'SILVER': {'trend': 'Volatile', 'signal': 'CAUTION', 'target': '±2.2%', 'reasoning': 'Industrial uncertainty'},
+                'CRUDE': {'trend': 'Bearish', 'signal': 'SELL', 'target': '-2.1%', 'reasoning': 'Aggressive selling pressure'},
+                'BITCOIN': {'trend': 'Volatile', 'signal': 'TIGHT STOPS', 'target': '±4.8%', 'reasoning': 'Mars brings extreme swings'}
+            },
+            'description': 'Late US session - Mars creates volatility, gold remains defensive'
+        }
+    ]
+    
+    # Display tomorrow's commodity forecast
+    for forecast in tomorrow_commodity_forecast:
+        st.markdown(f"""
+        <div style="background: #f5f5f5; color: #333; padding: 10px; border-radius: 6px; margin: 5px 0; border-left: 4px solid #ff6b35;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <h6 style="margin: 0; color: #333; font-weight: bold;">{forecast['planet']} {forecast['time']}</h6>
+                <small style="color: #666; font-style: italic;">Effect: {forecast['planetary_effect']}</small>
+            </div>
+            <small style="color: #555; font-size: 0.8em;">{forecast['description']}</small>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display commodity signals in a compact grid
+        commodity_cols = st.columns(4)
+        commodities = ['GOLD', 'SILVER', 'CRUDE', 'BITCOIN']
+        
+        for idx, commodity in enumerate(commodities):
+            if commodity in forecast['commodities']:
+                comm_data = forecast['commodities'][commodity]
+                
+                # Determine colors based on trend
+                if 'Strong Bullish' in comm_data['trend']:
+                    bg_color = '#2e7d32'
+                    text_color = '#ffffff'
+                    signal_icon = '🟢🟢'
+                elif 'Bullish' in comm_data['trend']:
+                    bg_color = '#c8e6c9'
+                    text_color = '#1b5e20'
+                    signal_icon = '🟢'
+                elif 'Bearish' in comm_data['trend']:
+                    bg_color = '#ffcdd2'
+                    text_color = '#b71c1c'
+                    signal_icon = '🔴'
+                elif 'Volatile' in comm_data['trend']:
+                    bg_color = '#fff8e1'
+                    text_color = '#e65100'
+                    signal_icon = '⚡'
+                else:
+                    bg_color = '#f5f5f5'
+                    text_color = '#616161'
+                    signal_icon = '🟡'
+                
+                with commodity_cols[idx]:
+                    st.markdown(f"""
+                    <div style="background: {bg_color}; color: {text_color}; padding: 8px; border-radius: 5px; margin: 2px; text-align: center; border: 1px solid {text_color};">
+                        <h6 style="margin: 0 0 3px 0; color: {text_color}; font-size: 0.9em;">{signal_icon} {commodity}</h6>
+                        <div style="font-size: 0.8em;">
+                        <span style="background: rgba(0,0,0,0.3); color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 0.85em;">{comm_data['signal']}</span><br>
+                        <small style="color: {text_color}; font-weight: bold;">{comm_data['target']}</small><br>
+                        <small style="color: {text_color}; opacity: 0.8; font-size: 0.75em;">{comm_data['reasoning']}</small>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+    
+    # Tomorrow's commodity highlights
+    st.markdown("### 🎯 Tomorrow's Commodity Highlights")
+    
+    commodity_highlight_col1, commodity_highlight_col2, commodity_highlight_col3 = st.columns(3)
+    
+    with commodity_highlight_col1:
+        st.markdown("""
+        <div style="background: #c8e6c9; color: #1b5e20; padding: 10px; border-radius: 6px; border: 2px solid #388e3c;">
+            <h6 style="margin: 0 0 5px 0; color: #1b5e20;">🥇 Best Commodity Opportunities</h6>
+            <div style="font-size: 0.85em; line-height: 1.3; color: #1b5e20;">
+            <strong>18:00-21:00 (Jupiter ♃):</strong><br>
+            <span style="background: #2e7d32; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">GOLD +2.2%</span><br>
+            <span style="background: #388e3c; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">SILVER +3.5%</span><br>
+            <span style="background: #43a047; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">BITCOIN +5.2%</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with commodity_highlight_col2:
+        st.markdown("""
+        <div style="background: #ffcdd2; color: #b71c1c; padding: 10px; border-radius: 6px; border: 2px solid #d32f2f;">
+            <h6 style="margin: 0 0 5px 0; color: #b71c1c;">🛢️ Commodity Warnings</h6>
+            <div style="font-size: 0.85em; line-height: 1.3; color: #b71c1c;">
+            <strong>09:00-12:00:</strong><br>
+            <span style="background: #c62828; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">CRUDE SELL -1.8%</span><br><br>
+            <strong>21:00-00:00:</strong><br>
+            <span style="background: #d32f2f; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">CRUDE SELL -2.1%</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with commodity_highlight_col3:
+        st.markdown("""
+        <div style="background: #fff8e1; color: #e65100; padding: 10px; border-radius: 6px; border: 2px solid #f57c00;">
+            <h6 style="margin: 0 0 5px 0; color: #e65100;">⚡ High Volatility Windows</h6>
+            <div style="font-size: 0.85em; line-height: 1.3; color: #e65100;">
+            <strong>06:00-09:00 (Saturn ♄):</strong><br>
+            <span style="background: #ef6c00; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">BITCOIN VOLATILE ±3.2%</span><br><br>
+            <strong>21:00-00:00 (Mars ♂️):</strong><br>
+            <span style="background: #f57c00; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">ALL COMMODITIES RISK</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Quick commodity trading plan for tomorrow
+    st.markdown("### 📋 Tomorrow's Commodity Trading Plan")
+    
+    plan_col1, plan_col2 = st.columns(2)
+    
+    with plan_col1:
+        st.markdown("""
+        <div style="background: #e8f5e8; color: #1b5e20; padding: 10px; border-radius: 6px; border: 2px solid #2e7d32;">
+            <h6 style="margin: 0 0 5px 0; color: #1b5e20;">✅ Recommended Actions</h6>
+            <div style="font-size: 0.85em; line-height: 1.3; color: #1b5e20;">
+            <strong>09:00-12:00:</strong> <span style="background: #2e7d32; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">BUY GOLD & SILVER</span><br>
+            <strong>15:00-18:00:</strong> <span style="background: #388e3c; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">BUY ALL COMMODITIES</span><br>
+            <strong>18:00-21:00:</strong> <span style="background: #1b5e20; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">PEAK BUY TIME</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with plan_col2:
+        st.markdown("""
+        <div style="background: #ffebee; color: #b71c1c; padding: 10px; border-radius: 6px; border: 2px solid #c62828;">
+            <h6 style="margin: 0 0 5px 0; color: #b71c1c;">❌ Avoid These Periods</h6>
+            <div style="font-size: 0.85em; line-height: 1.3; color: #b71c1c;">
+            <strong>06:00-09:00:</strong> <span style="background: #c62828; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">AVOID BITCOIN</span><br>
+            <strong>09:00-12:00:</strong> <span style="background: #d32f2f; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">SHORT CRUDE</span><br>
+            <strong>21:00-00:00:</strong> <span style="background: #f44336; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">HIGH RISK ALL</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 # Show all currently active opportunities across all markets
 st.subheader("🎯 All Active Trading Opportunities RIGHT NOW")
