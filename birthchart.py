@@ -2087,9 +2087,14 @@ with analysis_tab2:
                 st.success(f"Analyzing {custom_stock.upper()}...")
     
     if custom_stock:
-        st.markdown(f"### 📊 {custom_stock.upper()} - Planetary Transit Analysis")
+        st.markdown(f"""
+        <div style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 12px; border-radius: 8px; margin: 10px 0;">
+            <h3 style="margin: 0; color: white;">📊 {custom_stock.upper()} - Planetary Transit Analysis</h3>
+            <p style="margin: 0; opacity: 0.9;">Analysis Period: {custom_analysis_period}</p>
+        </div>
+        """, unsafe_allow_html=True)
         
-        # Generate custom stock analysis
+        # Generate custom stock analysis based on selected period
         custom_today_signals = [
             {'time': '09:30-10:30', 'planet': 'Venus ♀', 'trend': 'Bullish', 'signal': 'BUY', 'reasoning': 'Venus hora supports stock growth'},
             {'time': '11:00-12:00', 'planet': 'Sun ☀️', 'trend': 'Bullish', 'signal': 'BUY', 'reasoning': 'Solar energy boosts performance'},
@@ -2106,74 +2111,276 @@ with analysis_tab2:
             {'time': '15:15-15:30', 'planet': 'Sun ☀️', 'trend': 'Bullish', 'signal': 'BUY', 'reasoning': 'Solar recovery rally'}
         ]
         
-        # Display custom analysis
-        custom_tab1, custom_tab2 = st.tabs([f"📅 Today - {custom_stock.upper()}", f"📅 Tomorrow - {custom_stock.upper()}"])
-        
-        with custom_tab1:
-            st.markdown("#### Today's Planetary Signals")
-            custom_today_cols = st.columns(5)
+        if custom_analysis_period == "Today & Tomorrow":
+            # Display today and tomorrow analysis (existing code)
+            custom_tab1, custom_tab2 = st.tabs([f"📅 Today - {custom_stock.upper()}", f"📅 Tomorrow - {custom_stock.upper()}"])
             
-            for idx, signal in enumerate(custom_today_signals):
-                if signal['trend'] == 'Strong Bullish':
-                    bg_color = '#2e7d32'
-                    text_color = '#ffffff'
-                elif signal['trend'] == 'Bullish':
-                    bg_color = '#c8e6c9'
-                    text_color = '#1b5e20'
-                elif signal['trend'] == 'Bearish':
-                    bg_color = '#ffcdd2'
-                    text_color = '#b71c1c'
-                elif signal['trend'] == 'Volatile':
-                    bg_color = '#fff8e1'
-                    text_color = '#e65100'
-                else:
-                    bg_color = '#f5f5f5'
-                    text_color = '#616161'
+            with custom_tab1:
+                st.markdown(f"#### Today's Planetary Signals for {custom_stock.upper()}")
+                custom_today_cols = st.columns(5)
                 
-                is_active_now = is_time_in_range(current_time_str, signal['time'])
-                active_indicator = " 🔥" if is_active_now else ""
-                
-                with custom_today_cols[idx]:
-                    st.markdown(f"""
-                    <div style="background: {bg_color}; color: {text_color}; padding: 8px; border-radius: 5px; margin: 3px 0; text-align: center; border: 2px solid {text_color if not is_active_now else '#ff6b35'};">
-                        <h6 style="margin: 0 0 3px 0; color: {text_color}; font-size: 0.8em;">{signal['time']}{active_indicator}</h6>
-                        <div style="font-size: 0.8em;">
-                        <span style="background: rgba(0,0,0,0.3); color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 0.9em;">{signal['signal']}</span><br>
-                        <small style="color: {text_color}; font-weight: bold;">{signal['planet']}</small><br>
-                        <small style="color: {text_color}; font-size: 0.7em;">{signal['reasoning']}</small>
+                for idx, signal in enumerate(custom_today_signals):
+                    if signal['trend'] == 'Strong Bullish':
+                        bg_color = '#2e7d32'
+                        text_color = '#ffffff'
+                    elif signal['trend'] == 'Bullish':
+                        bg_color = '#c8e6c9'
+                        text_color = '#1b5e20'
+                    elif signal['trend'] == 'Bearish':
+                        bg_color = '#ffcdd2'
+                        text_color = '#b71c1c'
+                    elif signal['trend'] == 'Volatile':
+                        bg_color = '#fff8e1'
+                        text_color = '#e65100'
+                    else:
+                        bg_color = '#f5f5f5'
+                        text_color = '#616161'
+                    
+                    is_active_now = is_time_in_range(current_time_str, signal['time'])
+                    active_indicator = " 🔥" if is_active_now else ""
+                    
+                    with custom_today_cols[idx]:
+                        st.markdown(f"""
+                        <div style="background: {bg_color}; color: {text_color}; padding: 8px; border-radius: 5px; margin: 3px 0; text-align: center; border: 2px solid {text_color if not is_active_now else '#ff6b35'};">
+                            <h6 style="margin: 0 0 3px 0; color: {text_color}; font-size: 0.8em;">{signal['time']}{active_indicator}</h6>
+                            <div style="font-size: 0.8em;">
+                            <span style="background: rgba(0,0,0,0.3); color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 0.9em;">{signal['signal']}</span><br>
+                            <small style="color: {text_color}; font-weight: bold;">{signal['planet']}</small><br>
+                            <small style="color: {text_color}; font-size: 0.7em;">{signal['reasoning']}</small>
+                            </div>
                         </div>
-                    </div>
-                    """, unsafe_allow_html=True)
-        
-        with custom_tab2:
-            st.markdown("#### Tomorrow's Planetary Signals")
-            custom_tomorrow_cols = st.columns(5)
+                        """, unsafe_allow_html=True)
             
-            for idx, signal in enumerate(custom_tomorrow_signals):
-                if signal['trend'] == 'Strong Bullish':
+            with custom_tab2:
+                st.markdown(f"#### Tomorrow's Planetary Signals for {custom_stock.upper()}")
+                custom_tomorrow_cols = st.columns(5)
+                
+                for idx, signal in enumerate(custom_tomorrow_signals):
+                    if signal['trend'] == 'Strong Bullish':
+                        bg_color = '#2e7d32'
+                        text_color = '#ffffff'
+                    elif signal['trend'] == 'Bullish':
+                        bg_color = '#c8e6c9'
+                        text_color = '#1b5e20'
+                    elif signal['trend'] == 'Bearish':
+                        bg_color = '#ffcdd2'
+                        text_color = '#b71c1c'
+                    elif signal['trend'] == 'Volatile':
+                        bg_color = '#fff8e1'
+                        text_color = '#e65100'
+                    else:
+                        bg_color = '#f5f5f5'
+                        text_color = '#616161'
+                    
+                    with custom_tomorrow_cols[idx]:
+                        st.markdown(f"""
+                        <div style="background: {bg_color}; color: {text_color}; padding: 8px; border-radius: 5px; margin: 3px 0; text-align: center; border: 2px solid {text_color};">
+                            <h6 style="margin: 0 0 3px 0; color: {text_color}; font-size: 0.8em;">{signal['time']}</h6>
+                            <div style="font-size: 0.8em;">
+                            <span style="background: rgba(0,0,0,0.3); color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 0.9em;">{signal['signal']}</span><br>
+                            <small style="color: {text_color}; font-weight: bold;">{signal['planet']}</small><br>
+                            <small style="color: {text_color}; font-size: 0.7em;">{signal['reasoning']}</small>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+        
+        elif custom_analysis_period == "This Week":
+            # Weekly analysis for custom stock
+            st.markdown(f"### 📅 Weekly Planetary Forecast for {custom_stock.upper()}")
+            
+            weekly_stock_data = [
+                {'date': 'Mon, Aug 04', 'planet': 'Sun ☀️', 'trend': 'Bullish', 'signal': 'BUY', 'best_time': '11:00-12:00', 'target': '+1.5%', 'reasoning': 'Solar energy supports stock momentum'},
+                {'date': 'Tue, Aug 05', 'planet': 'Moon 🌙', 'trend': 'Volatile', 'signal': 'CAUTION', 'best_time': '09:15-10:15', 'target': '±2.1%', 'reasoning': 'Emotional market swings affect price'},
+                {'date': 'Wed, Aug 06', 'planet': 'Mars ♂️', 'trend': 'Volatile', 'signal': 'SCALP', 'best_time': '13:00-14:00', 'target': '±2.8%', 'reasoning': 'Mars creates aggressive price action'},
+                {'date': 'Thu, Aug 07', 'planet': 'Mercury ☿', 'trend': 'Bearish', 'signal': 'SELL', 'best_time': '14:00-15:00', 'target': '-1.3%', 'reasoning': 'Mercury retrograde effect on communication'},
+                {'date': 'Fri, Aug 08', 'planet': 'Jupiter ♃', 'trend': 'Strong Bullish', 'signal': 'STRONG BUY', 'best_time': '12:15-13:15', 'target': '+2.7%', 'reasoning': 'Jupiter expansion blesses the stock'},
+                {'date': 'Sat, Aug 09', 'planet': 'Venus ♀', 'trend': 'Bullish', 'signal': 'BUY', 'best_time': '10:00-12:00', 'target': '+1.8%', 'reasoning': 'Venus harmony supports upward movement'},
+                {'date': 'Sun, Aug 10', 'planet': 'Saturn ♄', 'trend': 'Bearish', 'signal': 'AVOID', 'best_time': 'No Trading', 'target': '-0.9%', 'reasoning': 'Saturn restriction limits growth'}
+            ]
+            
+            for day_data in weekly_stock_data:
+                if day_data['trend'] == 'Strong Bullish':
                     bg_color = '#2e7d32'
                     text_color = '#ffffff'
-                elif signal['trend'] == 'Bullish':
+                    day_icon = '🟢🟢'
+                elif day_data['trend'] == 'Bullish':
                     bg_color = '#c8e6c9'
                     text_color = '#1b5e20'
-                elif signal['trend'] == 'Bearish':
+                    day_icon = '🟢'
+                elif day_data['trend'] == 'Bearish':
                     bg_color = '#ffcdd2'
                     text_color = '#b71c1c'
-                elif signal['trend'] == 'Volatile':
+                    day_icon = '🔴'
+                elif day_data['trend'] == 'Volatile':
                     bg_color = '#fff8e1'
                     text_color = '#e65100'
+                    day_icon = '⚡'
                 else:
                     bg_color = '#f5f5f5'
                     text_color = '#616161'
+                    day_icon = '🟡'
                 
-                with custom_tomorrow_cols[idx]:
+                # Check if it's today
+                is_today = 'Aug 04' in day_data['date']  # Assuming Aug 4 is today for example
+                border_style = f"border: 3px solid #ff6b35;" if is_today else f"border: 2px solid {text_color};"
+                
+                st.markdown(f"""
+                <div style="background: {bg_color}; color: {text_color}; padding: 10px; border-radius: 6px; margin: 5px 0; {border_style}">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h5 style="margin: 0; color: {text_color};">{day_icon} {day_data['date']} - {day_data['planet']}{'  🌟 TODAY' if is_today else ''}</h5>
+                        <span style="background: {text_color}; color: white; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 0.8em;">{day_data['trend'].upper()}</span>
+                    </div>
+                    <div style="margin-top: 5px; font-size: 0.9em; line-height: 1.3;">
+                        <strong>Signal:</strong> <span style="background: rgba(0,0,0,0.3); color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 1.1em;">{day_data['signal']}</span> | 
+                        <strong>Best Time:</strong> {day_data['best_time']} | <strong>Target:</strong> {day_data['target']}<br>
+                        <strong>Reasoning:</strong> {day_data['reasoning']}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+        
+        elif custom_analysis_period == "This Month":
+            # Monthly analysis for custom stock
+            st.markdown(f"### 📆 Monthly Planetary Forecast for {custom_stock.upper()}")
+            
+            monthly_stock_data = [
+                {'date': 'Aug 01-03', 'period': 'Early Month', 'dominant_planet': 'Jupiter ♃', 'trend': 'Bullish', 'key_days': 'Aug 01, 02', 'avoid_days': 'Aug 03', 'best_strategy': 'Accumulate on dips'},
+                {'date': 'Aug 04-10', 'period': 'First Week', 'dominant_planet': 'Sun ☀️', 'trend': 'Strong Bullish', 'key_days': 'Aug 04, 08, 09', 'avoid_days': 'Aug 07, 10', 'best_strategy': 'Aggressive buying'},
+                {'date': 'Aug 11-17', 'period': 'Second Week', 'dominant_planet': 'Venus ♀', 'trend': 'Bullish', 'key_days': 'Aug 11, 15, 16', 'avoid_days': 'Aug 14, 17', 'best_strategy': 'Steady accumulation'},
+                {'date': 'Aug 18-24', 'period': 'Third Week', 'dominant_planet': 'Mars ♂️', 'trend': 'Volatile', 'key_days': 'Aug 19, 22', 'avoid_days': 'Aug 21, 24', 'best_strategy': 'Intraday trading only'},
+                {'date': 'Aug 25-31', 'period': 'Month End', 'dominant_planet': 'Mercury ☿', 'trend': 'Bearish', 'key_days': 'Aug 29', 'avoid_days': 'Aug 28, 31', 'best_strategy': 'Book profits, reduce positions'}
+            ]
+            
+            for period_data in monthly_stock_data:
+                if period_data['trend'] == 'Strong Bullish':
+                    bg_color = '#2e7d32'
+                    text_color = '#ffffff'
+                    period_icon = '🟢🟢'
+                elif period_data['trend'] == 'Bullish':
+                    bg_color = '#c8e6c9'
+                    text_color = '#1b5e20'
+                    period_icon = '🟢'
+                elif period_data['trend'] == 'Bearish':
+                    bg_color = '#ffcdd2'
+                    text_color = '#b71c1c'
+                    period_icon = '🔴'
+                elif period_data['trend'] == 'Volatile':
+                    bg_color = '#fff8e1'
+                    text_color = '#e65100'
+                    period_icon = '⚡'
+                else:
+                    bg_color = '#f5f5f5'
+                    text_color = '#616161'
+                    period_icon = '🟡'
+                
+                st.markdown(f"""
+                <div style="background: {bg_color}; color: {text_color}; padding: 12px; border-radius: 8px; margin: 8px 0; border: 2px solid {text_color};">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h5 style="margin: 0; color: {text_color};">{period_icon} {period_data['period']} ({period_data['date']})</h5>
+                        <span style="background: {text_color}; color: white; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 0.8em;">{period_data['trend'].upper()}</span>
+                    </div>
+                    <div style="font-size: 0.9em; line-height: 1.4;">
+                        <strong>Dominant Planet:</strong> {period_data['dominant_planet']}<br>
+                        <strong>🟢 Best Trading Days:</strong> <span style="background: #2e7d32; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">{period_data['key_days']}</span><br>
+                        <strong>🔴 Avoid Days:</strong> <span style="background: #c62828; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">{period_data['avoid_days']}</span><br>
+                        <strong>📈 Strategy:</strong> <span style="background: rgba(0,0,0,0.2); color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 1.05em;">{period_data['best_strategy']}</span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # Monthly summary for the stock
+            st.markdown(f"### 📊 {custom_stock.upper()} - Monthly Summary")
+            
+            summary_col1, summary_col2, summary_col3 = st.columns(3)
+            
+            with summary_col1:
+                st.markdown(f"""
+                <div style="background: #c8e6c9; color: #1b5e20; padding: 10px; border-radius: 6px; border: 2px solid #2e7d32;">
+                    <h6 style="margin: 0 0 5px 0; color: #1b5e20;">🎯 Best Opportunities</h6>
+                    <div style="font-size: 0.85em; color: #1b5e20;">
+                    <strong>Peak Period:</strong> Aug 04-10<br>
+                    <span style="background: #2e7d32; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">AGGRESSIVE BUY</span><br>
+                    <strong>Expected Move:</strong> +8-12%<br>
+                    <strong>Key Dates:</strong> Aug 1, 8, 9, 15, 16
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with summary_col2:
+                st.markdown(f"""
+                <div style="background: #ffcdd2; color: #b71c1c; padding: 10px; border-radius: 6px; border: 2px solid #c62828;">
+                    <h6 style="margin: 0 0 5px 0; color: #b71c1c;">⚠️ Risk Periods</h6>
+                    <div style="font-size: 0.85em; color: #b71c1c;">
+                    <strong>Weak Period:</strong> Aug 25-31<br>
+                    <span style="background: #c62828; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">BOOK PROFITS</span><br>
+                    <strong>Expected Drop:</strong> -5-8%<br>
+                    <strong>Avoid:</strong> Aug 7, 10, 14, 21, 28, 31
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with summary_col3:
+                st.markdown(f"""
+                <div style="background: #fff8e1; color: #e65100; padding: 10px; border-radius: 6px; border: 2px solid #f57c00;">
+                    <h6 style="margin: 0 0 5px 0; color: #e65100;">⚡ Volatile Periods</h6>
+                    <div style="font-size: 0.85em; color: #e65100;">
+                    <strong>High Vol:</strong> Aug 18-24<br>
+                    <span style="background: #f57c00; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">INTRADAY ONLY</span><br>
+                    <strong>Swings:</strong> ±3-5% daily<br>
+                    <strong>Mars Influence:</strong> Use tight stops
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+        
+        else:  # This Week option
+            # Weekly detailed day-by-day analysis
+            st.markdown(f"### 📅 This Week's Daily Signals for {custom_stock.upper()}")
+            
+            week_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+            week_planets = ['Sun ☀️', 'Moon 🌙', 'Mars ♂️', 'Mercury ☿', 'Jupiter ♃', 'Venus ♀', 'Saturn ♄']
+            week_trends = ['Bullish', 'Volatile', 'Volatile', 'Bearish', 'Strong Bullish', 'Bullish', 'Bearish']
+            week_signals = ['BUY', 'CAUTION', 'SCALP', 'SELL', 'STRONG BUY', 'BUY', 'AVOID']
+            week_times = ['11:00-12:00', '09:15-10:15', '13:00-14:00', '14:00-15:00', '12:15-13:15', '10:00-12:00', 'No Trading']
+            week_targets = ['+1.5%', '±2.1%', '±2.8%', '-1.3%', '+2.7%', '+1.8%', '-0.9%']
+            
+            daily_cols = st.columns(7)
+            
+            for idx, day in enumerate(week_days):
+                trend = week_trends[idx]
+                
+                if trend == 'Strong Bullish':
+                    bg_color = '#2e7d32'
+                    text_color = '#ffffff'
+                    day_icon = '🟢🟢'
+                elif trend == 'Bullish':
+                    bg_color = '#c8e6c9'
+                    text_color = '#1b5e20'
+                    day_icon = '🟢'
+                elif trend == 'Bearish':
+                    bg_color = '#ffcdd2'
+                    text_color = '#b71c1c'
+                    day_icon = '🔴'
+                elif trend == 'Volatile':
+                    bg_color = '#fff8e1'
+                    text_color = '#e65100'
+                    day_icon = '⚡'
+                else:
+                    bg_color = '#f5f5f5'
+                    text_color = '#616161'
+                    day_icon = '🟡'
+                
+                is_today = idx == 0  # Assuming Monday is today for example
+                border_style = f"border: 3px solid #ff6b35;" if is_today else f"border: 2px solid {text_color};"
+                
+                with daily_cols[idx]:
                     st.markdown(f"""
-                    <div style="background: {bg_color}; color: {text_color}; padding: 8px; border-radius: 5px; margin: 3px 0; text-align: center; border: 2px solid {text_color};">
-                        <h6 style="margin: 0 0 3px 0; color: {text_color}; font-size: 0.8em;">{signal['time']}</h6>
-                        <div style="font-size: 0.8em;">
-                        <span style="background: rgba(0,0,0,0.3); color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 0.9em;">{signal['signal']}</span><br>
-                        <small style="color: {text_color}; font-weight: bold;">{signal['planet']}</small><br>
-                        <small style="color: {text_color}; font-size: 0.7em;">{signal['reasoning']}</small>
+                    <div style="background: {bg_color}; color: {text_color}; padding: 8px; border-radius: 5px; margin: 3px 0; text-align: center; {border_style}">
+                        <h6 style="margin: 0 0 3px 0; color: {text_color}; font-size: 0.8em;">{day}{'  🌟' if is_today else ''}</h6>
+                        <div style="font-size: 0.75em;">
+                        {day_icon}<br>
+                        <span style="background: rgba(0,0,0,0.3); color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; font-size: 0.8em;">{week_signals[idx]}</span><br>
+                        <small style="color: {text_color}; font-weight: bold;">{week_planets[idx]}</small><br>
+                        <small style="color: {text_color};">{week_times[idx]}</small><br>
+                        <small style="color: {text_color}; font-weight: bold;">{week_targets[idx]}</small>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
