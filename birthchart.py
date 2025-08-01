@@ -683,13 +683,14 @@ with main_tab1:
     </div>
     """, unsafe_allow_html=True)
     
-    # All Market Types - Including NEW SECTORWISE
-    equity_tab, commodity_tab, forex_tab, global_tab, sectorwise_tab = st.tabs([
+    # All Market Types - Including NEW SECTORWISE and PLANETARY TRANSIT
+    equity_tab, commodity_tab, forex_tab, global_tab, sectorwise_tab, planetary_tab = st.tabs([
         "📈 EQUITY", 
         "🏭 COMMODITIES", 
         "💱 FOREX", 
         "🌍 GLOBAL", 
-        "🏢 SECTORWISE"
+        "🏢 SECTORWISE",
+        "🪐 PLANETARY TRANSIT"
     ])
     
     with equity_tab:
