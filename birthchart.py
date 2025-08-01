@@ -3,6 +3,7 @@ import pandas as pd
 import random
 from datetime import datetime, timedelta
 import time
+import pytz
 
 # Page configuration
 st.set_page_config(
@@ -329,7 +330,8 @@ try:
         }
     
     if 'last_update' not in st.session_state:
-        st.session_state.last_update = datetime.now()
+        ist_tz = pytz.timezone('Asia/Kolkata')
+        st.session_state.last_update = datetime.now(ist_tz)
 
 except Exception as e:
     st.error(f"Error initializing data: {e}")
@@ -348,7 +350,9 @@ def update_market_data():
             if data['price'] < data['low']:
                 data['low'] = data['price']
         
-        st.session_state.last_update = datetime.now()
+        # Use IST timezone for last update
+        ist_tz = pytz.timezone('Asia/Kolkata')
+        st.session_state.last_update = datetime.now(ist_tz)
         return True
     except Exception as e:
         st.error(f"Error updating market data: {e}")
@@ -368,7 +372,8 @@ def get_planetary_influence(hour):
 
 def get_planetary_transits():
     """Get current planetary transit data - Based on Real Astronomical Positions for Aug 1, 2025"""
-    current_date = datetime.now()
+    ist_tz = pytz.timezone('Asia/Kolkata')
+    current_date = datetime.now(ist_tz)
     current_time = current_date.strftime('%H:%M')
     
     # Real planetary positions for August 1, 2025 (based on astronomical ephemeris)
@@ -525,7 +530,8 @@ def create_intraday_signals(market_name):
 
 def generate_weekly_calendar(market_name):
     """Generate weekly planetary calendar"""
-    today = datetime.now()
+    ist_tz = pytz.timezone('Asia/Kolkata')
+    today = datetime.now(ist_tz)
     week_start = today - timedelta(days=today.weekday())
     
     weekly_data = []
@@ -871,11 +877,12 @@ def create_timeframe_tabs(market_name, market_type=""):
             </div>
             """, unsafe_allow_html=True)
 
-# Get current date and time
-current_date = datetime.now()
+# Get current date and time in IST
+ist_tz = pytz.timezone('Asia/Kolkata')
+current_date = datetime.now(ist_tz)
 current_date_str = current_date.strftime('%d %B %Y')
 current_day = current_date.strftime('%A')
-current_time_str = current_date.strftime('%H:%M:%S')  # This was missing!
+current_time_str = current_date.strftime('%H:%M:%S')  # Now properly in IST!
 tomorrow_date = (current_date + timedelta(days=1)).strftime('%d %B %Y')
 tomorrow_day = (current_date + timedelta(days=1)).strftime('%A')
 
