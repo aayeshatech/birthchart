@@ -2097,33 +2097,537 @@ with main_tab1:
                 weekly_data = generate_symbol_weekly_data(custom_symbol.upper())
                 
                 # Display weekly calendar
-            # Show individual stocks for selected sector (only when no custom symbol)
-            if not custom_symbol and selected_sector in st.session_state.sector_data:
-                st.markdown(f"### 📈 Top Stocks in {selected_sector} Sector")
-                
-                stocks = st.session_state.sector_data[selected_sector]['stocks']
-                
-                # Create stock grid
-                stock_cols = st.columns(5)
-                
-                for idx, stock in enumerate(stocks):
-                    col_idx = idx % 5
-                    
-                    # Generate random data for demonstration
+def generate_stock_planetary_signals(stock_name, sector_type):
+    """Generate planetary transit signals for individual stocks"""
+    
+    # Determine stock characteristics based on name and sector
+    stock_signals = []
+    
+    # Base planetary hours for different sectors
+    if sector_type == 'banking':
+        planetary_focus = {
+            'Jupiter ♃': {'strength': 'Maximum', 'bias': 'Strong Bullish'},
+            'Sun ☀️': {'strength': 'Strong', 'bias': 'Bullish'},
+            'Venus ♀': {'strength': 'Good', 'bias': 'Bullish'},
+            'Mercury ☿': {'strength': 'Moderate', 'bias': 'Neutral'},
+            'Saturn ♄': {'strength': 'Weak', 'bias': 'Bearish'},
+            'Mars ♂️': {'strength': 'High', 'bias': 'Volatile'},
+            'Moon 🌙': {'strength': 'Good', 'bias': 'Bullish'}
+        }
+    elif sector_type == 'tech':
+        planetary_focus = {
+            'Mercury ☿': {'strength': 'Maximum', 'bias': 'Strong Bearish'},
+            'Jupiter ♃': {'strength': 'Good', 'bias': 'Recovery'},
+            'Venus ♀': {'strength': 'Moderate', 'bias': 'Neutral'},
+            'Sun ☀️': {'strength': 'Good', 'bias': 'Bullish'},
+            'Saturn ♄': {'strength': 'Weak', 'bias': 'Strong Bearish'},
+            'Mars ♂️': {'strength': 'Extreme', 'bias': 'Volatile'},
+            'Moon 🌙': {'strength': 'Moderate', 'bias': 'Neutral'}
+        }
+    elif sector_type == 'pharma':
+        planetary_focus = {
+            'Sun ☀️': {'strength': 'Maximum', 'bias': 'Strong Bullish'},
+            'Jupiter ♃': {'strength': 'Strong', 'bias': 'Bullish'},
+            'Saturn ♄': {'strength': 'Moderate', 'bias': 'Cautious'},
+            'Venus ♀': {'strength': 'Good', 'bias': 'Bullish'},
+            'Mercury ☿': {'strength': 'Good', 'bias': 'Bullish'},
+            'Mars ♂️': {'strength': 'Moderate', 'bias': 'Bearish'},
+            'Moon 🌙': {'strength': 'Good', 'bias': 'Bullish'}
+        }
+    elif sector_type == 'auto':
+        planetary_focus = {
+            'Venus ♀': {'strength': 'Maximum', 'bias': 'Strong Bullish'},
+            'Mars ♂️': {'strength': 'Strong', 'bias': 'Bullish'},
+            'Sun ☀️': {'strength': 'Good', 'bias': 'Bullish'},
+            'Mercury ☿': {'strength': 'Moderate', 'bias': 'Neutral'},
+            'Jupiter ♃': {'strength': 'Good', 'bias': 'Bullish'},
+            'Saturn ♄': {'strength': 'Weak', 'bias': 'Bearish'},
+            'Moon 🌙': {'strength': 'Moderate', 'bias': 'Neutral'}
+        }
+    else:
+        # General sector
+        planetary_focus = {
+            'Jupiter ♃': {'strength': 'Strong', 'bias': 'Bullish'},
+            'Sun ☀️': {'strength': 'Strong', 'bias': 'Bullish'},
+            'Venus ♀': {'strength': 'Good', 'bias': 'Bullish'},
+            'Mercury ☿': {'strength': 'Moderate', 'bias': 'Neutral'},
+            'Saturn ♄': {'strength': 'Weak', 'bias': 'Bearish'},
+            'Mars ♂️': {'strength': 'High', 'bias': 'Volatile'},
+            'Moon 🌙': {'strength': 'Good', 'bias': 'Bullish'}
+        }
+    
+    # Generate signals for market hours
+    market_hours = [
+        {'time': '09:15-10:15', 'planet': 'Venus ♀'},
+        {'time': '10:15-11:15', 'planet': 'Sun ☀️'},
+        {'time': '11:15-12:15', 'planet': 'Mercury ☿'},
+        {'time': '12:15-13:15', 'planet': 'Saturn ♄'},
+        {'time': '13:15-14:15', 'planet': 'Jupiter ♃'},
+        {'time': '14:15-15:15', 'planet': 'Mars ♂️'},
+        {'time': '15:15-15:30', 'planet': 'Sun ☀️'}
+    ]
+    
+    for hour in market_hours:
+        planet = hour['planet']
+        planet_info = planetary_focus.get(planet, {'strength': 'Moderate', 'bias': 'Neutral'})
+        
+        # Generate signal based on planetary bias
+        if planet_info['bias'] == 'Strong Bullish':
+            signal = 'STRONG BUY'
+            target = f"+{random.uniform(1.5, 3.0):.1f}%"
+        elif planet_info['bias'] == 'Bullish':
+            signal = 'BUY'
+            target = f"+{random.uniform(0.8, 2.0):.1f}%"
+        elif planet_info['bias'] == 'Strong Bearish':
+            signal = 'STRONG SELL'
+            target = f"-{random.uniform(1.5, 2.5):.1f}%"
+        elif planet_info['bias'] == 'Bearish':
+            signal = 'SELL'
+            target = f"-{random.uniform(0.8, 1.8):.1f}%"
+        elif planet_info['bias'] == 'Volatile':
+            signal = 'CAUTION'
+            target = f"±{random.uniform(1.5, 3.0):.1f}%"
+        else:
+            signal = 'HOLD'
+            target = f"±{random.uniform(0.3, 0.8):.1f}%"
+        
+        stock_signals.append({
+            'time': hour['time'],
+            'planet': planet,
+            'signal': signal,
+            'target': target,
+            'trend': planet_info['bias'],
+            'strength': planet_info['strength']
+        })
+    
+    return stock_signals
+
+def display_sector_stocks_with_transits(sector_name, stocks):
+    """Display sector stocks with planetary transit information"""
+    
+    # Determine sector type
+    if 'BANK' in sector_name.upper():
+        sector_type = 'banking'
+    elif 'IT' in sector_name.upper():
+        sector_type = 'tech'
+    elif 'PHARMA' in sector_name.upper():
+        sector_type = 'pharma'
+    elif 'AUTO' in sector_name.upper():
+        sector_type = 'auto'
+    elif 'METAL' in sector_name.upper():
+        sector_type = 'metal'
+    else:
+        sector_type = 'general'
+    
+    st.markdown(f"### 🌟 {sector_name} Stocks - Live Planetary Transit Analysis")
+    
+    # Current time info
+    ist_tz = pytz.timezone('Asia/Kolkata')
+    current_time = datetime.now(ist_tz)
+    current_hour = current_time.hour
+    
+    # Find current planetary hour
+    current_planetary_hour = None
+    market_hours = [
+        {'time': '09:15-10:15', 'planet': 'Venus ♀'},
+        {'time': '10:15-11:15', 'planet': 'Sun ☀️'},
+        {'time': '11:15-12:15', 'planet': 'Mercury ☿'},
+        {'time': '12:15-13:15', 'planet': 'Saturn ♄'},
+        {'time': '13:15-14:15', 'planet': 'Jupiter ♃'},
+        {'time': '14:15-15:15', 'planet': 'Mars ♂️'},
+        {'time': '15:15-15:30', 'planet': 'Sun ☀️'}
+    ]
+    
+    for hour_info in market_hours:
+        start_hour = int(hour_info['time'].split('-')[0].split(':')[0])
+        end_hour = int(hour_info['time'].split('-')[1].split(':')[0])
+        if start_hour <= current_hour < end_hour:
+            current_planetary_hour = hour_info
+            break
+    
+    # Display current planetary hour for sector
+    if current_planetary_hour:
+        st.markdown(f"""
+        <div class="live-signal" style="margin: 10px 0;">
+            <h4 style="margin: 0;">🔥 CURRENT HOUR: {current_planetary_hour['time']} - {current_planetary_hour['planet']}</h4>
+            <p style="margin: 5px 0 0 0;">Active for {sector_name} Sector | Time: {current_time.strftime('%H:%M:%S')} IST</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Display stocks in a dynamic grid with planetary signals
+    for i in range(0, len(stocks), 2):  # 2 stocks per row for better layout
+        cols = st.columns(2)
+        
+        for j, stock in enumerate(stocks[i:i+2]):
+            if j < len(cols):
+                with cols[j]:
+                    # Generate stock data and signals
                     stock_data = generate_symbol_data(stock)
+                    stock_signals = generate_stock_planetary_signals(stock, sector_type)
+                    
+                    # Find current signal for this stock
+                    current_signal = None
+                    if current_planetary_hour:
+                        for signal in stock_signals:
+                            if signal['time'] == current_planetary_hour['time']:
+                                current_signal = signal
+                                break
+                    
+                    # Stock price card with live signal
                     color_class = "positive" if stock_data['change'] >= 0 else "negative"
                     arrow = "▲" if stock_data['change'] >= 0 else "▼"
                     
-                    with stock_cols[col_idx]:
+                    # Dynamic background based on current signal
+                    if current_signal:
+                        if 'BUY' in current_signal['signal']:
+                            card_bg = 'background: linear-gradient(135deg, #d4edda, #c3e6cb); border: 3px solid #28a745;'
+                            live_indicator = '🟢 LIVE BUY'
+                        elif 'SELL' in current_signal['signal']:
+                            card_bg = 'background: linear-gradient(135deg, #f8d7da, #f1c3c6); border: 3px solid #dc3545;'
+                            live_indicator = '🔴 LIVE SELL'
+                        else:
+                            card_bg = 'background: linear-gradient(135deg, #fff3cd, #ffeeba); border: 3px solid #ffc107;'
+                            live_indicator = '⚡ LIVE CAUTION'
+                    else:
+                        card_bg = 'background: #ffffff; border: 2px solid #dee2e6;'
+                        live_indicator = ''
+                    
+                    st.markdown(f"""
+                    <div style="{card_bg} padding: 15px; border-radius: 12px; margin: 10px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="margin: 0; color: #333; font-weight: bold;">{stock}</h4>
+                            {f'<span style="font-size: 0.8em; font-weight: bold; padding: 2px 6px; border-radius: 4px; background: #ff6b35; color: white;">{live_indicator}</span>' if live_indicator else ''}
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div>
+                                <h2 style="margin: 0; color: #007bff;">₹{stock_data['price']:,.1f}</h2>
+                                <h4 class="{color_class}" style="margin: 0;">
+                                    {arrow} {abs(stock_data['change']):.2f}%
+                                </h4>
+                            </div>
+                            <div style="text-align: right; font-size: 0.9em;">
+                                <p style="margin: 0;"><strong>Vol:</strong> {stock_data['volume']:,}</p>
+                                <p style="margin: 0;"><strong>MCap:</strong> ₹{stock_data['market_cap']:,}Cr</p>
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # Current planetary signal details
+                    if current_signal:
+                        signal_color = '#28a745' if 'BUY' in current_signal['signal'] else '#dc3545' if 'SELL' in current_signal['signal'] else '#ffc107'
+                        
                         st.markdown(f"""
-                        <div class="stock-card">
-                            <h6 style="margin: 0 0 8px 0; font-weight: bold; color: #333;">{stock}</h6>
-                            <h4 style="margin: 0; color: #007bff;">₹{stock_data['price']:.1f}</h4>
-                            <p class="{color_class}" style="margin: 5px 0 0 0; font-weight: bold;">
-                                {arrow} {abs(stock_data['change']):.2f}%
-                            </p>
+                        <div style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 8px; margin: 10px 0;">
+                            <h5 style="margin: 0 0 5px 0; color: #333;">🕐 Current Hour: {current_signal['time']}</h5>
+                            <p style="margin: 0; font-size: 0.9em;"><strong>Planet:</strong> {current_signal['planet']} | <strong>Strength:</strong> {current_signal['strength']}</p>
+                            <p style="margin: 0; font-size: 1em;"><strong>Signal:</strong> <span style="background: {signal_color}; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold;">{current_signal['signal']}</span></p>
+                            <p style="margin: 0; font-size: 0.9em;"><strong>Target:</strong> {current_signal['target']} | <strong>Trend:</strong> {current_signal['trend']}</p>
                         </div>
                         """, unsafe_allow_html=True)
+                    
+                    # Next 3 hours preview
+                    st.markdown("**🔮 Next 3 Hours:**")
+                    next_signals = stock_signals[min(len(stock_signals)-1, max(0, next((i for i, s in enumerate(stock_signals) if current_signal and s['time'] == current_signal['time']), 0) + 1)):min(len(stock_signals), max(0, next((i for i, s in enumerate(stock_signals) if current_signal and s['time'] == current_signal['time']), 0) + 4))]
+                    
+                    for next_signal in next_signals:
+                        signal_icon = '🟢' if 'BUY' in next_signal['signal'] else '🔴' if 'SELL' in next_signal['signal'] else '⚡'
+                        st.markdown(f"""
+                        <div style="font-size: 0.85em; padding: 3px 0; border-bottom: 1px solid rgba(0,0,0,0.1);">
+                            {signal_icon} <strong>{next_signal['time']}</strong> {next_signal['planet']} → <strong>{next_signal['signal']}</strong> ({next_signal['target']})
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
+                    st.markdown("</div>", unsafe_allow_html=True)
+
+def display_dynamic_sector_analysis(sector_name, stocks, current_hour):
+    """Display dynamic sector analysis with enhanced layout"""
+    
+    # Sector overview with live planetary status
+    sector_col1, sector_col2, sector_col3 = st.columns([2, 2, 1])
+    
+    with sector_col1:
+        st.markdown(f"### 🏢 {sector_name} Sector Overview")
+        
+        # Calculate sector sentiment
+        bullish_stocks = random.randint(3, 7)
+        bearish_stocks = random.randint(2, 5)
+        neutral_stocks = len(stocks) - bullish_stocks - bearish_stocks
+        
+        sector_sentiment = "BULLISH" if bullish_stocks > bearish_stocks else "BEARISH" if bearish_stocks > bullish_stocks else "NEUTRAL"
+        sentiment_color = "#28a745" if sector_sentiment == "BULLISH" else "#dc3545" if sector_sentiment == "BEARISH" else "#ffc107"
+        
+        st.markdown(f"""
+        <div style="background: linear-gradient(45deg, #f8f9fa, #e9ecef); padding: 15px; border-radius: 10px; border-left: 5px solid {sentiment_color};">
+            <h4 style="margin: 0; color: {sentiment_color};">Sector Sentiment: {sector_sentiment}</h4>
+            <p style="margin: 5px 0 0 0;"><strong>Bullish:</strong> {bullish_stocks} stocks | <strong>Bearish:</strong> {bearish_stocks} stocks | <strong>Neutral:</strong> {neutral_stocks} stocks</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with sector_col2:
+        # Current planetary influence on sector
+        current_planet, current_symbol, current_influence = get_planetary_influence(current_hour)
+        
+        st.markdown(f"""
+        <div style="background: linear-gradient(45deg, #e3f2fd, #bbdefb); padding: 15px; border-radius: 10px; border-left: 5px solid #2196f3;">
+            <h4 style="margin: 0; color: #1565c0;">{current_symbol} Current Planet: {current_planet}</h4>
+            <p style="margin: 5px 0 0 0; color: #1565c0;">{current_influence}</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with sector_col3:
+        # Live market status
+        ist_tz = pytz.timezone('Asia/Kolkata')
+        current_time = datetime.now(ist_tz)
+        
+        if 9 <= current_hour <= 15:
+            market_status = "🟢 LIVE"
+            status_color = "#28a745"
+        elif current_hour < 9:
+            market_status = "🔵 PRE-MKT"
+            status_color = "#17a2b8"
+        else:
+            market_status = "🔴 CLOSED"
+            status_color = "#dc3545"
+        
+        st.markdown(f"""
+        <div style="background: {status_color}; color: white; padding: 10px; border-radius: 8px; text-align: center;">
+            <h4 style="margin: 0;">Market</h4>
+            <h3 style="margin: 0;">{market_status}</h3>
+            <p style="margin: 0; font-size: 0.8em;">{current_time.strftime('%H:%M:%S')}</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Enhanced sector analysis tabs
+    sector_analysis_tab1, sector_analysis_tab2, sector_analysis_tab3 = st.tabs([
+        "🔥 LIVE STOCKS TRANSIT", 
+        "📊 HOURLY HEATMAP", 
+        "🎯 SECTOR STRATEGY"
+    ])
+    
+    with sector_analysis_tab1:
+        st.markdown(f"#### 🌟 {sector_name} Individual Stocks - Live Planetary Transit")
+        display_sector_stocks_with_transits(sector_name, stocks)
+    
+    with sector_analysis_tab2:
+        st.markdown(f"#### 📊 {sector_name} - Hourly Planetary Heatmap")
+        
+        # Create hourly heatmap for the sector
+        st.markdown("**🕐 Complete Market Day Planetary Transit Schedule**")
+        
+        heatmap_data = [
+            {'time': '09:15-10:15', 'planet': 'Venus ♀', 'sector_effect': 'Strong' if sector_name.upper() in ['AUTO', 'FMCG'] else 'Moderate'},
+            {'time': '10:15-11:15', 'planet': 'Sun ☀️', 'sector_effect': 'Strong' if sector_name.upper() in ['PHARMA', 'PSU BANK'] else 'Good'},
+            {'time': '11:15-12:15', 'planet': 'Mercury ☿', 'sector_effect': 'Weak' if sector_name.upper() == 'IT' else 'Moderate'},
+            {'time': '12:15-13:15', 'planet': 'Saturn ♄', 'sector_effect': 'Strong' if sector_name.upper() == 'METAL' else 'Weak'},
+            {'time': '13:15-14:15', 'planet': 'Jupiter ♃', 'sector_effect': 'Maximum' if 'BANK' in sector_name.upper() else 'Strong'},
+            {'time': '14:15-15:15', 'planet': 'Mars ♂️', 'sector_effect': 'Strong' if sector_name.upper() in ['AUTO', 'METAL'] else 'Volatile'},
+            {'time': '15:15-15:30', 'planet': 'Sun ☀️', 'sector_effect': 'Good'}
+        ]
+        
+        heatmap_cols = st.columns(4)
+        
+        for idx, heat_data in enumerate(heatmap_data):
+            col_idx = idx % 4
+            
+            is_current = current_hour >= int(heat_data['time'].split('-')[0].split(':')[0]) and current_hour < int(heat_data['time'].split('-')[1].split(':')[0])
+            
+            if heat_data['sector_effect'] == 'Maximum':
+                bg_color = '#28a745'
+                intensity = '🔥🔥🔥'
+            elif heat_data['sector_effect'] == 'Strong':
+                bg_color = '#20c997'
+                intensity = '🔥🔥'
+            elif heat_data['sector_effect'] == 'Good':
+                bg_color = '#17a2b8'
+                intensity = '🔥'
+            elif heat_data['sector_effect'] == 'Weak':
+                bg_color = '#dc3545'
+                intensity = '❄️'
+            else:
+                bg_color = '#ffc107'
+                intensity = '⚡'
+            
+            border_style = 'border: 3px solid #ff6b35; animation: pulse 2s infinite;' if is_current else 'border: 2px solid #dee2e6;'
+            
+            with heatmap_cols[col_idx]:
+                st.markdown(f"""
+                <div style="background: {bg_color}; color: white; padding: 12px; border-radius: 8px; text-align: center; margin: 5px 0; {border_style}">
+                    <h5 style="margin: 0; font-size: 0.9em;">{heat_data['time']}</h5>
+                    <h4 style="margin: 0;">{heat_data['planet']}</h4>
+                    <p style="margin: 0; font-size: 0.8em;">{heat_data['sector_effect']}</p>
+                    <p style="margin: 0;">{intensity}</p>
+                    {f'<p style="margin: 5px 0 0 0; font-size: 0.7em; background: #ff6b35; padding: 2px 4px; border-radius: 3px;">LIVE NOW</p>' if is_current else ''}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Sector-specific planetary insights
+        st.markdown(f"### 🌟 {sector_name} - Planetary Insights")
+        
+        insight_col1, insight_col2 = st.columns(2)
+        
+        with insight_col1:
+            st.markdown("""
+            <div class="report-section" style="background: #d4edda; border-left: 5px solid #28a745;">
+                <h4 style="color: #155724;">🟢 POWER HOURS for this Sector</h4>
+            """, unsafe_allow_html=True)
+            
+            # Sector-specific power hours
+            if 'BANK' in sector_name.upper():
+                power_hours = [
+                    "13:15-14:15 (Jupiter ♃) - Peak Banking Hour",
+                    "10:15-11:15 (Sun ☀️) - Government Support",
+                    "09:15-10:15 (Venus ♀) - Liquidity Strength"
+                ]
+            elif sector_name.upper() == 'IT':
+                power_hours = [
+                    "15:15-15:30 (Sun ☀️) - Closing Recovery",
+                    "13:15-14:15 (Jupiter ♃) - Institutional Support",
+                    "09:15-10:15 (Venus ♀) - Opening Stability"
+                ]
+            elif sector_name.upper() == 'PHARMA':
+                power_hours = [
+                    "10:15-11:15 (Sun ☀️) - Maximum Strength",
+                    "13:15-14:15 (Jupiter ♃) - Growth Phase",
+                    "11:15-12:15 (Mercury ☿) - Research Focus"
+                ]
+            elif sector_name.upper() == 'AUTO':
+                power_hours = [
+                    "09:15-10:15 (Venus ♀) - Peak Auto Hour",
+                    "14:15-15:15 (Mars ♂️) - Manufacturing Power",
+                    "10:15-11:15 (Sun ☀️) - Industrial Strength"
+                ]
+            else:
+                power_hours = [
+                    "13:15-14:15 (Jupiter ♃) - Growth Phase",
+                    "10:15-11:15 (Sun ☀️) - Strength Phase",
+                    "09:15-10:15 (Venus ♀) - Opening Strength"
+                ]
+            
+            for hour in power_hours:
+                st.markdown(f"• **{hour}**")
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+        
+        with insight_col2:
+            st.markdown("""
+            <div class="report-section" style="background: #f8d7da; border-left: 5px solid #dc3545;">
+                <h4 style="color: #721c24;">⚠️ CAUTION HOURS for this Sector</h4>
+            """, unsafe_allow_html=True)
+            
+            # Sector-specific caution hours
+            if 'BANK' in sector_name.upper():
+                caution_hours = [
+                    "12:15-13:15 (Saturn ♄) - Regulatory Pressure",
+                    "14:15-15:15 (Mars ♂️) - High Volatility",
+                    "11:15-12:15 (Mercury ☿) - News Sensitivity"
+                ]
+            elif sector_name.upper() == 'IT':
+                caution_hours = [
+                    "11:15-12:15 (Mercury ☿) - Extreme Pressure",
+                    "12:15-13:15 (Saturn ♄) - Strong Bearish",
+                    "14:15-15:15 (Mars ♂️) - Extreme Volatility"
+                ]
+            elif sector_name.upper() == 'PHARMA':
+                caution_hours = [
+                    "14:15-15:15 (Mars ♂️) - Regulatory Risk",
+                    "12:15-13:15 (Saturn ♄) - Compliance Issues"
+                ]
+            else:
+                caution_hours = [
+                    "12:15-13:15 (Saturn ♄) - Market Pressure",
+                    "14:15-15:15 (Mars ♂️) - High Volatility"
+                ]
+            
+            for hour in caution_hours:
+                st.markdown(f"• **{hour}**")
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+    
+    with sector_analysis_tab3:
+        st.markdown(f"#### 🎯 {sector_name} - Complete Trading Strategy")
+        
+        strategy_col1, strategy_col2 = st.columns(2)
+        
+        with strategy_col1:
+            st.markdown("""
+            <div class="report-section" style="background: #e8f5e8; border-left: 5px solid #28a745;">
+                <h4 style="color: #155724;">📈 LONG STRATEGY</h4>
+            """, unsafe_allow_html=True)
+            
+            long_strategies = [
+                "**Best Entry Time:** During Jupiter ♃ and Sun ☀️ hours",
+                "**Accumulation:** Use Venus ♀ hour for bulk buying",
+                "**Position Building:** 30% position in power hours",
+                "**Stop Loss:** Below Saturn ♄ hour low",
+                "**Target:** 15-25% in favorable planetary periods"
+            ]
+            
+            for strategy in long_strategies:
+                st.markdown(f"• {strategy}")
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+        
+        with strategy_col2:
+            st.markdown("""
+            <div class="report-section" style="background: #fde8e8; border-left: 5px solid #dc3545;">
+                <h4 style="color: #721c24;">📉 SHORT STRATEGY</h4>
+            """, unsafe_allow_html=True)
+            
+            short_strategies = [
+                "**Best Short Time:** During Saturn ♄ and Mars ♂️ hours",
+                "**Entry:** Short on rallies in weak planetary hours",
+                "**Risk Management:** Cover shorts in Jupiter ♃ hour",
+                "**Target:** 8-15% decline in bearish periods",
+                "**Stop Loss:** Above Jupiter ♃ hour high"
+            ]
+            
+            for strategy in short_strategies:
+                st.markdown(f"• {strategy}")
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+        
+        # Sector risk matrix
+        st.markdown(f"### ⚖️ {sector_name} - Risk vs Opportunity Matrix")
+        
+        risk_matrix_cols = st.columns(3)
+        
+        with risk_matrix_cols[0]:
+            risk_level = random.choice(['Low', 'Medium', 'High'])
+            risk_color = '#28a745' if risk_level == 'Low' else '#ffc107' if risk_level == 'Medium' else '#dc3545'
+            
+            st.markdown(f"""
+            <div style="background: {risk_color}; color: white; padding: 12px; border-radius: 8px; text-align: center;">
+                <h4 style="margin: 0;">Risk Level</h4>
+                <h2 style="margin: 0;">{risk_level}</h2>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with risk_matrix_cols[1]:
+            opportunity_score = random.randint(6, 9)
+            opp_color = '#28a745' if opportunity_score >= 8 else '#ffc107' if opportunity_score >= 7 else '#dc3545'
+            
+            st.markdown(f"""
+            <div style="background: {opp_color}; color: white; padding: 12px; border-radius: 8px; text-align: center;">
+                <h4 style="margin: 0;">Opportunity</h4>
+                <h2 style="margin: 0;">{opportunity_score}/10</h2>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with risk_matrix_cols[2]:
+            timeframe = random.choice(['1-3 Days', '1 Week', '2-3 Weeks'])
+            
+            st.markdown(f"""
+            <div style="background: #6f42c1; color: white; padding: 12px; border-radius: 8px; text-align: center;">
+                <h4 style="margin: 0;">Best Timeframe</h4>
+                <h2 style="margin: 0; font-size: 1.2em;">{timeframe}</h2>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Show sector stocks with planetary transits (only when no custom symbol)
+            if not custom_symbol and selected_sector in st.session_state.sector_data:
+                stocks = st.session_state.sector_data[selected_sector]['stocks']
+                display_dynamic_sector_analysis(selected_sector, stocks, current_hour)
             
             elif custom_symbol:
                 # Show additional analysis for custom symbol
@@ -2248,9 +2752,78 @@ with main_tab1:
                     """, unsafe_allow_html=True)
             
             else:
-                # Show sector weekly analysis (existing code)
+                # Show enhanced sector weekly analysis
                 weekly_data = generate_weekly_calendar(analysis_target)
                 display_calendar_grid(weekly_data, 7)
+                
+                # Enhanced sector weekly analysis
+                if selected_sector in st.session_state.sector_data:
+                    stocks = st.session_state.sector_data[selected_sector]['stocks']
+                    
+                    st.markdown(f"### 🌟 {selected_sector} Stocks - Weekly Planetary Performance")
+                    
+                    # Create enhanced weekly stock grid
+                    weekly_stock_cols = st.columns(2)
+                    
+                    for idx, stock in enumerate(stocks):
+                        col_idx = idx % 2
+                        
+                        # Generate weekly planetary data for each stock
+                        weekly_rating = random.choice(['Strong Buy', 'Buy', 'Hold', 'Sell', 'Strong Sell'])
+                        weekly_target = random.uniform(-15, 20)
+                        best_planet = random.choice(['Jupiter ♃', 'Sun ☀️', 'Venus ♀'])
+                        worst_planet = random.choice(['Saturn ♄', 'Mars ♂️', 'Mercury ☿'])
+                        
+                        # Weekly planetary schedule for stock
+                        weekly_schedule = [
+                            {'day': 'Mon', 'planet': 'Sun ☀️', 'signal': random.choice(['BUY', 'HOLD', 'SELL'])},
+                            {'day': 'Tue', 'planet': 'Moon 🌙', 'signal': random.choice(['BUY', 'HOLD', 'SELL'])},
+                            {'day': 'Wed', 'planet': 'Mars ♂️', 'signal': random.choice(['VOLATILE', 'SELL'])},
+                            {'day': 'Thu', 'planet': 'Mercury ☿', 'signal': random.choice(['HOLD', 'SELL'])},
+                            {'day': 'Fri', 'planet': 'Jupiter ♃', 'signal': random.choice(['STRONG BUY', 'BUY'])},
+                            {'day': 'Sat', 'planet': 'Venus ♀', 'signal': random.choice(['BUY', 'HOLD'])},
+                            {'day': 'Sun', 'planet': 'Saturn ♄', 'signal': random.choice(['SELL', 'HOLD'])}
+                        ]
+                        
+                        if weekly_rating in ['Strong Buy', 'Buy']:
+                            card_style = 'background: linear-gradient(135deg, #d4edda, #c3e6cb); border: 3px solid #28a745;'
+                            text_color = '#155724'
+                        elif weekly_rating in ['Strong Sell', 'Sell']:
+                            card_style = 'background: linear-gradient(135deg, #f8d7da, #f1c3c6); border: 3px solid #dc3545;'
+                            text_color = '#721c24'
+                        else:
+                            card_style = 'background: linear-gradient(135deg, #fff3cd, #ffeeba); border: 3px solid #ffc107;'
+                            text_color = '#856404'
+                        
+                        with weekly_stock_cols[col_idx]:
+                            st.markdown(f"""
+                            <div style="{card_style} padding: 15px; border-radius: 12px; margin: 8px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                <h4 style="margin: 0 0 10px 0; color: {text_color};">📊 {stock}</h4>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <div>
+                                        <p style="margin: 0; font-size: 1.1em; color: {text_color};"><strong>Rating:</strong> {weekly_rating}</p>
+                                        <p style="margin: 0; font-size: 1.1em; color: {text_color};"><strong>Target:</strong> {weekly_target:+.1f}%</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <p style="margin: 0; font-size: 0.9em; color: {text_color};"><strong>Best:</strong> {best_planet}</p>
+                                        <p style="margin: 0; font-size: 0.9em; color: {text_color};"><strong>Avoid:</strong> {worst_planet}</p>
+                                    </div>
+                                </div>
+                                
+                                <h5 style="margin: 10px 0 5px 0; color: {text_color};">📅 Weekly Planetary Schedule:</h5>
+                                <div style="background: rgba(255,255,255,0.3); padding: 8px; border-radius: 6px;">
+                            """, unsafe_allow_html=True)
+                            
+                            for day_info in weekly_schedule:
+                                signal_icon = '🟢' if 'BUY' in day_info['signal'] else '🔴' if 'SELL' in day_info['signal'] else '⚡'
+                                st.markdown(f"""
+                                <div style="font-size: 0.8em; padding: 2px 0; display: flex; justify-content: space-between;">
+                                    <span><strong>{day_info['day']}:</strong> {day_info['planet']}</span>
+                                    <span>{signal_icon} <strong>{day_info['signal']}</strong></span>
+                                </div>
+                                """, unsafe_allow_html=True)
+                            
+                            st.markdown("</div></div>", unsafe_allow_html=True)
                 
                 # Weekly Long/Short Analysis (for sectors)
                 st.markdown("### 🎯 Weekly Trading Opportunities")
@@ -2281,38 +2854,6 @@ with main_tab1:
                         st.markdown(f"**{day['day']}:** {day['planet']} | Target: {day['target']}")
                     
                     st.markdown("<p><strong>Strategy:</strong> Short on rallies during bearish days</p></div>", unsafe_allow_html=True)
-                
-                # Individual Stock Weekly Performance (for sectors)
-                if selected_sector in st.session_state.sector_data:
-                    st.markdown(f"### 📊 {selected_sector} Stocks - Weekly Outlook")
-                    
-                    stocks = st.session_state.sector_data[selected_sector]['stocks'][:8]  # Top 8 stocks
-                    perf_cols = st.columns(4)
-                    
-                    for idx, stock in enumerate(stocks):
-                        col_idx = idx % 4
-                        
-                        # Generate weekly performance
-                        weekly_outlook = random.choice(['Strong Buy', 'Buy', 'Hold', 'Sell'])
-                        weekly_target = random.uniform(-10, 15)
-                        
-                        if weekly_outlook == 'Strong Buy':
-                            css_class = 'performance-strong-buy'
-                        elif weekly_outlook == 'Buy':
-                            css_class = 'performance-buy'
-                        elif weekly_outlook == 'Sell':
-                            css_class = 'performance-sell'
-                        else:
-                            css_class = 'performance-hold'
-                        
-                        with perf_cols[col_idx]:
-                            st.markdown(f"""
-                            <div class="{css_class} performance-card">
-                                <h6 style="margin: 0 0 5px 0; font-weight: bold;">{stock}</h6>
-                                <p style="margin: 0; font-size: 0.9em;"><strong>{weekly_outlook}</strong></p>
-                                <p style="margin: 0; font-size: 0.9em;">Target: {weekly_target:+.1f}%</p>
-                            </div>
-                            """, unsafe_allow_html=True)
         
         with sector_tab3:
             st.markdown(f'<div class="timeframe-header"><h4>📅 {analysis_target} - Monthly Planetary Calendar</h4></div>', unsafe_allow_html=True)
