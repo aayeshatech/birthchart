@@ -223,6 +223,23 @@ st.markdown("""
     text-align: center;
     margin: 10px 0;
 }
+.planetary-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 15px 0;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+.transit-effect {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 10px 0;
+    border: 2px solid #dee2e6;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
 @keyframes pulse {
     0% { opacity: 1; }
     50% { opacity: 0.7; }
@@ -258,6 +275,7 @@ try:
             
             # Global Markets
             'DOWJONES': {'price': 44565, 'change': 0.85, 'high': 44750, 'low': 44200},
+            'SP500': {'price': 6090.27, 'change': 1.15, 'high': 6120, 'low': 6050},
             'NASDAQ': {'price': 20173, 'change': 1.25, 'high': 20350, 'low': 19850},
             
             # Forex
@@ -347,6 +365,105 @@ def get_planetary_influence(hour):
         15: ("Jupiter", "♃", "Banking recovery")
     }
     return planetary_hours.get(hour, ("Mixed", "🌟", "Multiple planetary influences"))
+
+def get_planetary_transits():
+    """Get current planetary transit data"""
+    current_date = datetime.now()
+    
+    transits = {
+        'Sun': {
+            'symbol': '☀️',
+            'sign': 'Leo',
+            'degree': '15°24\'',
+            'effect': 'Strong for Energy, Pharma, Government sectors',
+            'strength': 'Exalted',
+            'markets_affected': ['Energy', 'Pharma', 'Government PSUs'],
+            'trend': 'Bullish',
+            'duration': '30 days'
+        },
+        'Moon': {
+            'symbol': '🌙',
+            'sign': 'Cancer',
+            'degree': '8°12\'',
+            'effect': 'Favorable for FMCG, Dairy, Liquid commodities',
+            'strength': 'Own Sign',
+            'markets_affected': ['FMCG', 'Dairy', 'Silver'],
+            'trend': 'Bullish',
+            'duration': '2.5 days'
+        },
+        'Mars': {
+            'symbol': '♂️',
+            'sign': 'Aries',
+            'degree': '22°45\'',
+            'effect': 'Volatile for Defense, Steel, Energy sectors',
+            'strength': 'Own Sign',
+            'markets_affected': ['Defense', 'Steel', 'Energy'],
+            'trend': 'Volatile',
+            'duration': '45 days'
+        },
+        'Mercury': {
+            'symbol': '☿',
+            'sign': 'Virgo',
+            'degree': '5°33\'',
+            'effect': 'Mixed for IT, Communication, Media',
+            'strength': 'Own Sign',
+            'markets_affected': ['IT', 'Telecom', 'Media'],
+            'trend': 'Neutral',
+            'duration': '20 days'
+        },
+        'Jupiter': {
+            'symbol': '♃',
+            'sign': 'Taurus',
+            'degree': '18°56\'',
+            'effect': 'Highly favorable for Banking, Finance',
+            'strength': 'Friendly',
+            'markets_affected': ['Banking', 'Finance', 'Gold'],
+            'trend': 'Strong Bullish',
+            'duration': '12 months'
+        },
+        'Venus': {
+            'symbol': '♀',
+            'sign': 'Libra',
+            'degree': '11°28\'',
+            'effect': 'Excellent for Luxury, Auto, Textiles',
+            'strength': 'Own Sign',
+            'markets_affected': ['Auto', 'Textiles', 'Luxury'],
+            'trend': 'Bullish',
+            'duration': '25 days'
+        },
+        'Saturn': {
+            'symbol': '♄',
+            'sign': 'Aquarius',
+            'degree': '29°17\'',
+            'effect': 'Cautious for Metals, Mining, Oil',
+            'strength': 'Own Sign',
+            'markets_affected': ['Metals', 'Mining', 'Oil'],
+            'trend': 'Bearish',
+            'duration': '2.5 years'
+        },
+        'Rahu': {
+            'symbol': '☊',
+            'sign': 'Pisces',
+            'degree': '3°42\'',
+            'effect': 'Unpredictable for Tech, Crypto, Foreign stocks',
+            'strength': 'Neutral',
+            'markets_affected': ['Tech', 'Crypto', 'Foreign'],
+            'trend': 'Volatile',
+            'duration': '18 months'
+        },
+        'Ketu': {
+            'symbol': '☋',
+            'sign': 'Virgo',
+            'degree': '3°42\'',
+            'effect': 'Spiritual sectors, Healthcare supportive',
+            'strength': 'Neutral',
+            'markets_affected': ['Healthcare', 'Spiritual', 'Research'],
+            'trend': 'Supportive',
+            'duration': '18 months'
+        }
+    }
+    
+    return transits
 
 def create_intraday_signals(market_name):
     """Generate intraday hourly signals for any market"""
@@ -462,6 +579,118 @@ def create_timeframe_tabs(market_name, market_type=""):
     
     with tab1:
         st.markdown(f'<div class="timeframe-header"><h4>⚡ {market_name} - Today\'s Intraday Signals</h4></div>', unsafe_allow_html=True)
+        
+        # Show specific market details based on type
+        if market_type == "equity":
+            # Display NIFTY and BANKNIFTY details
+            equity_col1, equity_col2 = st.columns(2)
+            
+            with equity_col1:
+                nifty_data = st.session_state.market_data['NIFTY']
+                color_class = "positive" if nifty_data['change'] >= 0 else "negative"
+                arrow = "▲" if nifty_data['change'] >= 0 else "▼"
+                
+                st.markdown(f"""
+                <div class="sector-price-card">
+                    <h3 style="margin: 0 0 10px 0; color: #333;">📈 NIFTY 50</h3>
+                    <h1 style="margin: 0; color: #007bff;">{nifty_data['price']:,.2f}</h1>
+                    <h3 class="{color_class}" style="margin: 5px 0;">{arrow} {abs(nifty_data['change']):.2f}%</h3>
+                    <p style="margin: 0;"><strong>High:</strong> {nifty_data['high']:,.2f} | <strong>Low:</strong> {nifty_data['low']:,.2f}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with equity_col2:
+                banknifty_data = st.session_state.market_data['BANKNIFTY']
+                color_class = "positive" if banknifty_data['change'] >= 0 else "negative"
+                arrow = "▲" if banknifty_data['change'] >= 0 else "▼"
+                
+                st.markdown(f"""
+                <div class="sector-price-card">
+                    <h3 style="margin: 0 0 10px 0; color: #333;">🏦 BANKNIFTY</h3>
+                    <h1 style="margin: 0; color: #007bff;">{banknifty_data['price']:,.2f}</h1>
+                    <h3 class="{color_class}" style="margin: 5px 0;">{arrow} {abs(banknifty_data['change']):.2f}%</h3>
+                    <p style="margin: 0;"><strong>High:</strong> {banknifty_data['high']:,.2f} | <strong>Low:</strong> {banknifty_data['low']:,.2f}</p>
+                </div>
+                """, unsafe_allow_html=True)
+        
+        elif market_type == "commodity":
+            # Display Gold, Silver, Crude details
+            commodity_cols = st.columns(3)
+            
+            commodities = ['GOLD', 'SILVER', 'CRUDE']
+            icons = ['🥇', '🥈', '🛢️']
+            
+            for idx, (commodity, icon) in enumerate(zip(commodities, icons)):
+                with commodity_cols[idx]:
+                    data = st.session_state.market_data[commodity]
+                    color_class = "positive" if data['change'] >= 0 else "negative"
+                    arrow = "▲" if data['change'] >= 0 else "▼"
+                    
+                    st.markdown(f"""
+                    <div class="sector-price-card">
+                        <h4 style="margin: 0 0 10px 0; color: #333;">{icon} {commodity}</h4>
+                        <h2 style="margin: 0; color: #007bff;">₹{data['price']:,.0f}</h2>
+                        <h4 class="{color_class}" style="margin: 5px 0;">{arrow} {abs(data['change']):.2f}%</h4>
+                        <p style="margin: 0; font-size: 0.9em;"><strong>H:</strong> {data['high']:,.0f} | <strong>L:</strong> {data['low']:,.0f}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+        
+        elif market_type == "forex":
+            # Display USDINR and Bitcoin details
+            forex_col1, forex_col2 = st.columns(2)
+            
+            with forex_col1:
+                usdinr_data = st.session_state.market_data['USDINR']
+                color_class = "positive" if usdinr_data['change'] >= 0 else "negative"
+                arrow = "▲" if usdinr_data['change'] >= 0 else "▼"
+                
+                st.markdown(f"""
+                <div class="sector-price-card">
+                    <h3 style="margin: 0 0 10px 0; color: #333;">💵 USD/INR</h3>
+                    <h1 style="margin: 0; color: #007bff;">₹{usdinr_data['price']:.2f}</h1>
+                    <h3 class="{color_class}" style="margin: 5px 0;">{arrow} {abs(usdinr_data['change']):.2f}%</h3>
+                    <p style="margin: 0;"><strong>High:</strong> {usdinr_data['high']:.2f} | <strong>Low:</strong> {usdinr_data['low']:.2f}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with forex_col2:
+                btc_data = st.session_state.market_data['BITCOIN']
+                color_class = "positive" if btc_data['change'] >= 0 else "negative"
+                arrow = "▲" if btc_data['change'] >= 0 else "▼"
+                
+                st.markdown(f"""
+                <div class="sector-price-card">
+                    <h3 style="margin: 0 0 10px 0; color: #333;">₿ BITCOIN</h3>
+                    <h1 style="margin: 0; color: #007bff;">${btc_data['price']:,.0f}</h1>
+                    <h3 class="{color_class}" style="margin: 5px 0;">{arrow} {abs(btc_data['change']):.2f}%</h3>
+                    <p style="margin: 0;"><strong>High:</strong> ${btc_data['high']:,.0f} | <strong>Low:</strong> ${btc_data['low']:,.0f}</p>
+                </div>
+                """, unsafe_allow_html=True)
+        
+        elif market_type == "global":
+            # Display Dow Jones, S&P 500, NASDAQ details
+            global_cols = st.columns(3)
+            
+            global_markets = [
+                ('DOWJONES', '📊 DOW JONES'),
+                ('SP500', '📈 S&P 500'),
+                ('NASDAQ', '💻 NASDAQ')
+            ]
+            
+            for idx, (market_key, display_name) in enumerate(global_markets):
+                with global_cols[idx]:
+                    data = st.session_state.market_data[market_key]
+                    color_class = "positive" if data['change'] >= 0 else "negative"
+                    arrow = "▲" if data['change'] >= 0 else "▼"
+                    
+                    st.markdown(f"""
+                    <div class="sector-price-card">
+                        <h4 style="margin: 0 0 10px 0; color: #333;">{display_name}</h4>
+                        <h2 style="margin: 0; color: #007bff;">{data['price']:,.0f}</h2>
+                        <h4 class="{color_class}" style="margin: 5px 0;">{arrow} {abs(data['change']):.2f}%</h4>
+                        <p style="margin: 0; font-size: 0.9em;"><strong>H:</strong> {data['high']:,.0f} | <strong>L:</strong> {data['low']:,.0f}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
         
         signals = create_intraday_signals(market_name)
         current_hour = datetime.now().hour
@@ -1023,6 +1252,150 @@ with main_tab1:
                             <p style="margin: 0; font-size: 0.9em;"><strong>Avoid Week:</strong> {worst_week}</p>
                         </div>
                         """, unsafe_allow_html=True)
+    
+    with planetary_tab:
+        st.markdown('<div class="sector-header"><h3 style="margin: 0;">🪐 PLANETARY TRANSIT ANALYSIS - Current Cosmic Influences</h3></div>', unsafe_allow_html=True)
+        
+        # Get planetary transit data
+        transits = get_planetary_transits()
+        
+        st.markdown("### 🌟 Current Planetary Positions & Market Effects")
+        
+        # Display major planets in a grid
+        planet_cols = st.columns(3)
+        major_planets = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu']
+        
+        for idx, planet in enumerate(major_planets):
+            col_idx = idx % 3
+            transit = transits[planet]
+            
+            # Determine card color based on trend
+            if transit['trend'] in ['Strong Bullish', 'Bullish']:
+                card_color = 'background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #155724; border: 3px solid #28a745;'
+            elif transit['trend'] == 'Bearish':
+                card_color = 'background: linear-gradient(135deg, #f8d7da, #f1c3c6); color: #721c24; border: 3px solid #dc3545;'
+            elif transit['trend'] in ['Volatile', 'Neutral']:
+                card_color = 'background: linear-gradient(135deg, #fff3cd, #ffeeba); color: #856404; border: 3px solid #ffc107;'
+            else:
+                card_color = 'background: linear-gradient(135deg, #e2e3e5, #d6d8db); color: #495057; border: 3px solid #6c757d;'
+            
+            with planet_cols[col_idx]:
+                st.markdown(f"""
+                <div style="{card_color} padding: 15px; border-radius: 12px; margin: 10px 0; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <h3 style="margin: 0 0 10px 0;">{transit['symbol']} {planet}</h3>
+                    <h4 style="margin: 0 0 8px 0;">in {transit['sign']}</h4>
+                    <p style="margin: 0; font-size: 0.9em; font-weight: bold;">{transit['degree']}</p>
+                    <p style="margin: 8px 0; font-size: 0.9em;"><strong>Strength:</strong> {transit['strength']}</p>
+                    <p style="margin: 0; font-size: 1em; font-weight: bold;">{transit['trend']}</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.8em;">Duration: {transit['duration']}</p>
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Detailed effects by sector
+        st.markdown("### 📊 Sector-wise Planetary Effects")
+        
+        sector_effect_cols = st.columns(2)
+        
+        with sector_effect_cols[0]:
+            st.markdown("""
+            <div class="report-section" style="background: #d4edda; border-left: 5px solid #28a745;">
+                <h4 style="color: #155724;">🟢 POSITIVE PLANETARY EFFECTS</h4>
+            """, unsafe_allow_html=True)
+            
+            positive_effects = [
+                ("Banking & Finance", "Jupiter ♃ in Taurus - Extremely favorable for 12 months"),
+                ("FMCG & Dairy", "Moon 🌙 in Cancer - Strong support for 2.5 days"),
+                ("Auto & Luxury", "Venus ♀ in Libra - Excellent growth potential for 25 days"),
+                ("Energy & Pharma", "Sun ☀️ in Leo - Strong performance for 30 days"),
+                ("Healthcare", "Ketu ☋ in Virgo - Supportive for 18 months")
+            ]
+            
+            for sector, effect in positive_effects:
+                st.markdown(f"**{sector}:** {effect}")
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+        
+        with sector_effect_cols[1]:
+            st.markdown("""
+            <div class="report-section" style="background: #f8d7da; border-left: 5px solid #dc3545;">
+                <h4 style="color: #721c24;">🔴 NEGATIVE PLANETARY EFFECTS</h4>
+            """, unsafe_allow_html=True)
+            
+            negative_effects = [
+                ("Metals & Mining", "Saturn ♄ in Aquarius - Cautious approach for 2.5 years"),
+                ("Defense & Steel", "Mars ♂️ in Aries - High volatility for 45 days"),
+                ("Tech & Crypto", "Rahu ☊ in Pisces - Unpredictable moves for 18 months"),
+                ("IT & Communication", "Mercury ☿ in Virgo - Mixed signals for 20 days")
+            ]
+            
+            for sector, effect in negative_effects:
+                st.markdown(f"**{sector}:** {effect}")
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+        
+        # Current Transit Timeline
+        st.markdown("### ⏰ Today's Planetary Hour Timeline")
+        
+        timeline_data = [
+            {'time': '09:00-10:00', 'planet': 'Venus ♀', 'effect': 'Banking, Auto sectors favorable', 'strength': 'Strong'},
+            {'time': '10:00-11:00', 'planet': 'Sun ☀️', 'effect': 'Energy, Pharma sectors boost', 'strength': 'Very Strong'},
+            {'time': '11:00-12:00', 'planet': 'Mercury ☿', 'effect': 'IT, Communication mixed', 'strength': 'Moderate'},
+            {'time': '12:00-13:00', 'planet': 'Saturn ♄', 'effect': 'Metals, Mining under pressure', 'strength': 'Weak'},
+            {'time': '13:00-14:00', 'planet': 'Mars ♂️', 'effect': 'Defense, Energy volatile', 'strength': 'Very Volatile'},
+            {'time': '14:00-15:00', 'planet': 'Rahu ☊', 'effect': 'Tech, Crypto unpredictable', 'strength': 'Unpredictable'},
+            {'time': '15:00-15:30', 'planet': 'Jupiter ♃', 'effect': 'Banking recovery strong', 'strength': 'Excellent'}
+        ]
+        
+        for timeline in timeline_data:
+            is_active = current_hour >= int(timeline['time'].split('-')[0].split(':')[0]) and current_hour < int(timeline['time'].split('-')[1].split(':')[0])
+            
+            if timeline['strength'] in ['Strong', 'Very Strong', 'Excellent']:
+                bg_color = '#d4edda'
+                text_color = '#155724'
+                border_color = '#28a745'
+            elif timeline['strength'] in ['Weak']:
+                bg_color = '#f8d7da'
+                text_color = '#721c24'
+                border_color = '#dc3545'
+            else:
+                bg_color = '#fff3cd'
+                text_color = '#856404'
+                border_color = '#ffc107'
+            
+            active_style = 'animation: pulse 2s infinite; border: 3px solid #ff6b35;' if is_active else f'border: 2px solid {border_color};'
+            active_text = ' 🔥 ACTIVE NOW' if is_active else ''
+            
+            st.markdown(f"""
+            <div style="background: {bg_color}; color: {text_color}; padding: 12px; border-radius: 8px; margin: 8px 0; {active_style}">
+                <h5 style="margin: 0 0 5px 0;">{timeline['time']} - {timeline['planet']}{active_text}</h5>
+                <p style="margin: 0; font-size: 0.9em;"><strong>Effect:</strong> {timeline['effect']}</p>
+                <p style="margin: 0; font-size: 0.9em;"><strong>Strength:</strong> {timeline['strength']}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Weekly Transit Changes
+        st.markdown("### 📅 Upcoming Transit Changes This Week")
+        
+        upcoming_changes = [
+            {'date': 'Tomorrow', 'planet': 'Moon 🌙', 'change': 'Moves to Leo', 'effect': 'FMCG sector may weaken, Entertainment boost'},
+            {'date': 'Day After', 'planet': 'Mercury ☿', 'change': 'Aspects Jupiter', 'effect': 'IT and Banking synergy, positive for Fintech'},
+            {'date': 'Friday', 'planet': 'Venus ♀', 'change': 'Conjunct Mars', 'effect': 'Auto sector volatility, luxury goods mixed'},
+            {'date': 'Weekend', 'planet': 'Sun ☀️', 'change': 'Squares Saturn', 'effect': 'Energy vs Metals tension, avoid both sectors'}
+        ]
+        
+        change_cols = st.columns(2)
+        
+        for idx, change in enumerate(upcoming_changes):
+            col_idx = idx % 2
+            
+            with change_cols[col_idx]:
+                st.markdown(f"""
+                <div class="transit-effect">
+                    <h5 style="margin: 0 0 8px 0; color: #007bff;">{change['date']}: {change['planet']}</h5>
+                    <p style="margin: 0; font-size: 0.9em;"><strong>Change:</strong> {change['change']}</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9em;"><strong>Market Effect:</strong> {change['effect']}</p>
+                </div>
+                """, unsafe_allow_html=True)
 
 with main_tab2:
     st.markdown(f"""
@@ -1087,7 +1460,7 @@ with main_tab2:
             <h4 style="color: #155724;">⭐ PEAK OPPORTUNITY: 18:00-21:00 (Jupiter ♃)</h4>
             <p style="font-size: 1.1em;"><strong>🥇 GOLD:</strong> <span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;">STRONG BUY +2.2%</span></p>
             <p style="font-size: 1.1em;"><strong>🥈 SILVER:</strong> <span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;">STRONG BUY +3.5%</span></p>
-            <p style="font-size: 1.1em;"><strong>₿ BITCOIN:</strong> <span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;">STRONG BUY +5.2%</span></p>
+            <p style="font-size: 1.1em;"><strong>🛢️ CRUDE:</strong> <span style="background: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;">SELL -1.8%</span></p>
             <p style="margin: 15px 0 0 0; font-weight: bold; font-size: 1.2em; color: #155724;">🌟 This is the best commodity trading window of the week!</p>
         </div>
         """, unsafe_allow_html=True)
@@ -1098,7 +1471,7 @@ with main_tab2:
         forex_forecast = [
             {'pair': 'USD/INR', 'trend': 'Bearish', 'range': '83.15 - 83.45', 'strategy': 'Sell on rallies above 83.35'},
             {'pair': 'EUR/INR', 'trend': 'Bullish', 'range': '88.10 - 88.80', 'strategy': 'Buy on dips below 88.20'},
-            {'pair': 'GBP/INR', 'trend': 'Volatile', 'range': '106.00 - 108.00', 'strategy': 'Avoid or use very tight stops'},
+            {'pair': 'BITCOIN', 'trend': 'Volatile', 'range': '$95,000 - $102,000', 'strategy': 'Extreme volatility expected, use tight stops'},
         ]
         
         for forecast in forex_forecast:
@@ -1126,8 +1499,9 @@ with main_tab2:
         st.markdown("""
         <div class="report-section">
             <h4>🇺🇸 US MARKETS: Strong Evening Rally Expected</h4>
-            <p><strong>DOW JONES:</strong> Jupiter hour (21:00-23:00 IST) brings +1.5% rally</p>
-            <p><strong>NASDAQ:</strong> Tech strength continues, target +2.0%</p>
+            <p><strong>📊 DOW JONES:</strong> Jupiter hour (21:00-23:00 IST) brings +1.5% rally</p>
+            <p><strong>📈 S&P 500:</strong> Broad market strength, target +1.8%</p>
+            <p><strong>💻 NASDAQ:</strong> Tech strength continues, target +2.0%</p>
             
             <h4>₿ CRYPTOCURRENCY: Exceptional Day</h4>
             <p><strong>BITCOIN:</strong> Jupiter peak (18:00-21:00) could trigger +5%+ move</p>
