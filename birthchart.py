@@ -5,6 +5,16 @@ from datetime import datetime, timedelta
 import time
 import pytz
 
+# Set up IST timezone and get current time - MOVED TO TOP
+ist_tz = pytz.timezone('Asia/Kolkata')
+current_date = datetime.now(ist_tz)
+current_date_str = current_date.strftime('%d %B %Y')
+current_day = current_date.strftime('%A')
+current_time_str = current_date.strftime('%H:%M:%S')
+current_hour = current_date.hour
+tomorrow_date = (current_date + timedelta(days=1)).strftime('%d %B %Y')
+tomorrow_day = (current_date + timedelta(days=1)).strftime('%A')
+
 # Page configuration
 st.set_page_config(
     page_title="Vedic Market Intelligence",
@@ -282,7 +292,8 @@ try:
             # Forex
             'USDINR': {'price': 83.45, 'change': -0.14, 'high': 83.58, 'low': 83.42},
             'EURINR': {'price': 88.25, 'change': 0.35, 'high': 88.50, 'low': 87.90},
-            'GBPINR': {'price': 106.75, 'change': 0.28, 'high': 107.20, 'low': 106.50}
+            'GBPINR': {'price': 106.75, 'change': 0.28, 'high': 107.20, 'low': 106.50},
+            'DXY': {'price': 103.25, 'change': 0.15, 'high': 103.45, 'low': 102.95}
         }
     
     if 'sector_data' not in st.session_state:
@@ -330,8 +341,7 @@ try:
         }
     
     if 'last_update' not in st.session_state:
-        ist_tz = pytz.timezone('Asia/Kolkata')
-        st.session_state.last_update = datetime.now(ist_tz)
+        st.session_state.last_update = current_date
 
 except Exception as e:
     st.error(f"Error initializing data: {e}")
@@ -502,8 +512,434 @@ def get_planetary_transits():
     
     return transits
 
-def create_intraday_signals(market_name):
-    """Generate intraday hourly signals for any market"""
+def create_commodity_signals():
+    """Generate commodity-specific planetary signals from 5 AM to 11:55 PM"""
+    commodity_signals = [
+        # Early Morning (5 AM - 9 AM)
+        {'time': '05:00-06:00', 'planet': 'Saturn ♄', 'gold': 'SELL', 'silver': 'SELL', 'crude': 'BUY', 'trend': 'Bearish', 'strength': 'Moderate'},
+        {'time': '06:00-07:00', 'planet': 'Jupiter ♃', 'gold': 'BUY', 'silver': 'BUY', 'crude': 'HOLD', 'trend': 'Bullish', 'strength': 'Strong'},
+        {'time': '07:00-08:00', 'planet': 'Mars ♂️', 'gold': 'HOLD', 'silver': 'VOLATILE', 'crude': 'BUY', 'trend': 'Volatile', 'strength': 'High'},
+        {'time': '08:00-09:00', 'planet': 'Sun ☀️', 'gold': 'BUY', 'silver': 'BUY', 'crude': 'STRONG BUY', 'trend': 'Bullish', 'strength': 'Very Strong'},
+        
+        # Market Hours (9 AM - 4 PM)
+        {'time': '09:00-10:00', 'planet': 'Venus ♀', 'gold': 'STRONG BUY', 'silver': 'BUY', 'crude': 'SELL', 'trend': 'Bullish', 'strength': 'Strong'},
+        {'time': '10:00-11:00', 'planet': 'Mercury ☿', 'gold': 'HOLD', 'silver': 'VOLATILE', 'crude': 'HOLD', 'trend': 'Neutral', 'strength': 'Moderate'},
+        {'time': '11:00-12:00', 'planet': 'Moon 🌙', 'gold': 'BUY', 'silver': 'STRONG BUY', 'crude': 'SELL', 'trend': 'Bullish', 'strength': 'Strong'},
+        {'time': '12:00-13:00', 'planet': 'Saturn ♄', 'gold': 'SELL', 'silver': 'SELL', 'crude': 'VOLATILE', 'trend': 'Bearish', 'strength': 'Weak'},
+        {'time': '13:00-14:00', 'planet': 'Jupiter ♃', 'gold': 'STRONG BUY', 'silver': 'STRONG BUY', 'crude': 'BUY', 'trend': 'Strong Bullish', 'strength': 'Excellent'},
+        {'time': '14:00-15:00', 'planet': 'Mars ♂️', 'gold': 'VOLATILE', 'silver': 'VOLATILE', 'crude': 'STRONG BUY', 'trend': 'Volatile', 'strength': 'High'},
+        {'time': '15:00-16:00', 'planet': 'Sun ☀️', 'gold': 'BUY', 'silver': 'HOLD', 'crude': 'BUY', 'trend': 'Bullish', 'strength': 'Strong'},
+        
+        # Evening (4 PM - 11:55 PM)
+        {'time': '16:00-17:00', 'planet': 'Venus ♀', 'gold': 'BUY', 'silver': 'BUY', 'crude': 'HOLD', 'trend': 'Bullish', 'strength': 'Strong'},
+        {'time': '17:00-18:00', 'planet': 'Mercury ☿', 'gold': 'HOLD', 'silver': 'SELL', 'crude': 'SELL', 'trend': 'Bearish', 'strength': 'Weak'},
+        {'time': '18:00-19:00', 'planet': 'Moon 🌙', 'gold': 'STRONG BUY', 'silver': 'STRONG BUY', 'crude': 'HOLD', 'trend': 'Strong Bullish', 'strength': 'Excellent'},
+        {'time': '19:00-20:00', 'planet': 'Saturn ♄', 'gold': 'SELL', 'silver': 'VOLATILE', 'crude': 'SELL', 'trend': 'Bearish', 'strength': 'Weak'},
+        {'time': '20:00-21:00', 'planet': 'Jupiter ♃', 'gold': 'PEAK BUY', 'silver': 'PEAK BUY', 'crude': 'BUY', 'trend': 'Peak Bullish', 'strength': 'Maximum'},
+        {'time': '21:00-22:00', 'planet': 'Mars ♂️', 'gold': 'VOLATILE', 'silver': 'SELL', 'crude': 'STRONG BUY', 'trend': 'Volatile', 'strength': 'High'},
+        {'time': '22:00-23:00', 'planet': 'Sun ☀️', 'gold': 'HOLD', 'silver': 'HOLD', 'crude': 'BUY', 'trend': 'Neutral', 'strength': 'Moderate'},
+        {'time': '23:00-23:55', 'planet': 'Venus ♀', 'gold': 'BUY', 'silver': 'BUY', 'crude': 'HOLD', 'trend': 'Bullish', 'strength': 'Good'}
+    ]
+    return commodity_signals
+
+def create_forex_signals():
+    """Generate forex-specific planetary signals from 5 AM to 11:55 PM"""
+    forex_signals = [
+        # Early Morning (5 AM - 9 AM)
+        {'time': '05:00-06:00', 'planet': 'Saturn ♄', 'usdinr': 'BUY', 'btc': 'SELL', 'dxy': 'STRONG BUY', 'trend': 'Bearish Crypto', 'strength': 'Strong'},
+        {'time': '06:00-07:00', 'planet': 'Jupiter ♃', 'usdinr': 'SELL', 'btc': 'STRONG BUY', 'dxy': 'SELL', 'trend': 'Bullish Crypto', 'strength': 'Excellent'},
+        {'time': '07:00-08:00', 'planet': 'Mars ♂️', 'usdinr': 'VOLATILE', 'btc': 'VOLATILE', 'dxy': 'VOLATILE', 'trend': 'High Volatility', 'strength': 'Extreme'},
+        {'time': '08:00-09:00', 'planet': 'Sun ☀️', 'usdinr': 'BUY', 'btc': 'BUY', 'dxy': 'BUY', 'trend': 'Broad Bullish', 'strength': 'Strong'},
+        
+        # Active Trading (9 AM - 4 PM)
+        {'time': '09:00-10:00', 'planet': 'Venus ♀', 'usdinr': 'SELL', 'btc': 'STRONG BUY', 'dxy': 'SELL', 'trend': 'Crypto Bullish', 'strength': 'Strong'},
+        {'time': '10:00-11:00', 'planet': 'Mercury ☿', 'usdinr': 'VOLATILE', 'btc': 'SELL', 'dxy': 'BUY', 'trend': 'Dollar Strength', 'strength': 'Moderate'},
+        {'time': '11:00-12:00', 'planet': 'Moon 🌙', 'usdinr': 'BUY', 'btc': 'BUY', 'dxy': 'HOLD', 'trend': 'Mixed Bullish', 'strength': 'Good'},
+        {'time': '12:00-13:00', 'planet': 'Saturn ♄', 'usdinr': 'STRONG BUY', 'btc': 'SELL', 'dxy': 'STRONG BUY', 'trend': 'Dollar Bullish', 'strength': 'Strong'},
+        {'time': '13:00-14:00', 'planet': 'Jupiter ♃', 'usdinr': 'SELL', 'btc': 'PEAK BUY', 'dxy': 'SELL', 'trend': 'Peak Crypto', 'strength': 'Maximum'},
+        {'time': '14:00-15:00', 'planet': 'Mars ♂️', 'usdinr': 'VOLATILE', 'btc': 'VOLATILE', 'dxy': 'VOLATILE', 'trend': 'Extreme Volatility', 'strength': 'Extreme'},
+        {'time': '15:00-16:00', 'planet': 'Sun ☀️', 'usdinr': 'BUY', 'btc': 'HOLD', 'dxy': 'BUY', 'trend': 'Dollar Strength', 'strength': 'Strong'},
+        
+        # Evening Trading (4 PM - 11:55 PM)
+        {'time': '16:00-17:00', 'planet': 'Venus ♀', 'usdinr': 'SELL', 'btc': 'BUY', 'dxy': 'SELL', 'trend': 'Crypto Recovery', 'strength': 'Good'},
+        {'time': '17:00-18:00', 'planet': 'Mercury ☿', 'usdinr': 'HOLD', 'btc': 'SELL', 'dxy': 'BUY', 'trend': 'Dollar Recovery', 'strength': 'Moderate'},
+        {'time': '18:00-19:00', 'planet': 'Moon 🌙', 'usdinr': 'SELL', 'btc': 'STRONG BUY', 'dxy': 'SELL', 'trend': 'Crypto Surge', 'strength': 'Strong'},
+        {'time': '19:00-20:00', 'planet': 'Saturn ♄', 'usdinr': 'BUY', 'btc': 'SELL', 'dxy': 'BUY', 'trend': 'Safe Haven', 'strength': 'Strong'},
+        {'time': '20:00-21:00', 'planet': 'Jupiter ♃', 'usdinr': 'SELL', 'btc': 'PEAK BUY', 'dxy': 'VOLATILE', 'trend': 'Crypto Peak', 'strength': 'Maximum'},
+        {'time': '21:00-22:00', 'planet': 'Mars ♂️', 'usdinr': 'VOLATILE', 'btc': 'VOLATILE', 'dxy': 'VOLATILE', 'trend': 'Night Volatility', 'strength': 'High'},
+        {'time': '22:00-23:00', 'planet': 'Sun ☀️', 'usdinr': 'HOLD', 'btc': 'BUY', 'dxy': 'HOLD', 'trend': 'Consolidation', 'strength': 'Moderate'},
+        {'time': '23:00-23:55', 'planet': 'Venus ♀', 'usdinr': 'SELL', 'btc': 'BUY', 'dxy': 'SELL', 'trend': 'Late Crypto Buy', 'strength': 'Good'}
+    ]
+    return forex_signals
+
+def create_global_signals():
+    """Generate global market planetary signals from 5 AM to 11:55 PM"""
+    global_signals = [
+        # Early Morning (5 AM - 9 AM)
+        {'time': '05:00-06:00', 'planet': 'Saturn ♄', 'dow': 'SELL', 'nasdaq': 'SELL', 'sp500': 'SELL', 'trend': 'Pre-market Weakness', 'strength': 'Weak'},
+        {'time': '06:00-07:00', 'planet': 'Jupiter ♃', 'dow': 'BUY', 'nasdaq': 'STRONG BUY', 'sp500': 'BUY', 'trend': 'Pre-market Strength', 'strength': 'Strong'},
+        {'time': '07:00-08:00', 'planet': 'Mars ♂️', 'dow': 'VOLATILE', 'nasdaq': 'VOLATILE', 'sp500': 'VOLATILE', 'trend': 'Pre-market Volatility', 'strength': 'High'},
+        {'time': '08:00-09:00', 'planet': 'Sun ☀️', 'dow': 'BUY', 'nasdaq': 'BUY', 'sp500': 'STRONG BUY', 'trend': 'Opening Strength', 'strength': 'Strong'},
+        
+        # US Market Open (9:30 PM IST = 12:00 PM EST) - Active Trading
+        {'time': '09:00-10:00', 'planet': 'Venus ♀', 'dow': 'STRONG BUY', 'nasdaq': 'BUY', 'sp500': 'BUY', 'trend': 'Morning Rally', 'strength': 'Strong'},
+        {'time': '10:00-11:00', 'planet': 'Mercury ☿', 'dow': 'HOLD', 'nasdaq': 'SELL', 'sp500': 'HOLD', 'trend': 'Tech Weakness', 'strength': 'Moderate'},
+        {'time': '11:00-12:00', 'planet': 'Moon 🌙', 'dow': 'BUY', 'nasdaq': 'BUY', 'sp500': 'BUY', 'trend': 'Mid-day Strength', 'strength': 'Good'},
+        {'time': '12:00-13:00', 'planet': 'Saturn ♄', 'dow': 'SELL', 'nasdaq': 'VOLATILE', 'sp500': 'SELL', 'trend': 'Afternoon Pressure', 'strength': 'Weak'},
+        {'time': '13:00-14:00', 'planet': 'Jupiter ♃', 'dow': 'STRONG BUY', 'nasdaq': 'STRONG BUY', 'sp500': 'STRONG BUY', 'trend': 'Power Hour Prep', 'strength': 'Excellent'},
+        {'time': '14:00-15:00', 'planet': 'Mars ♂️', 'dow': 'VOLATILE', 'nasdaq': 'VOLATILE', 'sp500': 'VOLATILE', 'trend': 'High Volatility', 'strength': 'Extreme'},
+        {'time': '15:00-16:00', 'planet': 'Sun ☀️', 'dow': 'BUY', 'nasdaq': 'BUY', 'sp500': 'BUY', 'trend': 'Closing Strength', 'strength': 'Strong'},
+        
+        # After Hours & Evening (4 PM - 11:55 PM)
+        {'time': '16:00-17:00', 'planet': 'Venus ♀', 'dow': 'HOLD', 'nasdaq': 'BUY', 'sp500': 'HOLD', 'trend': 'After Hours Tech', 'strength': 'Moderate'},
+        {'time': '17:00-18:00', 'planet': 'Mercury ☿', 'dow': 'SELL', 'nasdaq': 'VOLATILE', 'sp500': 'SELL', 'trend': 'Evening Weakness', 'strength': 'Weak'},
+        {'time': '18:00-19:00', 'planet': 'Moon 🌙', 'dow': 'BUY', 'nasdaq': 'BUY', 'sp500': 'BUY', 'trend': 'Evening Recovery', 'strength': 'Good'},
+        {'time': '19:00-20:00', 'planet': 'Saturn ♄', 'dow': 'HOLD', 'nasdaq': 'SELL', 'sp500': 'HOLD', 'trend': 'Consolidation', 'strength': 'Neutral'},
+        {'time': '20:00-21:00', 'planet': 'Jupiter ♃', 'dow': 'PEAK BUY', 'nasdaq': 'PEAK BUY', 'sp500': 'PEAK BUY', 'trend': 'Peak Evening Rally', 'strength': 'Maximum'},
+        {'time': '21:00-22:00', 'planet': 'Mars ♂️', 'dow': 'VOLATILE', 'nasdaq': 'VOLATILE', 'sp500': 'VOLATILE', 'trend': 'Late Volatility', 'strength': 'High'},
+        {'time': '22:00-23:00', 'planet': 'Sun ☀️', 'dow': 'HOLD', 'nasdaq': 'BUY', 'sp500': 'HOLD', 'trend': 'Late Tech Strength', 'strength': 'Moderate'},
+        {'time': '23:00-23:55', 'planet': 'Venus ♀', 'dow': 'BUY', 'nasdaq': 'BUY', 'sp500': 'BUY', 'trend': 'End Day Strength', 'strength': 'Good'}
+    ]
+    return global_signals
+
+def create_equity_signals():
+    """Generate equity-specific planetary signals for Indian market hours (9:15 AM - 3:30 PM)"""
+    equity_signals = [
+        # Pre-opening (9:00-9:15)
+        {'time': '09:00-09:15', 'planet': 'Venus ♀', 'nifty': 'WATCH', 'banknifty': 'WATCH', 'trend': 'Pre-Open Analysis', 'strength': 'Setup'},
+        
+        # Opening Hour (9:15-10:15)
+        {'time': '09:15-10:15', 'planet': 'Venus ♀', 'nifty': 'STRONG BUY', 'banknifty': 'BUY', 'trend': 'Opening Bullish', 'strength': 'Strong'},
+        
+        # Mid Morning (10:15-11:15)
+        {'time': '10:15-11:15', 'planet': 'Sun ☀️', 'nifty': 'BUY', 'banknifty': 'STRONG BUY', 'trend': 'Bank Strength', 'strength': 'Very Strong'},
+        
+        # Late Morning (11:15-12:15)
+        {'time': '11:15-12:15', 'planet': 'Mercury ☿', 'nifty': 'VOLATILE', 'banknifty': 'SELL', 'trend': 'Tech Pressure', 'strength': 'Weak'},
+        
+        # Noon Hour (12:15-13:15)
+        {'time': '12:15-13:15', 'planet': 'Saturn ♄', 'nifty': 'SELL', 'banknifty': 'VOLATILE', 'trend': 'Midday Weakness', 'strength': 'Weak'},
+        
+        # Early Afternoon (13:15-14:15)
+        {'time': '13:15-14:15', 'planet': 'Jupiter ♃', 'nifty': 'PEAK BUY', 'banknifty': 'PEAK BUY', 'trend': 'Peak Banking Hour', 'strength': 'Maximum'},
+        
+        # Late Afternoon (14:15-15:15)
+        {'time': '14:15-15:15', 'planet': 'Mars ♂️', 'nifty': 'VOLATILE', 'banknifty': 'VOLATILE', 'trend': 'High Volatility', 'strength': 'Extreme'},
+        
+        # Closing Hour (15:15-15:30)
+        {'time': '15:15-15:30', 'planet': 'Sun ☀️', 'nifty': 'BUY', 'banknifty': 'BUY', 'trend': 'Closing Strength', 'strength': 'Strong'}
+    ]
+    return equity_signals
+
+def display_detailed_signals(signals, market_type, current_hour):
+    """Display detailed planetary signals for any market type"""
+    
+    if market_type == "commodity":
+        st.markdown("### 🥇 GOLD • 🥈 SILVER • 🛢️ CRUDE - Complete Planetary Transit")
+        
+        # Group signals by time periods
+        early_morning = [s for s in signals if int(s['time'].split('-')[0].split(':')[0]) < 9]
+        market_hours = [s for s in signals if 9 <= int(s['time'].split('-')[0].split(':')[0]) < 16]
+        evening_hours = [s for s in signals if int(s['time'].split('-')[0].split(':')[0]) >= 16]
+        
+        # Early Morning (5 AM - 9 AM)
+        st.markdown("#### 🌅 Early Morning Session (5:00 AM - 9:00 AM)")
+        early_cols = st.columns(2)
+        
+        for idx, signal in enumerate(early_morning):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if signal['trend'] in ['Bullish', 'Strong Bullish']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Bearish' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            
+            with early_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>🥇 GOLD:</strong> {signal['gold']} | <strong>🥈 SILVER:</strong> {signal['silver']} | <strong>🛢️ CRUDE:</strong> {signal['crude']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Market Hours (9 AM - 4 PM)
+        st.markdown("#### 📈 Active Trading Session (9:00 AM - 4:00 PM)")
+        market_cols = st.columns(2)
+        
+        for idx, signal in enumerate(market_hours):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if signal['trend'] in ['Bullish', 'Strong Bullish', 'Peak Bullish']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Bearish' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Maximum':
+                active_text += " ⭐ PEAK"
+            
+            with market_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>🥇 GOLD:</strong> {signal['gold']} | <strong>🥈 SILVER:</strong> {signal['silver']} | <strong>🛢️ CRUDE:</strong> {signal['crude']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Evening Hours (4 PM - 11:55 PM)
+        st.markdown("#### 🌙 Evening Session (4:00 PM - 11:55 PM)")
+        evening_cols = st.columns(2)
+        
+        for idx, signal in enumerate(evening_hours):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if signal['trend'] in ['Bullish', 'Strong Bullish', 'Peak Bullish']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Bearish' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Maximum':
+                active_text += " ⭐ PEAK"
+            
+            with evening_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>🥇 GOLD:</strong> {signal['gold']} | <strong>🥈 SILVER:</strong> {signal['silver']} | <strong>🛢️ CRUDE:</strong> {signal['crude']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+    
+    elif market_type == "forex":
+        st.markdown("### 💵 USDINR • ₿ BITCOIN • 📊 DOLLAR INDEX - Complete Planetary Transit")
+        
+        # Group signals by time periods
+        early_morning = [s for s in signals if int(s['time'].split('-')[0].split(':')[0]) < 9]
+        active_hours = [s for s in signals if 9 <= int(s['time'].split('-')[0].split(':')[0]) < 16]
+        evening_hours = [s for s in signals if int(s['time'].split('-')[0].split(':')[0]) >= 16]
+        
+        # Early Morning (5 AM - 9 AM)
+        st.markdown("#### 🌅 Early Session (5:00 AM - 9:00 AM)")
+        early_cols = st.columns(2)
+        
+        for idx, signal in enumerate(early_morning):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Bullish' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Bearish' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            
+            with early_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>💵 USDINR:</strong> {signal['usdinr']} | <strong>₿ BTC:</strong> {signal['btc']} | <strong>📊 DXY:</strong> {signal['dxy']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Active Hours (9 AM - 4 PM)
+        st.markdown("#### ⚡ Active Trading Session (9:00 AM - 4:00 PM)")
+        active_cols = st.columns(2)
+        
+        for idx, signal in enumerate(active_hours):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Bullish' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Bearish' in signal['trend'] or 'Weakness' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Maximum':
+                active_text += " ⭐ PEAK"
+            
+            with active_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>💵 USDINR:</strong> {signal['usdinr']} | <strong>₿ BTC:</strong> {signal['btc']} | <strong>📊 DXY:</strong> {signal['dxy']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Evening Hours (4 PM - 11:55 PM)
+        st.markdown("#### 🌙 Evening Session (4:00 PM - 11:55 PM)")
+        evening_cols = st.columns(2)
+        
+        for idx, signal in enumerate(evening_hours):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Bullish' in signal['trend'] or 'Recovery' in signal['trend'] or 'Surge' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Bearish' in signal['trend'] or 'Weakness' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Maximum':
+                active_text += " ⭐ PEAK"
+            
+            with evening_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>💵 USDINR:</strong> {signal['usdinr']} | <strong>₿ BTC:</strong> {signal['btc']} | <strong>📊 DXY:</strong> {signal['dxy']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+    
+    elif market_type == "global":
+        st.markdown("### 📊 DOW JONES • 💻 NASDAQ • 📈 S&P 500 - Complete Planetary Transit")
+        
+        # Group signals by time periods
+        early_morning = [s for s in signals if int(s['time'].split('-')[0].split(':')[0]) < 9]
+        market_hours = [s for s in signals if 9 <= int(s['time'].split('-')[0].split(':')[0]) < 16]
+        evening_hours = [s for s in signals if int(s['time'].split('-')[0].split(':')[0]) >= 16]
+        
+        # Early Morning (5 AM - 9 AM)
+        st.markdown("#### 🌅 Pre-Market Session (5:00 AM - 9:00 AM)")
+        early_cols = st.columns(2)
+        
+        for idx, signal in enumerate(early_morning):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Strength' in signal['trend'] or 'Bullish' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Weakness' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            
+            with early_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>📊 DOW:</strong> {signal['dow']} | <strong>💻 NASDAQ:</strong> {signal['nasdaq']} | <strong>📈 S&P500:</strong> {signal['sp500']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Market Hours (9 AM - 4 PM)
+        st.markdown("#### 🇺🇸 US Market Hours (9:00 AM - 4:00 PM IST)")
+        market_cols = st.columns(2)
+        
+        for idx, signal in enumerate(market_hours):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Strength' in signal['trend'] or 'Rally' in signal['trend'] or 'Bullish' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Weakness' in signal['trend'] or 'Pressure' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Excellent':
+                active_text += " ⭐ PEAK"
+            
+            with market_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>📊 DOW:</strong> {signal['dow']} | <strong>💻 NASDAQ:</strong> {signal['nasdaq']} | <strong>📈 S&P500:</strong> {signal['sp500']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Evening Hours (4 PM - 11:55 PM)
+        st.markdown("#### 🌙 After Hours & Evening (4:00 PM - 11:55 PM)")
+        evening_cols = st.columns(2)
+        
+        for idx, signal in enumerate(evening_hours):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Rally' in signal['trend'] or 'Strength' in signal['trend'] or 'Recovery' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Weakness' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Maximum':
+                active_text += " ⭐ PEAK"
+            
+            with evening_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>📊 DOW:</strong> {signal['dow']} | <strong>💻 NASDAQ:</strong> {signal['nasdaq']} | <strong>📈 S&P500:</strong> {signal['sp500']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+    
+    elif market_type == "equity":
+        st.markdown("### 📈 NIFTY 50 • 🏦 BANKNIFTY - Indian Market Planetary Transit")
+        
+        st.markdown("#### 🇮🇳 Indian Equity Market Hours (9:15 AM - 3:30 PM)")
+        equity_cols = st.columns(2)
+        
+        for idx, signal in enumerate(signals):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Bullish' in signal['trend'] or 'Strength' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Weakness' in signal['trend'] or 'Pressure' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Maximum':
+                active_text += " ⭐ PEAK BANKING HOUR"
+            elif signal['time'] == '09:15-10:15':
+                active_text += " 🔔 OPENING"
+            elif signal['time'] == '15:15-15:30':
+                active_text += " 🔔 CLOSING"
+            
+            with equity_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>📈 NIFTY:</strong> {signal['nifty']} | <strong>🏦 BANKNIFTY:</strong> {signal['banknifty']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+    """Legacy function - kept for backward compatibility"""
+    # This function is kept for any remaining legacy calls
+    # New code should use the specific signal functions above
     base_signals = [
         {'time': '09:15-10:00', 'planet': 'Venus ♀', 'signal': 'BUY', 'target': '+0.8%', 'sl': '-0.3%', 'trend': 'Bullish'},
         {'time': '10:00-11:00', 'planet': 'Sun ☀️', 'signal': 'HOLD', 'target': '+0.5%', 'sl': '-0.2%', 'trend': 'Neutral'},
@@ -513,20 +949,312 @@ def create_intraday_signals(market_name):
         {'time': '14:00-15:00', 'planet': 'Rahu ☊', 'signal': 'SELL', 'target': '-1.1%', 'sl': '+0.4%', 'trend': 'Bearish'},
         {'time': '15:00-15:30', 'planet': 'Jupiter ♃', 'signal': 'BUY', 'target': '+0.6%', 'sl': '-0.2%', 'trend': 'Bullish'}
     ]
-    
-    # Customize signals based on market type
-    if 'BANK' in market_name.upper():
-        for signal in base_signals:
-            if signal['planet'] == 'Jupiter ♃':
-                signal['target'] = '+1.5%'
-                signal['trend'] = 'Strong Bullish'
-    elif 'IT' in market_name.upper():
-        for signal in base_signals:
-            if signal['planet'] == 'Mercury ☿':
-                signal['target'] = '-0.8%'
-                signal['trend'] = 'Bearish'
-    
     return base_signals
+    """Display detailed planetary signals for any market type"""
+    
+    if market_type == "commodity":
+        st.markdown("### 🥇 GOLD • 🥈 SILVER • 🛢️ CRUDE - Complete Planetary Transit")
+        
+        # Group signals by time periods
+        early_morning = [s for s in signals if int(s['time'].split('-')[0].split(':')[0]) < 9]
+        market_hours = [s for s in signals if 9 <= int(s['time'].split('-')[0].split(':')[0]) < 16]
+        evening_hours = [s for s in signals if int(s['time'].split('-')[0].split(':')[0]) >= 16]
+        
+        # Early Morning (5 AM - 9 AM)
+        st.markdown("#### 🌅 Early Morning Session (5:00 AM - 9:00 AM)")
+        early_cols = st.columns(2)
+        
+        for idx, signal in enumerate(early_morning):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if signal['trend'] in ['Bullish', 'Strong Bullish']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Bearish' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            
+            with early_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>🥇 GOLD:</strong> {signal['gold']} | <strong>🥈 SILVER:</strong> {signal['silver']} | <strong>🛢️ CRUDE:</strong> {signal['crude']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Market Hours (9 AM - 4 PM)
+        st.markdown("#### 📈 Active Trading Session (9:00 AM - 4:00 PM)")
+        market_cols = st.columns(2)
+        
+        for idx, signal in enumerate(market_hours):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if signal['trend'] in ['Bullish', 'Strong Bullish', 'Peak Bullish']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Bearish' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Maximum':
+                active_text += " ⭐ PEAK"
+            
+            with market_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>🥇 GOLD:</strong> {signal['gold']} | <strong>🥈 SILVER:</strong> {signal['silver']} | <strong>🛢️ CRUDE:</strong> {signal['crude']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Evening Hours (4 PM - 11:55 PM)
+        st.markdown("#### 🌙 Evening Session (4:00 PM - 11:55 PM)")
+        evening_cols = st.columns(2)
+        
+        for idx, signal in enumerate(evening_hours):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if signal['trend'] in ['Bullish', 'Strong Bullish', 'Peak Bullish']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Bearish' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Maximum':
+                active_text += " ⭐ PEAK"
+            
+            with evening_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>🥇 GOLD:</strong> {signal['gold']} | <strong>🥈 SILVER:</strong> {signal['silver']} | <strong>🛢️ CRUDE:</strong> {signal['crude']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+    
+    elif market_type == "forex":
+        st.markdown("### 💵 USDINR • ₿ BITCOIN • 📊 DOLLAR INDEX - Complete Planetary Transit")
+        
+        # Group signals by time periods
+        early_morning = [s for s in signals if int(s['time'].split('-')[0].split(':')[0]) < 9]
+        active_hours = [s for s in signals if 9 <= int(s['time'].split('-')[0].split(':')[0]) < 16]
+        evening_hours = [s for s in signals if int(s['time'].split('-')[0].split(':')[0]) >= 16]
+        
+        # Early Morning (5 AM - 9 AM)
+        st.markdown("#### 🌅 Early Session (5:00 AM - 9:00 AM)")
+        early_cols = st.columns(2)
+        
+        for idx, signal in enumerate(early_morning):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Bullish' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Bearish' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            
+            with early_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>💵 USDINR:</strong> {signal['usdinr']} | <strong>₿ BTC:</strong> {signal['btc']} | <strong>📊 DXY:</strong> {signal['dxy']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Active Hours (9 AM - 4 PM)
+        st.markdown("#### ⚡ Active Trading Session (9:00 AM - 4:00 PM)")
+        active_cols = st.columns(2)
+        
+        for idx, signal in enumerate(active_hours):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Bullish' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Bearish' in signal['trend'] or 'Weakness' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Maximum':
+                active_text += " ⭐ PEAK"
+            
+            with active_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>💵 USDINR:</strong> {signal['usdinr']} | <strong>₿ BTC:</strong> {signal['btc']} | <strong>📊 DXY:</strong> {signal['dxy']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Evening Hours (4 PM - 11:55 PM)
+        st.markdown("#### 🌙 Evening Session (4:00 PM - 11:55 PM)")
+        evening_cols = st.columns(2)
+        
+        for idx, signal in enumerate(evening_hours):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Bullish' in signal['trend'] or 'Recovery' in signal['trend'] or 'Surge' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Bearish' in signal['trend'] or 'Weakness' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Maximum':
+                active_text += " ⭐ PEAK"
+            
+            with evening_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>💵 USDINR:</strong> {signal['usdinr']} | <strong>₿ BTC:</strong> {signal['btc']} | <strong>📊 DXY:</strong> {signal['dxy']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+    
+    elif market_type == "global":
+        st.markdown("### 📊 DOW JONES • 💻 NASDAQ • 📈 S&P 500 - Complete Planetary Transit")
+        
+        # Group signals by time periods
+        early_morning = [s for s in signals if int(s['time'].split('-')[0].split(':')[0]) < 9]
+        market_hours = [s for s in signals if 9 <= int(s['time'].split('-')[0].split(':')[0]) < 16]
+        evening_hours = [s for s in signals if int(s['time'].split('-')[0].split(':')[0]) >= 16]
+        
+        # Early Morning (5 AM - 9 AM)
+        st.markdown("#### 🌅 Pre-Market Session (5:00 AM - 9:00 AM)")
+        early_cols = st.columns(2)
+        
+        for idx, signal in enumerate(early_morning):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Strength' in signal['trend'] or 'Bullish' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Weakness' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            
+            with early_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>📊 DOW:</strong> {signal['dow']} | <strong>💻 NASDAQ:</strong> {signal['nasdaq']} | <strong>📈 S&P500:</strong> {signal['sp500']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Market Hours (9 AM - 4 PM)
+        st.markdown("#### 🇺🇸 US Market Hours (9:00 AM - 4:00 PM IST)")
+        market_cols = st.columns(2)
+        
+        for idx, signal in enumerate(market_hours):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Strength' in signal['trend'] or 'Rally' in signal['trend'] or 'Bullish' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Weakness' in signal['trend'] or 'Pressure' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Excellent':
+                active_text += " ⭐ PEAK"
+            
+            with market_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>📊 DOW:</strong> {signal['dow']} | <strong>💻 NASDAQ:</strong> {signal['nasdaq']} | <strong>📈 S&P500:</strong> {signal['sp500']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Evening Hours (4 PM - 11:55 PM)
+        st.markdown("#### 🌙 After Hours & Evening (4:00 PM - 11:55 PM)")
+        evening_cols = st.columns(2)
+        
+        for idx, signal in enumerate(evening_hours):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Rally' in signal['trend'] or 'Strength' in signal['trend'] or 'Recovery' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Weakness' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Maximum':
+                active_text += " ⭐ PEAK"
+            
+            with evening_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>📊 DOW:</strong> {signal['dow']} | <strong>💻 NASDAQ:</strong> {signal['nasdaq']} | <strong>📈 S&P500:</strong> {signal['sp500']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
+    
+    elif market_type == "equity":
+        st.markdown("### 📈 NIFTY 50 • 🏦 BANKNIFTY - Indian Market Planetary Transit")
+        
+        st.markdown("#### 🇮🇳 Indian Equity Market Hours (9:15 AM - 3:30 PM)")
+        equity_cols = st.columns(2)
+        
+        for idx, signal in enumerate(signals):
+            col_idx = idx % 2
+            is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+            
+            if 'Bullish' in signal['trend'] or 'Strength' in signal['trend']:
+                css_class = 'live-signal' if is_active else 'trend-bullish'
+            elif 'Weakness' in signal['trend'] or 'Pressure' in signal['trend']:
+                css_class = 'warning-signal' if is_active else 'trend-bearish'
+            else:
+                css_class = 'trend-volatile'
+            
+            active_text = " 🔥 LIVE NOW" if is_active else ""
+            if signal['strength'] == 'Maximum':
+                active_text += " ⭐ PEAK BANKING HOUR"
+            elif signal['time'] == '09:15-10:15':
+                active_text += " 🔔 OPENING"
+            elif signal['time'] == '15:15-15:30':
+                active_text += " 🔔 CLOSING"
+            
+            with equity_cols[col_idx]:
+                st.markdown(f"""
+                <div class="{css_class}">
+                    <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                    <strong>📈 NIFTY:</strong> {signal['nifty']} | <strong>🏦 BANKNIFTY:</strong> {signal['banknifty']}<br>
+                    <strong>Trend:</strong> {signal['trend']} | <strong>Strength:</strong> {signal['strength']}
+                </div>
+                """, unsafe_allow_html=True)
 
 def generate_weekly_calendar(market_name):
     """Generate weekly planetary calendar"""
@@ -556,7 +1284,8 @@ def generate_weekly_calendar(market_name):
 
 def generate_monthly_calendar(market_name):
     """Generate monthly planetary calendar"""
-    today = datetime.now()
+    ist_tz = pytz.timezone('Asia/Kolkata')
+    today = datetime.now(ist_tz)
     month_start = today.replace(day=1)
     
     if month_start.month == 12:
@@ -616,7 +1345,7 @@ def create_timeframe_tabs(market_name, market_type=""):
     tab1, tab2, tab3 = st.tabs(["⚡ INTRADAY", "📊 WEEKLY", "📅 MONTHLY"])
     
     with tab1:
-        st.markdown(f'<div class="timeframe-header"><h4>⚡ {market_name} - Today\'s Intraday Signals</h4></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="timeframe-header"><h4>⚡ {market_name} - Today\'s Intraday Planetary Signals</h4></div>', unsafe_allow_html=True)
         
         # Show specific market details based on type
         if market_type == "equity":
@@ -650,6 +1379,10 @@ def create_timeframe_tabs(market_name, market_type=""):
                     <p style="margin: 0;"><strong>High:</strong> {banknifty_data['high']:,.2f} | <strong>Low:</strong> {banknifty_data['low']:,.2f}</p>
                 </div>
                 """, unsafe_allow_html=True)
+            
+            # Show equity-specific planetary signals (9:15 AM - 3:30 PM)
+            signals = create_equity_signals()
+            display_detailed_signals(signals, "equity", current_hour)
         
         elif market_type == "commodity":
             # Display Gold, Silver, Crude details
@@ -672,10 +1405,14 @@ def create_timeframe_tabs(market_name, market_type=""):
                         <p style="margin: 0; font-size: 0.9em;"><strong>H:</strong> {data['high']:,.0f} | <strong>L:</strong> {data['low']:,.0f}</p>
                     </div>
                     """, unsafe_allow_html=True)
+            
+            # Show commodity-specific planetary signals (5 AM - 11:55 PM)
+            signals = create_commodity_signals()
+            display_detailed_signals(signals, "commodity", current_hour)
         
         elif market_type == "forex":
             # Display USDINR and Bitcoin details
-            forex_col1, forex_col2 = st.columns(2)
+            forex_col1, forex_col2, forex_col3 = st.columns(3)
             
             with forex_col1:
                 usdinr_data = st.session_state.market_data['USDINR']
@@ -684,10 +1421,10 @@ def create_timeframe_tabs(market_name, market_type=""):
                 
                 st.markdown(f"""
                 <div class="sector-price-card">
-                    <h3 style="margin: 0 0 10px 0; color: #333;">💵 USD/INR</h3>
-                    <h1 style="margin: 0; color: #007bff;">₹{usdinr_data['price']:.2f}</h1>
-                    <h3 class="{color_class}" style="margin: 5px 0;">{arrow} {abs(usdinr_data['change']):.2f}%</h3>
-                    <p style="margin: 0;"><strong>High:</strong> {usdinr_data['high']:.2f} | <strong>Low:</strong> {usdinr_data['low']:.2f}</p>
+                    <h4 style="margin: 0 0 10px 0; color: #333;">💵 USD/INR</h4>
+                    <h2 style="margin: 0; color: #007bff;">₹{usdinr_data['price']:.2f}</h2>
+                    <h4 class="{color_class}" style="margin: 5px 0;">{arrow} {abs(usdinr_data['change']):.2f}%</h4>
+                    <p style="margin: 0; font-size: 0.9em;"><strong>H:</strong> {usdinr_data['high']:.2f} | <strong>L:</strong> {usdinr_data['low']:.2f}</p>
                 </div>
                 """, unsafe_allow_html=True)
             
@@ -698,12 +1435,31 @@ def create_timeframe_tabs(market_name, market_type=""):
                 
                 st.markdown(f"""
                 <div class="sector-price-card">
-                    <h3 style="margin: 0 0 10px 0; color: #333;">₿ BITCOIN</h3>
-                    <h1 style="margin: 0; color: #007bff;">${btc_data['price']:,.0f}</h1>
-                    <h3 class="{color_class}" style="margin: 5px 0;">{arrow} {abs(btc_data['change']):.2f}%</h3>
-                    <p style="margin: 0;"><strong>High:</strong> ${btc_data['high']:,.0f} | <strong>Low:</strong> ${btc_data['low']:,.0f}</p>
+                    <h4 style="margin: 0 0 10px 0; color: #333;">₿ BITCOIN</h4>
+                    <h2 style="margin: 0; color: #007bff;">${btc_data['price']:,.0f}</h2>
+                    <h4 class="{color_class}" style="margin: 5px 0;">{arrow} {abs(btc_data['change']):.2f}%</h4>
+                    <p style="margin: 0; font-size: 0.9em;"><strong>H:</strong> ${btc_data['high']:,.0f} | <strong>L:</strong> ${btc_data['low']:,.0f}</p>
                 </div>
                 """, unsafe_allow_html=True)
+            
+            with forex_col3:
+                # Add Dollar Index (DXY) from session state
+                dxy_data = st.session_state.market_data['DXY']
+                color_class = "positive" if dxy_data['change'] >= 0 else "negative"
+                arrow = "▲" if dxy_data['change'] >= 0 else "▼"
+                
+                st.markdown(f"""
+                <div class="sector-price-card">
+                    <h4 style="margin: 0 0 10px 0; color: #333;">📊 DXY INDEX</h4>
+                    <h2 style="margin: 0; color: #007bff;">{dxy_data['price']:.2f}</h2>
+                    <h4 class="{color_class}" style="margin: 5px 0;">{arrow} {abs(dxy_data['change']):.2f}%</h4>
+                    <p style="margin: 0; font-size: 0.9em;"><strong>H:</strong> {dxy_data['high']:.2f} | <strong>L:</strong> {dxy_data['low']:.2f}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # Show forex-specific planetary signals (5 AM - 11:55 PM)
+            signals = create_forex_signals()
+            display_detailed_signals(signals, "forex", current_hour)
         
         elif market_type == "global":
             # Display Dow Jones, S&P 500, NASDAQ details
@@ -729,59 +1485,10 @@ def create_timeframe_tabs(market_name, market_type=""):
                         <p style="margin: 0; font-size: 0.9em;"><strong>H:</strong> {data['high']:,.0f} | <strong>L:</strong> {data['low']:,.0f}</p>
                     </div>
                     """, unsafe_allow_html=True)
-        
-        signals = create_intraday_signals(market_name)
-        current_hour = datetime.now().hour
-        
-        # Split signals into morning and afternoon
-        morning_signals = signals[:4]
-        afternoon_signals = signals[4:]
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("#### 🌅 Morning Session (9:15 AM - 1:00 PM)")
-            for signal in morning_signals:
-                is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
-                
-                if signal['trend'] == 'Bullish':
-                    css_class = 'live-signal' if is_active else 'trend-bullish'
-                elif signal['trend'] == 'Bearish':
-                    css_class = 'warning-signal' if is_active else 'trend-bearish'
-                else:
-                    css_class = 'trend-volatile'
-                
-                active_text = " 🔥 LIVE NOW" if is_active else ""
-                
-                st.markdown(f"""
-                <div class="{css_class}">
-                    <strong>{signal['time']}{active_text}</strong><br>
-                    Planet: {signal['planet']} | Signal: <strong>{signal['signal']}</strong><br>
-                    Target: {signal['target']} | SL: {signal['sl']}
-                </div>
-                """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown("#### 🌇 Afternoon Session (1:00 PM - 3:30 PM)")
-            for signal in afternoon_signals:
-                is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
-                
-                if signal['trend'] == 'Bullish':
-                    css_class = 'live-signal' if is_active else 'trend-bullish'
-                elif signal['trend'] == 'Bearish':
-                    css_class = 'warning-signal' if is_active else 'trend-bearish'
-                else:
-                    css_class = 'trend-volatile'
-                
-                active_text = " 🔥 LIVE NOW" if is_active else ""
-                
-                st.markdown(f"""
-                <div class="{css_class}">
-                    <strong>{signal['time']}{active_text}</strong><br>
-                    Planet: {signal['planet']} | Signal: <strong>{signal['signal']}</strong><br>
-                    Target: {signal['target']} | SL: {signal['sl']}
-                </div>
-                """, unsafe_allow_html=True)
+            
+            # Show global-specific planetary signals (5 AM - 11:55 PM)
+            signals = create_global_signals()
+            display_detailed_signals(signals, "global", current_hour)
     
     with tab2:
         st.markdown(f'<div class="timeframe-header"><h4>📊 {market_name} - This Week\'s Calendar</h4></div>', unsafe_allow_html=True)
@@ -877,15 +1584,6 @@ def create_timeframe_tabs(market_name, market_type=""):
             </div>
             """, unsafe_allow_html=True)
 
-# Get current date and time in IST
-ist_tz = pytz.timezone('Asia/Kolkata')
-current_date = datetime.now(ist_tz)
-current_date_str = current_date.strftime('%d %B %Y')
-current_day = current_date.strftime('%A')
-current_time_str = current_date.strftime('%H:%M:%S')  # Now properly in IST!
-tomorrow_date = (current_date + timedelta(days=1)).strftime('%d %B %Y')
-tomorrow_day = (current_date + timedelta(days=1)).strftime('%A')
-
 # Header
 st.markdown("""
 <div class="main-header">
@@ -932,7 +1630,6 @@ except Exception as e:
     st.error(f"Error creating ticker: {e}")
 
 # Current Planetary Hour - Based on Real Vedic Calculations
-current_hour = current_date.hour
 current_planet, current_symbol, current_influence = get_planetary_influence(current_hour)
 
 st.markdown(f"""
@@ -1042,55 +1739,23 @@ with main_tab1:
         with sector_tab1:
             st.markdown(f'<div class="timeframe-header"><h4>⚡ {analysis_target} - Today\'s Intraday Planetary Signals</h4></div>', unsafe_allow_html=True)
             
-            # Generate sector-specific signals
-            signals = create_intraday_signals(analysis_target)
-            
-            # Morning and Afternoon sessions
-            morning_col, afternoon_col = st.columns(2)
-            
-            with morning_col:
-                st.markdown("#### 🌅 Morning Session (9:15 AM - 1:00 PM)")
-                for signal in signals[:4]:
-                    is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
-                    
-                    if signal['trend'] == 'Bullish':
-                        css_class = 'live-signal' if is_active else 'trend-bullish'
-                    elif signal['trend'] == 'Bearish':
-                        css_class = 'warning-signal' if is_active else 'trend-bearish'
-                    else:
-                        css_class = 'trend-volatile'
-                    
-                    active_text = " 🔥 LIVE NOW" if is_active else ""
-                    
-                    st.markdown(f"""
-                    <div class="{css_class}">
-                        <strong>{signal['time']}{active_text}</strong><br>
-                        Planet: {signal['planet']} | Signal: <strong>{signal['signal']}</strong><br>
-                        Target: {signal['target']} | SL: {signal['sl']}
-                    </div>
-                    """, unsafe_allow_html=True)
-            
-            with afternoon_col:
-                st.markdown("#### 🌇 Afternoon Session (1:00 PM - 3:30 PM)")
-                for signal in signals[4:]:
-                    is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
-                    
-                    if signal['trend'] == 'Bullish':
-                        css_class = 'live-signal' if is_active else 'trend-bullish'
-                    elif signal['trend'] == 'Bearish':
-                        css_class = 'warning-signal' if is_active else 'trend-bearish'
-                    else:
-                        css_class = 'trend-volatile'
-                    
-                    active_text = " 🔥 LIVE NOW" if is_active else ""
-                    
-                    st.markdown(f"""
-                    <div class="{css_class}">
-                        <strong>{signal['time']}{active_text}</strong><br>
-                        Planet: {signal['planet']} | Signal: <strong>{signal['signal']}</strong><br>
-                        Target: {signal['target']} | SL: {signal['sl']}
-                    </div>
-                    """, unsafe_allow_html=True)
+            # Generate sector-specific signals based on type
+            if 'BANK' in analysis_target.upper() or analysis_target in ['BANKNIFTY', 'PSU BANK', 'PVT BANK']:
+                # Use banking-focused signals (similar to equity)
+                signals = create_equity_signals()
+                display_detailed_signals(signals, "equity", current_hour)
+            elif analysis_target in ['GOLD', 'SILVER', 'CRUDE'] or 'METAL' in analysis_target.upper():
+                # Use commodity signals
+                signals = create_commodity_signals()
+                display_detailed_signals(signals, "commodity", current_hour)
+            elif 'IT' in analysis_target.upper() or analysis_target in ['TCS', 'INFOSYS', 'WIPRO']:
+                # Use tech-focused signals (mix of equity and global)
+                signals = create_equity_signals()
+                display_detailed_signals(signals, "equity", current_hour)
+            else:
+                # Default equity signals for other sectors
+                signals = create_equity_signals()
+                display_detailed_signals(signals, "equity", current_hour)
             
             # Show individual stocks for selected sector (not custom symbol)
             if not custom_symbol and selected_sector in st.session_state.sector_data:
