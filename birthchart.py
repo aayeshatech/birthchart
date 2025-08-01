@@ -1256,7 +1256,279 @@ def display_detailed_signals(signals, market_type, current_hour):
                 </div>
                 """, unsafe_allow_html=True)
 
+def generate_symbol_data(symbol_name):
+    """Generate realistic data for any custom symbol"""
+    # Create realistic price based on symbol type
+    if 'BANK' in symbol_name.upper() or symbol_name.upper() in ['HDFC', 'ICICI', 'SBI', 'KOTAK', 'AXIS']:
+        base_price = random.uniform(800, 1800)
+    elif symbol_name.upper() in ['RELIANCE', 'TCS', 'INFOSYS']:
+        base_price = random.uniform(2500, 4000)
+    elif 'PHARMA' in symbol_name.upper() or symbol_name.upper() in ['SUN PHARMA', 'DR REDDY', 'CIPLA']:
+        base_price = random.uniform(600, 1500)
+    elif 'AUTO' in symbol_name.upper() or symbol_name.upper() in ['TATA MOTORS', 'MARUTI']:
+        base_price = random.uniform(300, 800)
+    else:
+        base_price = random.uniform(150, 2000)
+    
+    change_percent = random.uniform(-5, 5)
+    high_price = base_price * (1 + abs(change_percent)/100 + random.uniform(0.01, 0.03))
+    low_price = base_price * (1 - abs(change_percent)/100 - random.uniform(0.01, 0.03))
+    
+    return {
+        'price': base_price,
+        'change': change_percent,
+        'high': high_price,
+        'low': low_price,
+        'volume': random.randint(50000, 5000000),
+        'market_cap': random.randint(10000, 500000)  # in crores
+    }
+
+def create_symbol_intraday_signals(symbol_name):
+    """Generate symbol-specific intraday signals based on symbol characteristics"""
+    
+    # Determine sector characteristics
+    if 'BANK' in symbol_name.upper():
+        sector_type = 'banking'
+    elif 'IT' in symbol_name.upper() or symbol_name.upper() in ['TCS', 'INFOSYS', 'WIPRO']:
+        sector_type = 'tech'
+    elif 'PHARMA' in symbol_name.upper():
+        sector_type = 'pharma'
+    elif 'AUTO' in symbol_name.upper():
+        sector_type = 'auto'
+    elif 'METAL' in symbol_name.upper():
+        sector_type = 'metal'
+    else:
+        sector_type = 'general'
+    
+    # Base signals adjusted for sector
+    if sector_type == 'banking':
+        signals = [
+            {'time': '09:15-10:15', 'planet': 'Venus ♀', 'signal': 'BUY', 'target': '+1.2%', 'sl': '-0.4%', 'trend': 'Bullish'},
+            {'time': '10:15-11:15', 'planet': 'Sun ☀️', 'signal': 'STRONG BUY', 'target': '+1.8%', 'sl': '-0.5%', 'trend': 'Strong Bullish'},
+            {'time': '11:15-12:15', 'planet': 'Mercury ☿', 'signal': 'HOLD', 'target': '+0.5%', 'sl': '-0.3%', 'trend': 'Neutral'},
+            {'time': '12:15-13:15', 'planet': 'Saturn ♄', 'signal': 'SELL', 'target': '-0.8%', 'sl': '+0.3%', 'trend': 'Bearish'},
+            {'time': '13:15-14:15', 'planet': 'Jupiter ♃', 'signal': 'PEAK BUY', 'target': '+2.5%', 'sl': '-0.6%', 'trend': 'Peak Bullish'},
+            {'time': '14:15-15:15', 'planet': 'Mars ♂️', 'signal': 'VOLATILE', 'target': '±1.8%', 'sl': '±0.6%', 'trend': 'High Volatility'},
+            {'time': '15:15-15:30', 'planet': 'Sun ☀️', 'signal': 'BUY', 'target': '+1.0%', 'sl': '-0.3%', 'trend': 'Closing Strength'}
+        ]
+    elif sector_type == 'tech':
+        signals = [
+            {'time': '09:15-10:15', 'planet': 'Venus ♀', 'signal': 'HOLD', 'target': '+0.8%', 'sl': '-0.4%', 'trend': 'Cautious'},
+            {'time': '10:15-11:15', 'planet': 'Sun ☀️', 'signal': 'BUY', 'target': '+1.2%', 'sl': '-0.4%', 'trend': 'Bullish'},
+            {'time': '11:15-12:15', 'planet': 'Mercury ☿', 'signal': 'SELL', 'target': '-1.2%', 'sl': '+0.4%', 'trend': 'Tech Pressure'},
+            {'time': '12:15-13:15', 'planet': 'Saturn ♄', 'signal': 'STRONG SELL', 'target': '-1.8%', 'sl': '+0.6%', 'trend': 'Strong Bearish'},
+            {'time': '13:15-14:15', 'planet': 'Jupiter ♃', 'signal': 'BUY', 'target': '+1.5%', 'sl': '-0.5%', 'trend': 'Recovery'},
+            {'time': '14:15-15:15', 'planet': 'Mars ♂️', 'signal': 'VOLATILE', 'target': '±2.2%', 'sl': '±0.7%', 'trend': 'Extreme Volatility'},
+            {'time': '15:15-15:30', 'planet': 'Sun ☀️', 'signal': 'HOLD', 'target': '+0.6%', 'sl': '-0.3%', 'trend': 'Neutral Close'}
+        ]
+    elif sector_type == 'pharma':
+        signals = [
+            {'time': '09:15-10:15', 'planet': 'Venus ♀', 'signal': 'BUY', 'target': '+1.0%', 'sl': '-0.3%', 'trend': 'Bullish'},
+            {'time': '10:15-11:15', 'planet': 'Sun ☀️', 'signal': 'STRONG BUY', 'target': '+2.0%', 'sl': '-0.6%', 'trend': 'Strong Bullish'},
+            {'time': '11:15-12:15', 'planet': 'Mercury ☿', 'signal': 'BUY', 'target': '+1.3%', 'sl': '-0.4%', 'trend': 'Bullish'},
+            {'time': '12:15-13:15', 'planet': 'Saturn ♄', 'signal': 'CAUTION', 'target': '±0.8%', 'sl': '±0.3%', 'trend': 'Mixed'},
+            {'time': '13:15-14:15', 'planet': 'Jupiter ♃', 'signal': 'BUY', 'target': '+1.5%', 'sl': '-0.5%', 'trend': 'Good'},
+            {'time': '14:15-15:15', 'planet': 'Mars ♂️', 'signal': 'SELL', 'target': '-1.2%', 'sl': '+0.4%', 'trend': 'Bearish'},
+            {'time': '15:15-15:30', 'planet': 'Sun ☀️', 'signal': 'HOLD', 'target': '+0.5%', 'sl': '-0.2%', 'trend': 'Stable'}
+        ]
+    else:
+        # General signals for other sectors
+        signals = [
+            {'time': '09:15-10:15', 'planet': 'Venus ♀', 'signal': 'BUY', 'target': '+1.0%', 'sl': '-0.3%', 'trend': 'Bullish'},
+            {'time': '10:15-11:15', 'planet': 'Sun ☀️', 'signal': 'BUY', 'target': '+1.2%', 'sl': '-0.4%', 'trend': 'Bullish'},
+            {'time': '11:15-12:15', 'planet': 'Mercury ☿', 'signal': 'HOLD', 'target': '+0.6%', 'sl': '-0.3%', 'trend': 'Neutral'},
+            {'time': '12:15-13:15', 'planet': 'Saturn ♄', 'signal': 'SELL', 'target': '-0.9%', 'sl': '+0.3%', 'trend': 'Bearish'},
+            {'time': '13:15-14:15', 'planet': 'Jupiter ♃', 'signal': 'BUY', 'target': '+1.5%', 'sl': '-0.5%', 'trend': 'Recovery'},
+            {'time': '14:15-15:15', 'planet': 'Mars ♂️', 'signal': 'VOLATILE', 'target': '±1.5%', 'sl': '±0.5%', 'trend': 'High Volatility'},
+            {'time': '15:15-15:30', 'planet': 'Sun ☀️', 'signal': 'BUY', 'target': '+0.8%', 'sl': '-0.3%', 'trend': 'Closing Strength'}
+        ]
+    
+    return signals
+
+def display_symbol_signals(symbol_name, signals, current_hour):
+    """Display symbol-specific planetary signals"""
+    st.markdown(f"### 📊 {symbol_name} - Intraday Planetary Transit Signals")
+    
+    # Market Hours Display
+    st.markdown("#### 🇮🇳 Indian Market Hours (9:15 AM - 3:30 PM)")
+    
+    signal_cols = st.columns(2)
+    
+    for idx, signal in enumerate(signals):
+        col_idx = idx % 2
+        is_active = current_hour >= int(signal['time'].split('-')[0].split(':')[0]) and current_hour < int(signal['time'].split('-')[1].split(':')[0])
+        
+        if signal['trend'] in ['Bullish', 'Strong Bullish', 'Peak Bullish', 'Recovery']:
+            css_class = 'live-signal' if is_active else 'trend-bullish'
+        elif signal['trend'] in ['Bearish', 'Strong Bearish', 'Tech Pressure']:
+            css_class = 'warning-signal' if is_active else 'trend-bearish'
+        else:
+            css_class = 'trend-volatile'
+        
+        active_text = " 🔥 LIVE NOW" if is_active else ""
+        if 'PEAK' in signal['signal']:
+            active_text += " ⭐ PEAK HOUR"
+        elif signal['time'] == '09:15-10:15':
+            active_text += " 🔔 OPENING"
+        elif signal['time'] == '15:15-15:30':
+            active_text += " 🔔 CLOSING"
+        
+        with signal_cols[col_idx]:
+            st.markdown(f"""
+            <div class="{css_class}">
+                <strong>{signal['time']} - {signal['planet']}{active_text}</strong><br>
+                <strong>📊 {symbol_name}:</strong> <span style="background: {'#28a745' if 'BUY' in signal['signal'] else '#dc3545' if 'SELL' in signal['signal'] else '#ffc107'}; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold;">{signal['signal']}</span><br>
+                <strong>Target:</strong> {signal['target']} | <strong>SL:</strong> {signal['sl']} | <strong>Trend:</strong> {signal['trend']}
+            </div>
+            """, unsafe_allow_html=True)
+
+def generate_symbol_weekly_data(symbol_name):
+    """Generate weekly performance data for custom symbol"""
+    weekly_data = []
+    today = datetime.now(ist_tz)
+    week_start = today - timedelta(days=today.weekday())
+    
+    planets = ['Sun ☀️', 'Moon 🌙', 'Mars ♂️', 'Mercury ☿', 'Jupiter ♃', 'Venus ♀', 'Saturn ♄']
+    
+    # Generate sector-appropriate trends
+    if 'BANK' in symbol_name.upper():
+        trends = ['Bullish', 'Strong Bullish', 'Bearish', 'Neutral', 'Peak Bullish', 'Bullish', 'Bearish']
+    elif 'IT' in symbol_name.upper():
+        trends = ['Bearish', 'Volatile', 'Strong Bearish', 'Neutral', 'Recovery', 'Bullish', 'Bearish']
+    elif 'PHARMA' in symbol_name.upper():
+        trends = ['Strong Bullish', 'Bullish', 'Neutral', 'Bullish', 'Strong Bullish', 'Volatile', 'Neutral']
+    else:
+        trends = ['Bullish', 'Volatile', 'Bearish', 'Neutral', 'Bullish', 'Bullish', 'Bearish']
+    
+    for i in range(7):
+        current_date = week_start + timedelta(days=i)
+        target_change = random.uniform(-3, 4) if trends[i] == 'Volatile' else random.uniform(-2, 3)
+        
+        weekly_data.append({
+            'date': current_date.strftime('%Y-%m-%d'),
+            'day': current_date.strftime('%A'),
+            'short_day': current_date.strftime('%a'),
+            'day_num': current_date.strftime('%d'),
+            'month': current_date.strftime('%m'),
+            'planet': planets[i],
+            'trend': trends[i],
+            'target': f"{'+' if target_change > 0 else ''}{target_change:.1f}%",
+            'is_today': current_date.date() == today.date(),
+            'rating': 'Strong Buy' if trends[i] in ['Strong Bullish', 'Peak Bullish'] else 'Buy' if trends[i] == 'Bullish' else 'Sell' if trends[i] in ['Bearish', 'Strong Bearish'] else 'Hold'
+        })
+    
+    return weekly_data
+
+def generate_monthly_calendar(market_name):
+    """Generate monthly planetary calendar for sectors"""
+    ist_tz = pytz.timezone('Asia/Kolkata')
+    today = datetime.now(ist_tz)
+    month_start = today.replace(day=1)
+    
+    if month_start.month == 12:
+        next_month = month_start.replace(year=month_start.year + 1, month=1)
+    else:
+        next_month = month_start.replace(month=month_start.month + 1)
+    month_end = next_month - timedelta(days=1)
+    
+    monthly_data = []
+    planets = ['Sun ☀️', 'Moon 🌙', 'Mars ♂️', 'Mercury ☿', 'Jupiter ♃', 'Venus ♀', 'Saturn ♄', 'Rahu ☊', 'Ketu ☋']
+    trends = ['Bullish', 'Volatile', 'Bearish', 'Neutral', 'Bullish', 'Bullish', 'Bearish', 'Volatile', 'Bearish']
+    
+    current_date = month_start
+    while current_date <= month_end:
+        planet_idx = (current_date.day - 1) % len(planets)
+        trend_idx = (current_date.day - 1) % len(trends)
+        
+        monthly_data.append({
+            'date': current_date.strftime('%Y-%m-%d'),
+            'day': current_date.strftime('%a'),
+            'day_num': current_date.strftime('%d'),
+            'month': current_date.strftime('%m'),
+            'planet': planets[planet_idx],
+            'trend': trends[trend_idx],
+            'target': f"{'+' if trends[trend_idx] == 'Bullish' else '-' if trends[trend_idx] == 'Bearish' else '±'}{random.uniform(0.3, 1.8):.1f}%",
+            'is_today': current_date.date() == today.date()
+        })
+        current_date += timedelta(days=1)
+    
+    return monthly_data
+
+def generate_symbol_monthly_data(symbol_name):
+    """Generate monthly performance data for custom symbol"""
+    today = datetime.now(ist_tz)
+    month_start = today.replace(day=1)
+    
+    if month_start.month == 12:
+        next_month = month_start.replace(year=month_start.year + 1, month=1)
+    else:
+        next_month = month_start.replace(month=month_start.month + 1)
+    month_end = next_month - timedelta(days=1)
+    
+    monthly_data = []
+    planets = ['Sun ☀️', 'Moon 🌙', 'Mars ♂️', 'Mercury ☿', 'Jupiter ♃', 'Venus ♀', 'Saturn ♄', 'Rahu ☊', 'Ketu ☋']
+    
+    # Generate sector-appropriate monthly trends
+    if 'BANK' in symbol_name.upper():
+        base_trends = ['Strong Bullish', 'Bullish', 'Bearish', 'Neutral', 'Peak Bullish', 'Bullish', 'Volatile', 'Bearish', 'Recovery']
+    elif 'IT' in symbol_name.upper():
+        base_trends = ['Bearish', 'Volatile', 'Strong Bearish', 'Weak', 'Recovery', 'Neutral', 'Bearish', 'Volatile', 'Weak']
+    elif 'PHARMA' in symbol_name.upper():
+        base_trends = ['Strong Bullish', 'Bullish', 'Neutral', 'Bullish', 'Strong Bullish', 'Volatile', 'Bullish', 'Neutral', 'Strong Bullish']
+    else:
+        base_trends = ['Bullish', 'Volatile', 'Bearish', 'Neutral', 'Bullish', 'Bullish', 'Bearish', 'Volatile', 'Neutral']
+    
+    current_date = month_start
+    day_count = 0
+    
+    while current_date <= month_end:
+        trend_idx = day_count % len(base_trends)
+        planet_idx = day_count % len(planets)
+        
+        target_change = random.uniform(-2.5, 3.5)
+        
+        monthly_data.append({
+            'date': current_date.strftime('%Y-%m-%d'),
+            'day': current_date.strftime('%a'),
+            'day_num': current_date.strftime('%d'),
+            'month': current_date.strftime('%m'),
+            'planet': planets[planet_idx],
+            'trend': base_trends[trend_idx],
+            'target': f"{'+' if target_change > 0 else ''}{target_change:.1f}%",
+            'is_today': current_date.date() == today.date(),
+            'rating': 'Strong Buy' if base_trends[trend_idx] in ['Strong Bullish', 'Peak Bullish'] else 'Buy' if base_trends[trend_idx] == 'Bullish' else 'Sell' if base_trends[trend_idx] in ['Bearish', 'Strong Bearish'] else 'Hold'
+        })
+        
+        current_date += timedelta(days=1)
+        day_count += 1
+    
+    return monthly_data
+
 def generate_weekly_calendar(market_name):
+    """Generate weekly planetary calendar for sectors"""
+    ist_tz = pytz.timezone('Asia/Kolkata')
+    today = datetime.now(ist_tz)
+    week_start = today - timedelta(days=today.weekday())
+    
+    weekly_data = []
+    planets = ['Sun ☀️', 'Moon 🌙', 'Mars ♂️', 'Mercury ☿', 'Jupiter ♃', 'Venus ♀', 'Saturn ♄']
+    trends = ['Bullish', 'Volatile', 'Bearish', 'Neutral', 'Bullish', 'Bullish', 'Bearish']
+    
+    for i in range(7):
+        current_date = week_start + timedelta(days=i)
+        weekly_data.append({
+            'date': current_date.strftime('%Y-%m-%d'),
+            'day': current_date.strftime('%A'),
+            'short_day': current_date.strftime('%a'),
+            'day_num': current_date.strftime('%d'),
+            'month': current_date.strftime('%m'),
+            'planet': planets[i],
+            'trend': trends[i],
+            'target': f"{'+' if trends[i] == 'Bullish' else '-' if trends[i] == 'Bearish' else '±'}{random.uniform(0.5, 2.5):.1f}%",
+            'is_today': current_date.date() == today.date()
+        })
+    
+    return weekly_data
     """Generate weekly planetary calendar"""
     ist_tz = pytz.timezone('Asia/Kolkata')
     today = datetime.now(ist_tz)
@@ -1703,8 +1975,34 @@ with main_tab1:
             analysis_target = custom_symbol.upper() if custom_symbol else selected_sector
             st.markdown(f"<h4 style='color: #007bff;'>{analysis_target}</h4>", unsafe_allow_html=True)
         
-        # Display Sector Price (if available)
-        if not custom_symbol and selected_sector in st.session_state.sector_data:
+        # Display Symbol Price or Sector Price
+        if custom_symbol:
+            # Show custom symbol data
+            symbol_data = generate_symbol_data(custom_symbol.upper())
+            color_class = "positive" if symbol_data['change'] >= 0 else "negative"
+            arrow = "▲" if symbol_data['change'] >= 0 else "▼"
+            
+            st.markdown(f"""
+            <div class="sector-price-card">
+                <h2 style="margin: 0 0 10px 0; color: #333;">📊 {custom_symbol.upper()}</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h1 style="margin: 0; color: #007bff;">₹{symbol_data['price']:,.2f}</h1>
+                        <h3 class="{color_class}" style="margin: 5px 0;">
+                            {arrow} {abs(symbol_data['change']):.2f}%
+                        </h3>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="margin: 0; font-size: 1.1em;"><strong>High:</strong> ₹{symbol_data['high']:,.2f}</p>
+                        <p style="margin: 0; font-size: 1.1em;"><strong>Low:</strong> ₹{symbol_data['low']:,.2f}</p>
+                        <p style="margin: 0; font-size: 0.9em;"><strong>Volume:</strong> {symbol_data['volume']:,}</p>
+                        <p style="margin: 0; font-size: 0.9em;"><strong>Mkt Cap:</strong> ₹{symbol_data['market_cap']:,} Cr</p>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        elif selected_sector in st.session_state.sector_data:
+            # Show sector index data only when no custom symbol
             sector_info = st.session_state.sector_data[selected_sector]
             index_key = sector_info['index_key']
             
@@ -1730,7 +2028,6 @@ with main_tab1:
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
-        
         # Sector/Symbol Analysis with Timeframes
         st.markdown(f"### 📊 {analysis_target} - Complete Planetary Analysis")
         
@@ -1739,23 +2036,28 @@ with main_tab1:
         with sector_tab1:
             st.markdown(f'<div class="timeframe-header"><h4>⚡ {analysis_target} - Today\'s Intraday Planetary Signals</h4></div>', unsafe_allow_html=True)
             
-            # Generate sector-specific signals based on type
-            if 'BANK' in analysis_target.upper() or analysis_target in ['BANKNIFTY', 'PSU BANK', 'PVT BANK']:
-                # Use banking-focused signals (similar to equity)
-                signals = create_equity_signals()
-                display_detailed_signals(signals, "equity", current_hour)
-            elif analysis_target in ['GOLD', 'SILVER', 'CRUDE'] or 'METAL' in analysis_target.upper():
-                # Use commodity signals
-                signals = create_commodity_signals()
-                display_detailed_signals(signals, "commodity", current_hour)
-            elif 'IT' in analysis_target.upper() or analysis_target in ['TCS', 'INFOSYS', 'WIPRO']:
-                # Use tech-focused signals (mix of equity and global)
-                signals = create_equity_signals()
-                display_detailed_signals(signals, "equity", current_hour)
+            if custom_symbol:
+                # Show custom symbol intraday analysis
+                symbol_signals = create_symbol_intraday_signals(custom_symbol.upper())
+                display_symbol_signals(custom_symbol.upper(), symbol_signals, current_hour)
             else:
-                # Default equity signals for other sectors
-                signals = create_equity_signals()
-                display_detailed_signals(signals, "equity", current_hour)
+                # Generate sector-specific signals based on type
+                if 'BANK' in analysis_target.upper() or analysis_target in ['BANKNIFTY', 'PSU BANK', 'PVT BANK']:
+                    # Use banking-focused signals (similar to equity)
+                    signals = create_equity_signals()
+                    display_detailed_signals(signals, "equity", current_hour)
+                elif analysis_target in ['GOLD', 'SILVER', 'CRUDE'] or 'METAL' in analysis_target.upper():
+                    # Use commodity signals
+                    signals = create_commodity_signals()
+                    display_detailed_signals(signals, "commodity", current_hour)
+                elif 'IT' in analysis_target.upper() or analysis_target in ['TCS', 'INFOSYS', 'WIPRO']:
+                    # Use tech-focused signals (mix of equity and global)
+                    signals = create_equity_signals()
+                    display_detailed_signals(signals, "equity", current_hour)
+                else:
+                    # Default equity signals for other sectors
+                    signals = create_equity_signals()
+                    display_detailed_signals(signals, "equity", current_hour)
             
             # Show individual stocks for selected sector (not custom symbol)
             if not custom_symbol and selected_sector in st.session_state.sector_data:
@@ -1790,8 +2092,439 @@ with main_tab1:
         with sector_tab2:
             st.markdown(f'<div class="timeframe-header"><h4>📊 {analysis_target} - Weekly Planetary Calendar</h4></div>', unsafe_allow_html=True)
             
-            weekly_data = generate_weekly_calendar(analysis_target)
-            display_calendar_grid(weekly_data, 7)
+            if custom_symbol:
+                # Show custom symbol weekly analysis
+                weekly_data = generate_symbol_weekly_data(custom_symbol.upper())
+                
+                # Display weekly calendar
+            # Show individual stocks for selected sector (only when no custom symbol)
+            if not custom_symbol and selected_sector in st.session_state.sector_data:
+                st.markdown(f"### 📈 Top Stocks in {selected_sector} Sector")
+                
+                stocks = st.session_state.sector_data[selected_sector]['stocks']
+                
+                # Create stock grid
+                stock_cols = st.columns(5)
+                
+                for idx, stock in enumerate(stocks):
+                    col_idx = idx % 5
+                    
+                    # Generate random data for demonstration
+                    stock_data = generate_symbol_data(stock)
+                    color_class = "positive" if stock_data['change'] >= 0 else "negative"
+                    arrow = "▲" if stock_data['change'] >= 0 else "▼"
+                    
+                    with stock_cols[col_idx]:
+                        st.markdown(f"""
+                        <div class="stock-card">
+                            <h6 style="margin: 0 0 8px 0; font-weight: bold; color: #333;">{stock}</h6>
+                            <h4 style="margin: 0; color: #007bff;">₹{stock_data['price']:.1f}</h4>
+                            <p class="{color_class}" style="margin: 5px 0 0 0; font-weight: bold;">
+                                {arrow} {abs(stock_data['change']):.2f}%
+                            </p>
+                        </div>
+                        """, unsafe_allow_html=True)
+            
+            elif custom_symbol:
+                # Show additional analysis for custom symbol
+                st.markdown(f"### 📊 {custom_symbol.upper()} - Additional Technical Analysis")
+                
+                symbol_data = generate_symbol_data(custom_symbol.upper())
+                
+                tech_col1, tech_col2, tech_col3 = st.columns(3)
+                
+                with tech_col1:
+                    rsi = random.uniform(30, 70)
+                    rsi_signal = "Oversold - BUY" if rsi < 40 else "Overbought - SELL" if rsi > 60 else "Neutral - HOLD"
+                    rsi_color = "#28a745" if rsi < 40 else "#dc3545" if rsi > 60 else "#ffc107"
+                    
+                    st.markdown(f"""
+                    <div class="report-section" style="border-left: 5px solid {rsi_color};">
+                        <h5 style="margin: 0 0 10px 0; color: {rsi_color};">📈 RSI Analysis</h5>
+                        <h3 style="margin: 0; color: {rsi_color};">{rsi:.1f}</h3>
+                        <p style="margin: 5px 0 0 0; font-weight: bold;">{rsi_signal}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with tech_col2:
+                    volume_ratio = random.uniform(0.8, 2.5)
+                    volume_signal = "High Volume - Strong Move" if volume_ratio > 1.5 else "Low Volume - Weak Move" if volume_ratio < 1.0 else "Average Volume"
+                    volume_color = "#28a745" if volume_ratio > 1.5 else "#dc3545" if volume_ratio < 1.0 else "#ffc107"
+                    
+                    st.markdown(f"""
+                    <div class="report-section" style="border-left: 5px solid {volume_color};">
+                        <h5 style="margin: 0 0 10px 0; color: {volume_color};">📊 Volume Analysis</h5>
+                        <h3 style="margin: 0; color: {volume_color};">{volume_ratio:.1f}x</h3>
+                        <p style="margin: 5px 0 0 0; font-weight: bold;">{volume_signal}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with tech_col3:
+                    momentum = random.choice(['Strong Bullish', 'Bullish', 'Neutral', 'Bearish', 'Strong Bearish'])
+                    momentum_color = "#28a745" if 'Bullish' in momentum else "#dc3545" if 'Bearish' in momentum else "#ffc107"
+                    
+                    st.markdown(f"""
+                    <div class="report-section" style="border-left: 5px solid {momentum_color};">
+                        <h5 style="margin: 0 0 10px 0; color: {momentum_color};">⚡ Momentum</h5>
+                        <h4 style="margin: 0; color: {momentum_color};">{momentum}</h4>
+                        <p style="margin: 5px 0 0 0; font-weight: bold;">Trend Direction</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+        
+        with sector_tab2:
+            st.markdown(f'<div class="timeframe-header"><h4>📊 {analysis_target} - Weekly Planetary Calendar</h4></div>', unsafe_allow_html=True)
+            
+            if custom_symbol:
+                # Show custom symbol weekly analysis
+                weekly_data = generate_symbol_weekly_data(custom_symbol.upper())
+                
+                # Display weekly calendar
+                display_calendar_grid(weekly_data, 7)
+                
+                # Custom symbol weekly summary
+                st.markdown(f"### 📈 {custom_symbol.upper()} - Weekly Trading Analysis")
+                
+                bullish_days = [day for day in weekly_data if 'Bullish' in day['trend']]
+                bearish_days = [day for day in weekly_data if 'Bearish' in day['trend']]
+                
+                weekly_symbol_col1, weekly_symbol_col2 = st.columns(2)
+                
+                with weekly_symbol_col1:
+                    st.markdown(f"""
+                    <div class="report-section" style="background: #d4edda; border-left: 5px solid #28a745;">
+                        <h4 style="color: #155724;">🟢 {custom_symbol.upper()} LONG Opportunities</h4>
+                    """, unsafe_allow_html=True)
+                    
+                    for day in bullish_days:
+                        st.markdown(f"**{day['day']}:** {day['planet']} | **{day['rating']}** | Target: {day['target']}")
+                    
+                    st.markdown(f"<p><strong>Strategy:</strong> Accumulate {custom_symbol.upper()} on dips during bullish days</p></div>", unsafe_allow_html=True)
+                
+                with weekly_symbol_col2:
+                    st.markdown(f"""
+                    <div class="report-section" style="background: #f8d7da; border-left: 5px solid #dc3545;">
+                        <h4 style="color: #721c24;">🔴 {custom_symbol.upper()} SHORT Opportunities</h4>
+                    """, unsafe_allow_html=True)
+                    
+                    for day in bearish_days:
+                        st.markdown(f"**{day['day']}:** {day['planet']} | **{day['rating']}** | Target: {day['target']}")
+                    
+                    st.markdown(f"<p><strong>Strategy:</strong> Book profits or short {custom_symbol.upper()} on rallies</p></div>", unsafe_allow_html=True)
+                
+                # Weekly performance summary
+                st.markdown(f"### 📊 {custom_symbol.upper()} - Weekly Performance Forecast")
+                
+                weekly_perf_col1, weekly_perf_col2, weekly_perf_col3 = st.columns(3)
+                
+                strong_buy_days = sum(1 for day in weekly_data if day['rating'] == 'Strong Buy')
+                buy_days = sum(1 for day in weekly_data if day['rating'] == 'Buy')
+                sell_days = sum(1 for day in weekly_data if day['rating'] == 'Sell')
+                
+                with weekly_perf_col1:
+                    st.markdown(f"""
+                    <div class="performance-strong-buy performance-card">
+                        <h5 style="margin: 0 0 5px 0;">⭐ Strong Buy Days</h5>
+                        <h2 style="margin: 0;">{strong_buy_days}</h2>
+                        <p style="margin: 0; font-size: 0.9em;">Peak accumulation opportunities</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with weekly_perf_col2:
+                    st.markdown(f"""
+                    <div class="performance-buy performance-card">
+                        <h5 style="margin: 0 0 5px 0;">✅ Buy Days</h5>
+                        <h2 style="margin: 0;">{buy_days}</h2>
+                        <p style="margin: 0; font-size: 0.9em;">Good entry opportunities</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with weekly_perf_col3:
+                    st.markdown(f"""
+                    <div class="performance-sell performance-card">
+                        <h5 style="margin: 0 0 5px 0;">❌ Sell Days</h5>
+                        <h2 style="margin: 0;">{sell_days}</h2>
+                        <p style="margin: 0; font-size: 0.9em;">Profit booking recommended</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+            
+            else:
+                # Show sector weekly analysis (existing code)
+                weekly_data = generate_weekly_calendar(analysis_target)
+                display_calendar_grid(weekly_data, 7)
+                
+                # Weekly Long/Short Analysis (for sectors)
+                st.markdown("### 🎯 Weekly Trading Opportunities")
+                
+                weekly_opp_col1, weekly_opp_col2 = st.columns(2)
+                
+                bullish_days = [day for day in weekly_data if day['trend'] == 'Bullish']
+                bearish_days = [day for day in weekly_data if day['trend'] == 'Bearish']
+                
+                with weekly_opp_col1:
+                    st.markdown("""
+                    <div class="report-section" style="background: #d4edda; border-left: 5px solid #28a745;">
+                        <h4 style="color: #155724;">🟢 LONG Opportunities This Week</h4>
+                    """, unsafe_allow_html=True)
+                    
+                    for day in bullish_days:
+                        st.markdown(f"**{day['day']}:** {day['planet']} | Target: {day['target']}")
+                    
+                    st.markdown("<p><strong>Strategy:</strong> Accumulate on dips during bullish days</p></div>", unsafe_allow_html=True)
+                
+                with weekly_opp_col2:
+                    st.markdown("""
+                    <div class="report-section" style="background: #f8d7da; border-left: 5px solid #dc3545;">
+                        <h4 style="color: #721c24;">🔴 SHORT Opportunities This Week</h4>
+                    """, unsafe_allow_html=True)
+                    
+                    for day in bearish_days:
+                        st.markdown(f"**{day['day']}:** {day['planet']} | Target: {day['target']}")
+                    
+                    st.markdown("<p><strong>Strategy:</strong> Short on rallies during bearish days</p></div>", unsafe_allow_html=True)
+                
+                # Individual Stock Weekly Performance (for sectors)
+                if selected_sector in st.session_state.sector_data:
+                    st.markdown(f"### 📊 {selected_sector} Stocks - Weekly Outlook")
+                    
+                    stocks = st.session_state.sector_data[selected_sector]['stocks'][:8]  # Top 8 stocks
+                    perf_cols = st.columns(4)
+                    
+                    for idx, stock in enumerate(stocks):
+                        col_idx = idx % 4
+                        
+                        # Generate weekly performance
+                        weekly_outlook = random.choice(['Strong Buy', 'Buy', 'Hold', 'Sell'])
+                        weekly_target = random.uniform(-10, 15)
+                        
+                        if weekly_outlook == 'Strong Buy':
+                            css_class = 'performance-strong-buy'
+                        elif weekly_outlook == 'Buy':
+                            css_class = 'performance-buy'
+                        elif weekly_outlook == 'Sell':
+                            css_class = 'performance-sell'
+                        else:
+                            css_class = 'performance-hold'
+                        
+                        with perf_cols[col_idx]:
+                            st.markdown(f"""
+                            <div class="{css_class} performance-card">
+                                <h6 style="margin: 0 0 5px 0; font-weight: bold;">{stock}</h6>
+                                <p style="margin: 0; font-size: 0.9em;"><strong>{weekly_outlook}</strong></p>
+                                <p style="margin: 0; font-size: 0.9em;">Target: {weekly_target:+.1f}%</p>
+                            </div>
+                            """, unsafe_allow_html=True)
+        
+        with sector_tab3:
+            st.markdown(f'<div class="timeframe-header"><h4>📅 {analysis_target} - Monthly Planetary Calendar</h4></div>', unsafe_allow_html=True)
+            
+            if custom_symbol:
+                # Show custom symbol monthly analysis
+                monthly_data = generate_symbol_monthly_data(custom_symbol.upper())
+                
+                # Monthly calendar display
+                st.markdown("#### 📆 Complete Monthly Timeline")
+                
+                # Group by weeks
+                weeks = []
+                current_week = []
+                
+                for day_data in monthly_data:
+                    current_week.append(day_data)
+                    if len(current_week) == 7:
+                        weeks.append(current_week)
+                        current_week = []
+                
+                if current_week:
+                    weeks.append(current_week)
+                
+                # Display weeks
+                for week_idx, week in enumerate(weeks[:4]):  # First 4 weeks
+                    st.markdown(f"**Week {week_idx + 1}**")
+                    display_calendar_grid(week, 7)
+                
+                # Monthly Performance Summary for custom symbol
+                st.markdown(f"### 📈 {custom_symbol.upper()} - Monthly Performance Forecast")
+                
+                strong_bullish_count = sum(1 for day in monthly_data if 'Strong Bullish' in day['trend'] or 'Peak Bullish' in day['trend'])
+                bullish_count = sum(1 for day in monthly_data if day['trend'] == 'Bullish')
+                bearish_count = sum(1 for day in monthly_data if 'Bearish' in day['trend'])
+                volatile_count = sum(1 for day in monthly_data if day['trend'] == 'Volatile')
+                
+                monthly_symbol_col1, monthly_symbol_col2, monthly_symbol_col3 = st.columns(3)
+                
+                with monthly_symbol_col1:
+                    st.markdown(f"""
+                    <div class="report-section" style="background: #d4edda; border-left: 5px solid #28a745;">
+                        <h4 style="color: #155724;">🟢 Strong Bullish Period</h4>
+                        <h2 style="color: #155724;">{strong_bullish_count} Days</h2>
+                        <p>Peak accumulation opportunities for {custom_symbol.upper()}</p>
+                        <p><strong>Strategy:</strong> Heavy buying, long-term positions</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with monthly_symbol_col2:
+                    st.markdown(f"""
+                    <div class="report-section" style="background: #d1ecf1; border-left: 5px solid #17a2b8;">
+                        <h4 style="color: #0c5460;">✅ Bullish Period</h4>
+                        <h2 style="color: #0c5460;">{bullish_count} Days</h2>
+                        <p>Good entry points for {custom_symbol.upper()}</p>
+                        <p><strong>Strategy:</strong> Regular buying, SIP approach</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with monthly_symbol_col3:
+                    st.markdown(f"""
+                    <div class="report-section" style="background: #f8d7da; border-left: 5px solid #dc3545;">
+                        <h4 style="color: #721c24;">🔴 Bearish Period</h4>
+                        <h2 style="color: #721c24;">{bearish_count} Days</h2>
+                        <p>Profit booking for {custom_symbol.upper()}</p>
+                        <p><strong>Strategy:</strong> Book profits, avoid fresh buying</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # Monthly price targets and levels
+                st.markdown(f"### 🎯 {custom_symbol.upper()} - Monthly Price Targets & Key Levels")
+                
+                symbol_data = generate_symbol_data(custom_symbol.upper())
+                current_price = symbol_data['price']
+                
+                monthly_target_col1, monthly_target_col2 = st.columns(2)
+                
+                with monthly_target_col1:
+                    upside_target = current_price * (1 + random.uniform(0.05, 0.25))
+                    resistance_1 = current_price * (1 + random.uniform(0.02, 0.08))
+                    resistance_2 = current_price * (1 + random.uniform(0.12, 0.20))
+                    
+                    st.markdown(f"""
+                    <div class="report-section" style="background: #d4edda; border-left: 5px solid #28a745;">
+                        <h4 style="color: #155724;">📈 Upside Targets</h4>
+                        <p><strong>Current Price:</strong> ₹{current_price:.2f}</p>
+                        <p><strong>Resistance 1:</strong> ₹{resistance_1:.2f} (+{((resistance_1/current_price - 1) * 100):.1f}%)</p>
+                        <p><strong>Resistance 2:</strong> ₹{resistance_2:.2f} (+{((resistance_2/current_price - 1) * 100):.1f}%)</p>
+                        <p><strong>Monthly Target:</strong> ₹{upside_target:.2f} (+{((upside_target/current_price - 1) * 100):.1f}%)</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with monthly_target_col2:
+                    downside_target = current_price * (1 - random.uniform(0.05, 0.20))
+                    support_1 = current_price * (1 - random.uniform(0.02, 0.08))
+                    support_2 = current_price * (1 - random.uniform(0.12, 0.18))
+                    
+                    st.markdown(f"""
+                    <div class="report-section" style="background: #f8d7da; border-left: 5px solid #dc3545;">
+                        <h4 style="color: #721c24;">📉 Downside Levels</h4>
+                        <p><strong>Current Price:</strong> ₹{current_price:.2f}</p>
+                        <p><strong>Support 1:</strong> ₹{support_1:.2f} ({((support_1/current_price - 1) * 100):.1f}%)</p>
+                        <p><strong>Support 2:</strong> ₹{support_2:.2f} ({((support_2/current_price - 1) * 100):.1f}%)</p>
+                        <p><strong>Stop Loss:</strong> ₹{downside_target:.2f} ({((downside_target/current_price - 1) * 100):.1f}%)</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # Symbol-specific monthly insights
+                st.markdown(f"### 🎯 {custom_symbol.upper()} - Monthly Trading Strategy")
+                
+                strategy_insights = [
+                    f"**Best Entry Zone:** ₹{support_1:.2f} - ₹{current_price * 0.98:.2f}",
+                    f"**Profit Booking:** ₹{resistance_1:.2f} - ₹{resistance_2:.2f}",
+                    f"**Stop Loss:** Below ₹{support_2:.2f}",
+                    f"**Risk-Reward Ratio:** 1:{((resistance_1 - current_price)/(current_price - support_2)):.1f}",
+                    f"**Position Size:** Allocate based on {random.choice(['High', 'Medium', 'Low'])} conviction"
+                ]
+                
+                strategy_col1, strategy_col2 = st.columns(2)
+                
+                with strategy_col1:
+                    st.markdown("""
+                    <div class="report-section" style="background: #e3f2fd; border-left: 5px solid #2196f3;">
+                        <h4 style="color: #1565c0;">📋 Key Trading Levels</h4>
+                    """, unsafe_allow_html=True)
+                    
+                    for insight in strategy_insights[:3]:
+                        st.markdown(f"• {insight}")
+                    
+                    st.markdown("</div>", unsafe_allow_html=True)
+                
+                with strategy_col2:
+                    st.markdown("""
+                    <div class="report-section" style="background: #f3e5f5; border-left: 5px solid #9c27b0;">
+                        <h4 style="color: #7b1fa2;">🎯 Risk Management</h4>
+                    """, unsafe_allow_html=True)
+                    
+                    for insight in strategy_insights[3:]:
+                        st.markdown(f"• {insight}")
+                    
+                    st.markdown("</div>", unsafe_allow_html=True)
+                
+                # Custom symbol weekly summary
+                st.markdown(f"### 📈 {custom_symbol.upper()} - Weekly Trading Analysis")
+                
+                bullish_days = [day for day in weekly_data if 'Bullish' in day['trend']]
+                bearish_days = [day for day in weekly_data if 'Bearish' in day['trend']]
+                
+                weekly_symbol_col1, weekly_symbol_col2 = st.columns(2)
+                
+                with weekly_symbol_col1:
+                    st.markdown(f"""
+                    <div class="report-section" style="background: #d4edda; border-left: 5px solid #28a745;">
+                        <h4 style="color: #155724;">🟢 {custom_symbol.upper()} LONG Opportunities</h4>
+                    """, unsafe_allow_html=True)
+                    
+                    for day in bullish_days:
+                        st.markdown(f"**{day['day']}:** {day['planet']} | **{day['rating']}** | Target: {day['target']}")
+                    
+                    st.markdown(f"<p><strong>Strategy:</strong> Accumulate {custom_symbol.upper()} on dips during bullish days</p></div>", unsafe_allow_html=True)
+                
+                with weekly_symbol_col2:
+                    st.markdown(f"""
+                    <div class="report-section" style="background: #f8d7da; border-left: 5px solid #dc3545;">
+                        <h4 style="color: #721c24;">🔴 {custom_symbol.upper()} SHORT Opportunities</h4>
+                    """, unsafe_allow_html=True)
+                    
+                    for day in bearish_days:
+                        st.markdown(f"**{day['day']}:** {day['planet']} | **{day['rating']}** | Target: {day['target']}")
+                    
+                    st.markdown(f"<p><strong>Strategy:</strong> Book profits or short {custom_symbol.upper()} on rallies</p></div>", unsafe_allow_html=True)
+                
+                # Weekly performance summary
+                st.markdown(f"### 📊 {custom_symbol.upper()} - Weekly Performance Forecast")
+                
+                weekly_perf_col1, weekly_perf_col2, weekly_perf_col3 = st.columns(3)
+                
+                strong_buy_days = sum(1 for day in weekly_data if day['rating'] == 'Strong Buy')
+                buy_days = sum(1 for day in weekly_data if day['rating'] == 'Buy')
+                sell_days = sum(1 for day in weekly_data if day['rating'] == 'Sell')
+                
+                with weekly_perf_col1:
+                    st.markdown(f"""
+                    <div class="performance-strong-buy performance-card">
+                        <h5 style="margin: 0 0 5px 0;">⭐ Strong Buy Days</h5>
+                        <h2 style="margin: 0;">{strong_buy_days}</h2>
+                        <p style="margin: 0; font-size: 0.9em;">Peak accumulation opportunities</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with weekly_perf_col2:
+                    st.markdown(f"""
+                    <div class="performance-buy performance-card">
+                        <h5 style="margin: 0 0 5px 0;">✅ Buy Days</h5>
+                        <h2 style="margin: 0;">{buy_days}</h2>
+                        <p style="margin: 0; font-size: 0.9em;">Good entry opportunities</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with weekly_perf_col3:
+                    st.markdown(f"""
+                    <div class="performance-sell performance-card">
+                        <h5 style="margin: 0 0 5px 0;">❌ Sell Days</h5>
+                        <h2 style="margin: 0;">{sell_days}</h2>
+                        <p style="margin: 0; font-size: 0.9em;">Profit booking recommended</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+            
+            else:
+                # Show sector weekly analysis (existing code)
+                weekly_data = generate_weekly_calendar(analysis_target)
+                display_calendar_grid(weekly_data, 7)
             
             # Weekly Long/Short Analysis
             st.markdown("### 🎯 Weekly Trading Opportunities")
