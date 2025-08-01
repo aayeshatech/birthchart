@@ -875,6 +875,7 @@ def create_timeframe_tabs(market_name, market_type=""):
 current_date = datetime.now()
 current_date_str = current_date.strftime('%d %B %Y')
 current_day = current_date.strftime('%A')
+current_time_str = current_date.strftime('%H:%M:%S')  # This was missing!
 tomorrow_date = (current_date + timedelta(days=1)).strftime('%d %B %Y')
 tomorrow_day = (current_date + timedelta(days=1)).strftime('%A')
 
