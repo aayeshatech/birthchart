@@ -395,7 +395,7 @@ with planetary_tab:
                 
                 st.markdown(f"""
                 <div style="background: {period_bg}; color: {period_color}; padding: 20px; border-radius: 12px; margin: 15px 0; border: 3px solid {period_color};">
-                    <h4 style="margin: 0 0 15px 0; color: {period_color}; text-align: center;">📅 {period_data['period']}</h4>
+                    <h4 style="margin: 0 0 15px 0; color: {period_color}; text-align: center;"> {period_data['period']}</h4>
                     
                     <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 8px;">
                         <h5 style="margin: 0 0 10px 0; color: {period_color};"> Major Transit: {period_data['major_event']}</h5>
