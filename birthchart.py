@@ -228,10 +228,10 @@ with planetary_tab:
                     </div>
                     
                     <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px; margin: 10px 0;">
-                        <p style="margin: 0 0 8px 0; font-size: 1.1em; font-weight: bold;"><strong>🌟 Nakshatra:</strong> {transit['nakshatra']}</p>
-                        <p style="margin: 0 0 8px 0; font-size: 1em;"><strong>📊 Market Effect:</strong> {transit['effect']}</p>
-                        <p style="margin: 0 0 8px 0; font-size: 1em;"><strong>🏢 Sectors Affected:</strong> {', '.join(transit['sectors_affected'])}</p>
-                        <p style="margin: 0 0 8px 0; font-size: 1em;"><strong>💡 Trading Strategy:</strong> {transit['recommendation']}</p>
+                        <p style="margin: 0 0 8px 0; font-size: 1.1em; font-weight: bold;"><strong> Nakshatra:</strong> {transit['nakshatra']}</p>
+                        <p style="margin: 0 0 8px 0; font-size: 1em;"><strong> Market Effect:</strong> {transit['effect']}</p>
+                        <p style="margin: 0 0 8px 0; font-size: 1em;"><strong> Sectors Affected:</strong> {', '.join(transit['sectors_affected'])}</p>
+                        <p style="margin: 0 0 8px 0; font-size: 1em;"><strong> Trading Strategy:</strong> {transit['recommendation']}</p>
                         <p style="margin: 0; font-size: 1em;"><strong>⚡ Planetary Strength:</strong> {transit['strength']}</p>
                     </div>
                 </div>
