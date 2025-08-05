@@ -395,7 +395,7 @@ with planetary_tab:
                 
                 st.markdown(f"""
                 <div style="background: {period_bg}; color: {period_color}; padding: 20px; border-radius: 12px; margin: 15px 0; border: 3px solid {period_color};">
-                    <h4 style="margin: 0 0 15px 0; color: {period_color}; text-align: center;">📅 {period_data['period']}</h4>
+                    <h4 style="margin: 0 0 15px 0; color: {period_color}; text-align: center;"> {period_data['period']}</h4>
                     
                     <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 8px;">
                         <h5 style="margin: 0 0 10px 0; color: {period_color};"> Major Transit: {period_data['major_event']}</h5>
@@ -403,7 +403,7 @@ with planetary_tab:
                         <p style="margin: 0 0 10px 0; font-size: 1em;"><strong> Best Sectors:</strong> {', '.join(period_data['best_sectors'])}</p>
                         <p style="margin: 0 0 10px 0; font-size: 1em;"><strong> Strategy:</strong> {period_data['strategy']}</p>
                         <p style="margin: 0; font-size: 1.1em; text-align: center;">
-                            <strong>📈 Overall Impact:</strong> 
+                            <strong> Overall Impact:</strong> 
                             <span style="background: {period_color}; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold;">
                                 {period_data['impact_level']}
                             </span>
