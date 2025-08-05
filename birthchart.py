@@ -61,7 +61,7 @@ with planetary_tab:
                             </span>
                         </div>
                         <p style="margin: 0; font-size: 1.1em; font-weight: bold; color: {week_info['color']};">
-                            💡 {week_info['strategy']}
+                             {week_info['strategy']}
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
