@@ -403,7 +403,7 @@ with planetary_tab:
                         <p style="margin: 0 0 10px 0; font-size: 1em;"><strong> Best Sectors:</strong> {', '.join(period_data['best_sectors'])}</p>
                         <p style="margin: 0 0 10px 0; font-size: 1em;"><strong> Strategy:</strong> {period_data['strategy']}</p>
                         <p style="margin: 0; font-size: 1.1em; text-align: center;">
-                            <strong>📈 Overall Impact:</strong> 
+                            <strong> Overall Impact:</strong> 
                             <span style="background: {period_color}; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold;">
                                 {period_data['impact_level']}
                             </span>
@@ -413,7 +413,7 @@ with planetary_tab:
                 """, unsafe_allow_html=True)
             
             # Monthly stock-specific predictions
-            st.markdown("### 📊 Top Stocks - Monthly Planetary Outlook")
+            st.markdown("###  Top Stocks - Monthly Planetary Outlook")
             
             stock_monthly_predictions = [
                 {'stock': 'RELIANCE', 'planet': 'Venus ♀', 'effect': 'Energy + Luxury combo strong', 'target': '+15-20%', 'rating': 'Strong Buy'},
