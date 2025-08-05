@@ -228,11 +228,11 @@ with planetary_tab:
                     </div>
                     
                     <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px; margin: 10px 0;">
-                        <p style="margin: 0 0 8px 0; font-size: 1.1em; font-weight: bold;"><strong>🌟 Nakshatra:</strong> {transit['nakshatra']}</p>
-                        <p style="margin: 0 0 8px 0; font-size: 1em;"><strong>📊 Market Effect:</strong> {transit['effect']}</p>
-                        <p style="margin: 0 0 8px 0; font-size: 1em;"><strong>🏢 Sectors Affected:</strong> {', '.join(transit['sectors_affected'])}</p>
-                        <p style="margin: 0 0 8px 0; font-size: 1em;"><strong>💡 Trading Strategy:</strong> {transit['recommendation']}</p>
-                        <p style="margin: 0; font-size: 1em;"><strong>⚡ Planetary Strength:</strong> {transit['strength']}</p>
+                        <p style="margin: 0 0 8px 0; font-size: 1.1em; font-weight: bold;"><strong> Nakshatra:</strong> {transit['nakshatra']}</p>
+                        <p style="margin: 0 0 8px 0; font-size: 1em;"><strong> Market Effect:</strong> {transit['effect']}</p>
+                        <p style="margin: 0 0 8px 0; font-size: 1em;"><strong> Sectors Affected:</strong> {', '.join(transit['sectors_affected'])}</p>
+                        <p style="margin: 0 0 8px 0; font-size: 1em;"><strong> Trading Strategy:</strong> {transit['recommendation']}</p>
+                        <p style="margin: 0; font-size: 1em;"><strong> Planetary Strength:</strong> {transit['strength']}</p>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -302,7 +302,7 @@ with planetary_tab:
                     st.markdown(f"""
                     <div style="{date_style} padding: 15px; border-radius: 10px; text-align: center; margin: 10px 0;">
                         <h4 style="margin: 0; font-weight: bold;">{day_transit['date']}</h4>
-                        {f'<p style="margin: 5px 0 0 0; font-size: 0.8em;">🔥 CURRENT DAY</p>' if is_today else ''}
+                        {f'<p style="margin: 5px 0 0 0; font-size: 0.8em;"> CURRENT DAY</p>' if is_today else ''}
                     </div>
                     """, unsafe_allow_html=True)
                 
@@ -398,10 +398,10 @@ with planetary_tab:
                     <h4 style="margin: 0 0 15px 0; color: {period_color}; text-align: center;">📅 {period_data['period']}</h4>
                     
                     <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 8px;">
-                        <h5 style="margin: 0 0 10px 0; color: {period_color};">🌟 Major Transit: {period_data['major_event']}</h5>
-                        <p style="margin: 0 0 10px 0; font-size: 1em;"><strong>📊 Market Effect:</strong> {period_data['effect']}</p>
-                        <p style="margin: 0 0 10px 0; font-size: 1em;"><strong>🏢 Best Sectors:</strong> {', '.join(period_data['best_sectors'])}</p>
-                        <p style="margin: 0 0 10px 0; font-size: 1em;"><strong>💡 Strategy:</strong> {period_data['strategy']}</p>
+                        <h5 style="margin: 0 0 10px 0; color: {period_color};"> Major Transit: {period_data['major_event']}</h5>
+                        <p style="margin: 0 0 10px 0; font-size: 1em;"><strong> Market Effect:</strong> {period_data['effect']}</p>
+                        <p style="margin: 0 0 10px 0; font-size: 1em;"><strong> Best Sectors:</strong> {', '.join(period_data['best_sectors'])}</p>
+                        <p style="margin: 0 0 10px 0; font-size: 1em;"><strong> Strategy:</strong> {period_data['strategy']}</p>
                         <p style="margin: 0; font-size: 1.1em; text-align: center;">
                             <strong>📈 Overall Impact:</strong> 
                             <span style="background: {period_color}; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold;">
@@ -446,10 +446,10 @@ with planetary_tab:
                 with prediction_cols[col_idx]:
                     st.markdown(f"""
                     <div style="background: {rating_bg}; color: {rating_color}; padding: 15px; border-radius: 10px; margin: 8px 0; border: 2px solid {rating_color};">
-                        <h5 style="margin: 0 0 10px 0; color: {rating_color};">📊 {prediction['stock']}</h5>
-                        <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong>🪐 Ruling Planet:</strong> {prediction['planet']}</p>
-                        <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong>🌟 Effect:</strong> {prediction['effect']}</p>
-                        <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong>🎯 Target:</strong> {prediction['target']}</p>
+                        <h5 style="margin: 0 0 10px 0; color: {rating_color};"> {prediction['stock']}</h5>
+                        <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong> Ruling Planet:</strong> {prediction['planet']}</p>
+                        <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong> Effect:</strong> {prediction['effect']}</p>
+                        <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong> Target:</strong> {prediction['target']}</p>
                         <p style="margin: 0; font-size: 1em; text-align: center;">
                             <span style="background: {rating_color}; color: white; padding: 4px 12px; border-radius: 15px; font-weight: bold; font-size: 0.9em;">
                                 {prediction['rating']}
