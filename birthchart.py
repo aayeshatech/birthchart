@@ -75,7 +75,7 @@ with planetary_tab:
                 
                 st.markdown(f"""
                 <div style="background: linear-gradient(45deg, {sentiment_color}20, {sentiment_color}10); border: 3px solid {sentiment_color}; border-radius: 15px; padding: 20px; margin: 20px 0; text-align: center;">
-                    <h3 style="margin: 0 0 10px 0; color: {sentiment_color};">📊 {analysis_target} SECTOR - AUGUST 2025 OUTLOOK</h3>
+                    <h3 style="margin: 0 0 10px 0; color: {sentiment_color};"> {analysis_target} SECTOR - AUGUST 2025 OUTLOOK</h3>
                     <h2 style="margin: 0 0 15px 0; color: {sentiment_color}; font-size: 2em;">{sector_sentiment}</h2>
                     <p style="margin: 0; font-size: 1.2em; color: {sentiment_color}; font-weight: bold;">
                         {total_bullish} Bullish Days | {total_bearish} Bearish Days | {volatile_count} Volatile Days
